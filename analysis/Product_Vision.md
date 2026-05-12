@@ -102,46 +102,54 @@ SterioX là **hệ thống độc lập** (web + backend) dùng để học tíc
 ---
 ## 5. Các Tính năng của Sản phẩm (Product Features)
 **A. Người dùng & tài khoản**
-- **FEAT-01:** Đăng ký/đăng nhập — email (và social nếu học OAuth), xác minh email tùy môi trường, khôi phục mật khẩu, MFA tùy chọn (chủ đề học bảo mật).
+- **FEAT-01:** Đăng ký/đăng nhập — email/social (tùy cấu hình), xác minh email, khôi phục mật khẩu, MFA tùy chọn.
 - **FEAT-02:** Hồ sơ người dùng — avatar, bio, liên kết, cài đặt riêng tư, chặn người dùng.
-- **FEAT-03:** RBAC — vai trò Viewer, Streamer, Mod kênh, Admin; ma trận quyền API/UI (**trọng tâm học tập**).
+- **FEAT-03:** RBAC — vai trò Viewer, Streamer, Mod kênh, Admin; ma trận quyền API/UI.
 - **FEAT-04:** Quản lý phiên & thiết bị — đăng xuất mọi nơi, danh sách phiên (nâng cao).
+
 **B. Livestream & quản lý luồng**
 - **FEAT-05:** Phát live video — khóa stream, gợi ý bitrate, trạng thái live/offline.
 - **FEAT-06:** Danh mục & thẻ — category, tag có kiểm soát, metadata phục vụ tìm kiếm.
 - **FEAT-07:** Lịch phát — tạo lịch, hiển thị kênh, nhắc qua thông báo.
 - **FEAT-08:** VOD / Replay — lưu sau live, public/unlisted/private, retention theo chính sách demo.
-- **FEAT-09:** Clip highlight — cắt đoạn ngắn, link chia sẻ, quota học tập.
-- **FEAT-10:** Trạng thái kênh — tiêu đề phiên, viewer count (có thể làm tròn trong demo).
+- **FEAT-10:** Trạng thái kênh — tiêu đề phiên, viewer count.
+
 **C. Chat & tương tác trên stream**
-- **FEAT-11:** Chat realtime — tin nhắn, mention, emoji/sticker nếu có.
+- **FEAT-11:** Chat realtime — tin nhắn, mention, emoji/sticker.
 - **FEAT-12:** Slow mode & follower-only chat.
 - **FEAT-13:** Pin message / announcement.
+
 **D. Cộng đồng**
 - **FEAT-14:** Group / community — tạo, mô tả, quy tắc, ảnh bìa.
 - **FEAT-15:** Group chat — realtime, phân quyền thành viên/mod group.
 - **FEAT-16:** Follow streamer — feed theo dõi, trạng thái live.
-- **FEAT-17:** Subscribe streamer — **luồng sandbox**: badge/emote có thể đơn giản hóa; học chu kỳ gia hạn/hủy trên dữ liệu thử.
-**E. Monetization (học tập / sandbox)**
+- **FEAT-17:** Subscribe streamer — **luồng sandbox**: badge/emote.
+
+**E. Monetization (sandbox)**
 - **FEAT-18:** Donate / tips — tích hợp **sandbox** hoặc ghi nhận nội bộ không tiền thật; lọc từ khóa khi hiển thị cảm ơn.
-- **FEAT-19:** Quà ảo — catalog và animation; “doanh thu” chỉ mang tính minh họa hoặc điểm ảo trong demo.
+- **FEAT-19:** Quà ảo — catalog và animation; “doanh thu” chỉ mang tính minh họa hoặc điểm ảo.
 - **FEAT-20:** Báo cáo thu nhập (demo) — export CSV, trạng thái payout **mô phỏng** để học báo cáo và reconciliation cơ bản.
+
 **F. Khám phá & gợi ý**
 - **FEAT-21:** Tìm kiếm — kênh, tiêu đề, tag; phân trang; lọc live/VOD.
 - **FEAT-22:** Trang khám phá — top theo danh mục, mới, đề xuất đơn giản.
 - **FEAT-23:** Gợi ý — heuristic trước; mở rộng theo lịch sử nếu có thời gian (học recommendation từ từ).
+
 **G. Kiểm duyệt & an toàn**
 - **FEAT-24:** Công cụ mod kênh — timeout, ban, xóa tin nhắn, từ cấm.
 - **FEAT-25:** Hệ thống báo cáo — stream, user, chat; queue cho admin/mod.
 - **FEAT-26:** Anti-spam — rate limit, CAPTCHA khi cần; chính sách shadowban chỉ áp dụng trong phạm vi demo có tài liệu.
-- **FEAT-27:** Gỡ nội dung / bản quyền (học quy trình) — gỡ VOD/clip, lưu vết quyết định.
+- **FEAT-27:** Gỡ nội dung / bản quyền — gỡ VOD/clip, lưu vết quyết định.
+
 **H. Thông báo**
 - **FEAT-28:** Thông báo realtime trong web.
 - **FEAT-29:** Email/push tùy chọn — phục vụ học tích hợp bên thứ ba.
+
 **I. Admin & vận hành (demo)**
-- **FEAT-30:** Admin dashboard — người dùng, stream live, báo cáo, giao dịch bất thường (trong dữ liệu thử).
+- **FEAT-30:** Admin dashboard — người dùng, stream live, báo cáo, giao dịch bất thường.
 - **FEAT-31:** Quản lý danh mục & tag — CRUD, ẩn/hiện, gộp tag.
 - **FEAT-32:** Audit log — hành động quan trọng, export phục vụ báo cáo.
+
 **J. Phân tích**
 - **FEAT-33:** Analytics cho streamer — concurrent viewers, nguồn traffic đơn giản, retention phiên; “doanh thu” theo loại nếu bật module sandbox.
 
