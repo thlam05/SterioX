@@ -6,25 +6,25 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import com.thlam05.steriox.common.enums.ResponseCode;
+import com.thlam05.steriox.common.enums.ResponseStatus;
 import com.thlam05.steriox.common.response.ApiResponse;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApiResponse<Void>> handlingAppException(AppException exception) {
-        ResponseCode code = exception.getResponseCode();
+        ResponseStatus code = exception.getResponseStatus();
         if (code == null) {
-            code = ResponseCode.INTERNAL_SERVER_ERROR;
+            code = ResponseStatus.INTERNAL_SERVER_ERROR;
         }
         ApiResponse<Void> apiResponse = new ApiResponse<>(code);
 
-        return ResponseEntity.status(code.getStatus()).body(apiResponse);
+        return ResponseEntity.status(code.getHttpStatus()).body(apiResponse);
     }
 
     @ExceptionHandler(value = Exception.class)
     ResponseEntity<ApiResponse<Void>> handlingAppException(Exception exception) {
-        ResponseCode code = ResponseCode.INTERNAL_SERVER_ERROR;
+        ResponseStatus code = ResponseStatus.INTERNAL_SERVER_ERROR;
         ApiResponse<Void> apiResponse = new ApiResponse<>(code);
 
         apiResponse.setCode(code.getCode());
@@ -36,13 +36,13 @@ public class GlobalExceptionHandler {
         }
         apiResponse.setSuccess(success);
 
-        return ResponseEntity.status(code.getStatus()).body(apiResponse);
+        return ResponseEntity.status(code.getHttpStatus()).body(apiResponse);
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     ResponseEntity<ApiResponse<Void>> handlingMethodArgumentNotValidException(
             MethodArgumentNotValidException exception) {
-        ResponseCode code = ResponseCode.BAD_LOGIN_REQUEST;
+        ResponseStatus code = ResponseStatus.BAD_REQUEST;
         ApiResponse<Void> apiResponse = new ApiResponse<>(null);
 
         apiResponse.setCode(code.getCode());
@@ -56,12 +56,12 @@ public class GlobalExceptionHandler {
         }
         apiResponse.setSuccess(success);
 
-        return ResponseEntity.status(code.getStatus()).body(apiResponse);
+        return ResponseEntity.status(code.getHttpStatus()).body(apiResponse);
     }
 
     @ExceptionHandler(value = NoResourceFoundException.class)
     ResponseEntity<ApiResponse<Void>> handlingNoHandlerFoundException(NoResourceFoundException exception) {
-        ResponseCode code = ResponseCode.NOT_FOUND;
+        ResponseStatus code = ResponseStatus.NOT_FOUND;
         ApiResponse<Void> apiResponse = new ApiResponse<>(null);
 
         apiResponse.setCode(code.getCode());
@@ -73,6 +73,6 @@ public class GlobalExceptionHandler {
         }
         apiResponse.setSuccess(success);
 
-        return ResponseEntity.status(code.getStatus()).body(apiResponse);
+        return ResponseEntity.status(code.getHttpStatus()).body(apiResponse);
     }
 }
