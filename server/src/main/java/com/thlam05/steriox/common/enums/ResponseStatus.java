@@ -2,21 +2,58 @@ package com.thlam05.steriox.common.enums;
 
 import org.springframework.http.HttpStatus;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Getter
 public enum ResponseStatus {
-    SUCCESS(0, "Successfully", HttpStatus.OK),
-    BAD_REQUEST(1, "Bad request", HttpStatus.BAD_REQUEST),
-    NOT_FOUND(4, "Can not find", HttpStatus.NOT_FOUND),
-    INTERNAL_SERVER_ERROR(5, "Server is error", HttpStatus.INTERNAL_SERVER_ERROR),
 
-    BAD_LOGIN_REQUEST(6, "Username or password is wrong", HttpStatus.BAD_REQUEST),
-    USER_ALREADY_EXISTS(7, "Username already exists", HttpStatus.BAD_REQUEST);
+    // ===== SUCCESS =====
+    SUCCESS(
+            0,
+            "Success",
+            HttpStatus.OK),
+
+    // ===== CLIENT ERRORS =====
+    BAD_REQUEST(
+            1000,
+            "Bad request",
+            HttpStatus.BAD_REQUEST),
+
+    UNAUTHORIZED(
+            1001,
+            "Unauthorized",
+            HttpStatus.UNAUTHORIZED),
+
+    FORBIDDEN(
+            1003,
+            "Forbidden",
+            HttpStatus.FORBIDDEN),
+
+    NOT_FOUND(
+            1004,
+            "Resource not found",
+            HttpStatus.NOT_FOUND),
+
+    // ===== AUTH ERRORS =====
+    INVALID_USERNAME_OR_PASSWORD(
+            2000,
+            "Invalid username or password",
+            HttpStatus.BAD_REQUEST),
+
+    USER_ALREADY_EXISTS(
+            2001,
+            "User already exists",
+            HttpStatus.BAD_REQUEST),
+
+    // ===== SERVER ERRORS =====
+    INTERNAL_SERVER_ERROR(
+            5000,
+            "Internal server error",
+            HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final int code;
     private final String message;
-    private final HttpStatus status;
+    private final HttpStatus httpStatus;
 }

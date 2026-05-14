@@ -5,7 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.thlam05.steriox.common.enums.ResponseCode;
+import com.thlam05.steriox.common.enums.ResponseStatus;
 import com.thlam05.steriox.common.exception.AppException;
 import com.thlam05.steriox.common.service.JwtService;
 import com.thlam05.steriox.modules.auth.dto.request.LoginRequest;
@@ -26,7 +26,7 @@ public class AuthService {
 
     public TokenResponse register(RegisterRequest request) {
         if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
-            throw new AppException(ResponseCode.BAD_REQUEST);
+            throw new AppException(ResponseStatus.BAD_REQUEST);
         }
         if (userRepository.existsByUsernameIgnoreCase(request.getUsername())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already taken");
