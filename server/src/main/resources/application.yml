@@ -13,3 +13,10 @@ spring:
         driverClassName: org.postgresql.Driver
         password: ${DBMS_PASSWORD:root}
         username: ${DBMS_USERNAME:root}
+    jpa:
+        hibernate:
+            ddl-auto: update
+
+jwt:
+    secretKey: ${JWT_SECRET_KEY:local-dev-secret-key-32bytes!!!}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}

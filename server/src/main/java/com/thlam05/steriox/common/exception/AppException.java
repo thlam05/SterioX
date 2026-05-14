@@ -1,4 +1,6 @@
-package com.thlam05.steriox.common.exceptions;
+package com.thlam05.steriox.common.exception;
+
+import com.thlam05.steriox.common.enums.ResponseCode;
 
 import lombok.Getter;
 import lombok.Setter;
