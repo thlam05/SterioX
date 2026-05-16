@@ -1,0 +1,22 @@
+server:
+    port: ${PORT:8080}
+    servlet:
+        context-path: "/api"
+
+spring:
+    profiles:
+        active: local
+    application:
+        name: "SterioX"
+    datasource:
+        url: ${DBMS_CONNECTION:jdbc:postgresql://localhost:5432/sterio_x}
+        driverClassName: org.postgresql.Driver
+        password: ${DBMS_PASSWORD:root}
+        username: ${DBMS_USERNAME:root}
+    jpa:
+        hibernate:
+            ddl-auto: update
+
+jwt:
+    secretKey: ${JWT_SECRET_KEY:local-dev-secret-key-32bytes!!!}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
