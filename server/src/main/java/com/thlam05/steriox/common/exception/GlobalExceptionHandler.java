@@ -1,8 +1,7 @@
 package com.thlam05.steriox.common.exception;
 
-import java.nio.file.AccessDeniedException;
-
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -59,6 +58,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = AccessDeniedException.class)
     ResponseEntity<ApiResponse<Void>> handlingAccessDeniedException(AccessDeniedException exception) {
+        System.out.println("TESSSST");
         ResponseStatus code = ResponseStatus.UNAUTHORIZED;
         ApiResponse<Void> apiResponse = new ApiResponse<>(null);
 

@@ -19,7 +19,10 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import com.thlam05.steriox.common.enums.RoleType;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private String[] PUBLIC_ENDPOINT = { "/auth/login", "/auth/register", "/ws/**" };
@@ -27,15 +30,24 @@ public class SecurityConfig {
     @Value("${jwt.secretKey}")
     private String secretKey;
 
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
+
         httpSecurity.authorizeHttpRequests(request -> request
                 .requestMatchers(PUBLIC_ENDPOINT).permitAll()
                 .requestMatchers(HttpMethod.GET, "/health").hasRole(RoleType.ADMIN.name())
                 .anyRequest().authenticated());
-        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder())
-                .jwtAuthenticationConverter(jwtAuthenticationConverter())));
+
+        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2
+                .jwt(jwtConfigurer -> jwtConfigurer
+                        .decoder(jwtDecoder())
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                .accessDeniedHandler(jwtAccessDeniedHandler));
+
         return httpSecurity.build();
     }
 
