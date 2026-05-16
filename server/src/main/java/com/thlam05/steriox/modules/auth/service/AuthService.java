@@ -48,7 +48,7 @@ public class AuthService {
 
     public TokenResponse login(LoginRequest request) {
         User user = userRepository
-                .findByEmailIgnoreCase(request.getEmail().trim())
+                .findByEmail(request.getEmail().trim())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
@@ -57,6 +57,6 @@ public class AuthService {
     }
 
     private TokenResponse issueToken(User user) {
-        return TokenResponse.bearer(jwtService.generateAccessToken(user.getId(), user.getUsername()));
+        return TokenResponse.bearer(jwtService.generateAccessToken(user));
     }
 }

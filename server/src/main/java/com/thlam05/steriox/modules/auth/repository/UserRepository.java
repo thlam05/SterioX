@@ -8,7 +8,7 @@ import com.thlam05.steriox.modules.auth.model.User;
 
 public interface UserRepository extends JpaRepository<User, String> {
 
-    Optional<User> findByEmailIgnoreCase(String email);
+    Optional<User> findByEmail(String email);
 
     boolean existsByEmailIgnoreCase(String email);
 

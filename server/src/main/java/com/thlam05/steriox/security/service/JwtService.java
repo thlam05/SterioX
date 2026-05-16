@@ -3,6 +3,7 @@ package com.thlam05.steriox.security.service;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.StringJoiner;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -18,24 +19,22 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import com.thlam05.steriox.modules.auth.model.User;
 
 @Component
 public class JwtService {
-
-    public static final String USERNAME_CLAIM = "username";
-
     @Value("${jwt.secretKey}")
     private String secretKey;
 
     @Value("${jwt.expiration-ms}")
     private long expirationMs;
 
-    public String generateAccessToken(String userId, String username) {
+    public String generateAccessToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(userId)
-                .claim(USERNAME_CLAIM, username)
+                .subject(user.getId())
+                .claim("scope", buildScope(user))
                 .issueTime(new Date())
                 .expirationTime(new Date(
                         Instant.now().plus(expirationMs, ChronoUnit.SECONDS).toEpochMilli()))
@@ -80,5 +79,13 @@ public class JwtService {
         } catch (Exception e) {
             throw new RuntimeException("Lỗi khi trích xuất Subject: " + e.getMessage());
         }
+    }
+
+    private String buildScope(User user) {
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        if (user.getRoles().isEmpty())
+            return "";
+        user.getRoles().forEach(role -> stringJoiner.add(role.getName()));
+        return stringJoiner.toString();
     }
 }

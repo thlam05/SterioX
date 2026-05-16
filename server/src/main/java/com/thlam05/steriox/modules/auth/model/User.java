@@ -1,7 +1,8 @@
 package com.thlam05.steriox.modules.auth.model;
 
-import java.time.LocalDateTime;
 import java.util.Set;
+
+import com.thlam05.steriox.common.model.BaseModel;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,7 +27,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Setter
 @Builder
-public class User {
+public class User extends BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
@@ -42,12 +43,6 @@ public class User {
 
     @Column(name = "avatar_image_url")
     String avatarImageUrl;
-
-    @Column(name = "created_at")
-    LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    LocalDateTime updatedAt;
 
     @ManyToMany
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_name"))
