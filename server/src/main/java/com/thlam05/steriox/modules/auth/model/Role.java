@@ -1,5 +1,6 @@
 package com.thlam05.steriox.modules.auth.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
@@ -17,7 +18,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class Role {
     @Id
+    @Column(name = "name")
     String name;
-
-    String description;
 }

@@ -1,18 +1,22 @@
 package com.thlam05.steriox.modules.auth.service;
 
+import java.util.Set;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.thlam05.steriox.common.enums.ResponseStatus;
+import com.thlam05.steriox.common.enums.RoleType;
 import com.thlam05.steriox.common.exception.AppException;
-import com.thlam05.steriox.common.service.JwtService;
 import com.thlam05.steriox.modules.auth.dto.request.LoginRequest;
 import com.thlam05.steriox.modules.auth.dto.request.RegisterRequest;
 import com.thlam05.steriox.modules.auth.dto.response.TokenResponse;
+import com.thlam05.steriox.modules.auth.model.Role;
 import com.thlam05.steriox.modules.auth.model.User;
 import com.thlam05.steriox.modules.auth.repository.UserRepository;
+import com.thlam05.steriox.security.service.JwtService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +39,8 @@ public class AuthService {
                 .email(request.getEmail().trim())
                 .username(request.getUsername().trim())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .roles(Set.of(new Role(RoleType.VIEWER.toString())))
+                .avatarImageUrl("https://source.unsplash.com/random/800x600")
                 .build();
         userRepository.save(user);
         return issueToken(user);
