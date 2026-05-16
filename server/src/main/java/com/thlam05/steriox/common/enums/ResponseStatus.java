@@ -33,7 +33,7 @@ public enum ResponseStatus {
 
     NOT_FOUND(
             1004,
-            "Resource not found",
+            "Not found",
             HttpStatus.NOT_FOUND),
 
     // ===== AUTH ERRORS =====

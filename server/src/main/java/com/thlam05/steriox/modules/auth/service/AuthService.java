@@ -2,10 +2,8 @@ package com.thlam05.steriox.modules.auth.service;
 
 import java.util.Set;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.thlam05.steriox.common.enums.ResponseStatus;
 import com.thlam05.steriox.common.enums.RoleType;
@@ -30,10 +28,10 @@ public class AuthService {
 
     public TokenResponse register(RegisterRequest request) {
         if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
-            throw new AppException(ResponseStatus.BAD_REQUEST);
+            throw new AppException(ResponseStatus.BAD_REQUEST, "Email already exists.");
         }
         if (userRepository.existsByUsernameIgnoreCase(request.getUsername())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already taken");
+            throw new AppException(ResponseStatus.BAD_REQUEST, "Username already exists.");
         }
         User user = User.builder()
                 .email(request.getEmail().trim())
@@ -49,9 +47,9 @@ public class AuthService {
     public TokenResponse login(LoginRequest request) {
         User user = userRepository
                 .findByEmail(request.getEmail().trim())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
+                .orElseThrow(() -> new AppException(ResponseStatus.INVALID_USERNAME_OR_PASSWORD));
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+            throw new AppException(ResponseStatus.INVALID_USERNAME_OR_PASSWORD);
         }
         return issueToken(user);
     }
