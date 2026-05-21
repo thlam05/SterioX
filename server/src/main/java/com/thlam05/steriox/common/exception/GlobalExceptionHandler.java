@@ -19,6 +19,7 @@ public class GlobalExceptionHandler {
             code = ResponseStatus.INTERNAL_SERVER_ERROR;
         }
         ApiResponse<Void> apiResponse = new ApiResponse<>(code);
+        apiResponse.setMessage(exception.getMessage());
 
         return ResponseEntity.status(code.getHttpStatus()).body(apiResponse);
     }
@@ -58,9 +59,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = AccessDeniedException.class)
     ResponseEntity<ApiResponse<Void>> handlingAccessDeniedException(AccessDeniedException exception) {
-        System.out.println("TESSSST");
         ResponseStatus code = ResponseStatus.UNAUTHORIZED;
-        ApiResponse<Void> apiResponse = new ApiResponse<>(null);
+        ApiResponse<Void> apiResponse = new ApiResponse<>();
 
         apiResponse.setMessage(exception.getMessage());
 

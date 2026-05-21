@@ -1,91 +1,62 @@
 package com.thlam05.steriox.security.service;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.StringJoiner;
-import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Value;
+import java.text.ParseException;
 import org.springframework.stereotype.Component;
 
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.JWSObject;
-import com.nimbusds.jose.JWSVerifier;
-import com.nimbusds.jose.Payload;
-import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jose.crypto.MACVerifier;
-import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import com.thlam05.steriox.modules.auth.model.User;
+import com.thlam05.steriox.common.enums.ResponseStatus;
+import com.thlam05.steriox.common.exception.AppException;
+import com.thlam05.steriox.modules.auth.entity.InvalidatedToken;
+import com.thlam05.steriox.modules.auth.repository.InvalidatedTokenRepository;
+import com.thlam05.steriox.modules.user.entity.User;
+import com.thlam05.steriox.modules.user.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class JwtService {
-    @Value("${jwt.secretKey}")
-    private String secretKey;
+    private final JwtGenerator jwtGenerator;
+    private final JwtValidator jwtValidator;
 
-    @Value("${jwt.expiration-ms}")
-    private long expirationMs;
+    private final InvalidatedTokenRepository invalidatedTokenRepository;
+    private final UserRepository userRepository;
 
     public String generateAccessToken(User user) {
-        JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
-
-        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getId())
-                .claim("scope", buildScope(user))
-                .issueTime(new Date())
-                .expirationTime(new Date(
-                        Instant.now().plus(expirationMs, ChronoUnit.SECONDS).toEpochMilli()))
-                .jwtID(UUID.randomUUID().toString())
-                .build();
-
-        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
-        JWSObject jwsObject = new JWSObject(header, payload);
-
-        try {
-            jwsObject.sign(new MACSigner(secretKey.getBytes()));
-            return jwsObject.serialize();
-        } catch (JOSEException e) {
-            throw new RuntimeException("Lỗi khi tạo Token: " + e.getMessage());
-        }
+        return jwtGenerator.generateAccessToken(user);
     }
 
-    public SignedJWT parseAndValidate(String token) {
-        try {
-            SignedJWT signedJWT = SignedJWT.parse(token);
-            JWSVerifier verifier = new MACVerifier(secretKey.getBytes());
+    public String refreshToken(String token) throws ParseException, JOSEException {
+        SignedJWT signedJWT = verify(token, true);
 
-            boolean verified = signedJWT.verify(verifier);
+        var jit = signedJWT.getJWTClaimsSet().getJWTID();
+        var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
 
-            Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
-            boolean isNotExpired = expirationTime.after(new Date());
+        InvalidatedToken invalidatedToken = InvalidatedToken.builder().id(jit).expireAt(expiryTime).build();
 
-            if (verified && isNotExpired) {
-                return signedJWT;
-            } else {
-                throw new RuntimeException("Token không hợp lệ hoặc đã hết hạn");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Không thể xác thực Token: " + e.getMessage());
-        }
+        invalidatedTokenRepository.save(invalidatedToken);
+
+        var userId = signedJWT.getJWTClaimsSet().getSubject();
+
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND));
+
+        token = generateAccessToken(user);
+        return token;
     }
 
-    public String extractSubject(String token) {
-        try {
-            SignedJWT signedJWT = parseAndValidate(token);
-            return signedJWT.getJWTClaimsSet().getSubject();
-        } catch (Exception e) {
-            throw new RuntimeException("Lỗi khi trích xuất Subject: " + e.getMessage());
-        }
+    public SignedJWT verify(String token, boolean isRefresh) throws ParseException, JOSEException {
+        return jwtValidator.validate(token, isRefresh);
     }
 
-    private String buildScope(User user) {
-        StringJoiner stringJoiner = new StringJoiner(" ");
-        if (user.getRoles().isEmpty())
-            return "";
-        user.getRoles().forEach(role -> stringJoiner.add(role.getName()));
-        return stringJoiner.toString();
+    public boolean introspect(String token) throws JOSEException, ParseException {
+        boolean isValid = true;
+        try {
+            verify(token, false);
+        } catch (AppException e) {
+            isValid = false;
+        }
+        return isValid;
     }
 }

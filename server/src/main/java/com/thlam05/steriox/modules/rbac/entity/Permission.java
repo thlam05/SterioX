@@ -1,4 +1,4 @@
-package com.thlam05.steriox.modules.auth.model;
+package com.thlam05.steriox.modules.rbac.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,14 +11,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-@Entity(name = "roles")
+@Entity(name = "permissions")
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 @Setter
 @Builder
-public class Role {
+public class Permission {
     @Id
     @Column(name = "name")
     String name;

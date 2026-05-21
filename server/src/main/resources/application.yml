@@ -16,7 +16,9 @@ spring:
     jpa:
         hibernate:
             ddl-auto: update
-
+            
 jwt:
-    secretKey: ${JWT_SECRET_KEY:local-dev-secret-key-32bytes!!!}
-    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+    secret-key: ${JWT_SECRET_KEY:local-dev-secret-key-32bytes!!!}
+    valid-duration: ${JWT_EXPIRATION_S:3600}
+    refreshable-duration: ${JWT_REFRESHABLE_S:86400}
+

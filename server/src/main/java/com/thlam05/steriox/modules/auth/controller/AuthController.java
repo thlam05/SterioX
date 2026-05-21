@@ -4,13 +4,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nimbusds.jose.JOSEException;
+import com.thlam05.steriox.common.enums.ResponseStatus;
 import com.thlam05.steriox.common.response.ApiResponse;
 import com.thlam05.steriox.modules.auth.dto.request.LoginRequest;
+import com.thlam05.steriox.modules.auth.dto.request.LogoutRequest;
+import com.thlam05.steriox.modules.auth.dto.request.RefreshRequest;
 import com.thlam05.steriox.modules.auth.dto.request.RegisterRequest;
 import com.thlam05.steriox.modules.auth.dto.response.TokenResponse;
 import com.thlam05.steriox.modules.auth.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
+
+import java.text.ParseException;
+
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
@@ -34,5 +41,19 @@ public class AuthController {
     public ApiResponse<TokenResponse> register(@RequestBody RegisterRequest request) {
         var response = authService.register(request);
         return new ApiResponse<TokenResponse>(response);
+    }
+
+    @PostMapping("/auth/logout")
+    public ApiResponse<TokenResponse> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
+        authService.logout(request);
+        return new ApiResponse<>(ResponseStatus.SUCCESS);
+    }
+
+    @PostMapping("/auth/refresh")
+    public ApiResponse<TokenResponse> refresh(@RequestBody RefreshRequest request)
+            throws ParseException, JOSEException {
+        var response = authService.refresh(request);
+
+        return new ApiResponse<>(response);
     }
 }
