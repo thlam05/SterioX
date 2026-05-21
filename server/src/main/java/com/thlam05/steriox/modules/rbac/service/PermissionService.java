@@ -3,6 +3,7 @@ package com.thlam05.steriox.modules.rbac.service;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.thlam05.steriox.common.enums.ResponseStatus;
@@ -32,11 +33,13 @@ public class PermissionService {
             "ROLE",
             "PERMISSION");
 
+    @PreAuthorize("hasAuthority('READ:PERMISSION')")
     public List<PermissionResponse> getAll() {
         List<Permission> permissions = permissionRepository.findAll();
         return permissionMapper.toPermissionResponses(permissions);
     }
 
+    @PreAuthorize("hasAuthority('CREATE:PERMISSION')")
     public PermissionResponse create(PermissionRequest request) {
         String permissionName = request.getName()
                 .trim()
@@ -56,6 +59,7 @@ public class PermissionService {
         return permissionMapper.toPermissionResponse(permission);
     }
 
+    @PreAuthorize("hasAuthority('DELETE:PERMISSION')")
     public void delete(String name) {
         if (!permissionRepository.existsById(name)) {
             throw new AppException(ResponseStatus.NOT_FOUND, "Permission not found");

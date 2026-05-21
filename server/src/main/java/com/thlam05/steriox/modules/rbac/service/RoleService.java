@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.thlam05.steriox.common.enums.ResponseStatus;
@@ -26,6 +27,7 @@ public class RoleService {
     private final PermissionRepository permissionRepository;
     private final RoleMapper roleMapper;
 
+    @PreAuthorize("hasAuthority('CREATE:ROLE')")
     public RoleResponse create(RoleRequest request) {
         String roleName = request.getName()
                 .trim();
@@ -55,11 +57,13 @@ public class RoleService {
         return roleMapper.toRoleResponse(role);
     }
 
+    @PreAuthorize("hasAuthority('READ:ROLE')")
     public List<RoleResponse> getAll() {
         List<Role> roles = roleRepository.findAll();
         return roleMapper.toRoleResponses(roles);
     }
 
+    @PreAuthorize("hasAuthority('DELETE:ROLE')")
     public void delete(String roleName) {
         if (!roleRepository.existsById(roleName)) {
             throw new AppException(ResponseStatus.NOT_FOUND, "Role not found");
@@ -68,6 +72,7 @@ public class RoleService {
         roleRepository.deleteById(roleName);
     }
 
+    @PreAuthorize("hasAuthority('UPDATE:ROLE')")
     public RoleResponse update(String roleName, UpdateRoleRequest request) {
         Role role = roleRepository.findById(roleName)
                 .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Role not found"));

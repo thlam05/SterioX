@@ -85,7 +85,12 @@ public class JwtService {
         StringJoiner stringJoiner = new StringJoiner(" ");
         if (user.getRoles().isEmpty())
             return "";
-        user.getRoles().forEach(role -> stringJoiner.add(role.getName()));
+        user.getRoles().forEach(role -> {
+            stringJoiner.add("ROLE_" + role.getName());
+            role.getPermissions().forEach(permission -> {
+                stringJoiner.add(permission.getName());
+            });
+        });
         return stringJoiner.toString();
     }
 }
