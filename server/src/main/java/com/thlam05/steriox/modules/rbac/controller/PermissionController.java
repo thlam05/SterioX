@@ -40,5 +40,4 @@ public class PermissionController {
         permissionService.delete(name);
         return new ApiResponse<>(ResponseStatus.SUCCESS);
     }
-
 }
