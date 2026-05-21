@@ -19,15 +19,23 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import com.thlam05.steriox.common.enums.ResponseStatus;
+import com.thlam05.steriox.common.exception.AppException;
+import com.thlam05.steriox.modules.auth.repository.InvalidatedTokenRepository;
 import com.thlam05.steriox.modules.user.entity.User;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor
 public class JwtService {
     @Value("${jwt.secretKey}")
     private String secretKey;
 
     @Value("${jwt.expiration-ms}")
     private long expirationMs;
+
+    private final InvalidatedTokenRepository invalidatedTokenRepository;
 
     public String generateAccessToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS256);
@@ -48,7 +56,7 @@ public class JwtService {
             jwsObject.sign(new MACSigner(secretKey.getBytes()));
             return jwsObject.serialize();
         } catch (JOSEException e) {
-            throw new RuntimeException("Lỗi khi tạo Token: " + e.getMessage());
+            throw new AppException(ResponseStatus.INTERNAL_SERVER_ERROR, "Token creation error");
         }
     }
 
@@ -62,13 +70,16 @@ public class JwtService {
             Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
             boolean isNotExpired = expirationTime.after(new Date());
 
-            if (verified && isNotExpired) {
+            String tokenId = signedJWT.getJWTClaimsSet().getJWTID();
+            boolean isNotInvalidated = !invalidatedTokenRepository.existsById(tokenId);
+
+            if (verified && isNotExpired && isNotInvalidated) {
                 return signedJWT;
             } else {
-                throw new RuntimeException("Token không hợp lệ hoặc đã hết hạn");
+                throw new AppException(ResponseStatus.BAD_REQUEST, "Invalid or expired token");
             }
         } catch (Exception e) {
-            throw new RuntimeException("Không thể xác thực Token: " + e.getMessage());
+            throw new AppException(ResponseStatus.INTERNAL_SERVER_ERROR, "Token cannot be verified: " + e.getMessage());
         }
     }
 
@@ -77,7 +88,7 @@ public class JwtService {
             SignedJWT signedJWT = parseAndValidate(token);
             return signedJWT.getJWTClaimsSet().getSubject();
         } catch (Exception e) {
-            throw new RuntimeException("Lỗi khi trích xuất Subject: " + e.getMessage());
+            throw new AppException(ResponseStatus.INTERNAL_SERVER_ERROR, "Error extracting Subject:" + e.getMessage());
         }
     }
 

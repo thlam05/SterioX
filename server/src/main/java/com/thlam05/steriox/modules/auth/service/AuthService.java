@@ -1,16 +1,21 @@
 package com.thlam05.steriox.modules.auth.service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Set;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.nimbusds.jwt.SignedJWT;
 import com.thlam05.steriox.common.enums.ResponseStatus;
 import com.thlam05.steriox.common.enums.RoleType;
 import com.thlam05.steriox.common.exception.AppException;
 import com.thlam05.steriox.modules.auth.dto.request.LoginRequest;
 import com.thlam05.steriox.modules.auth.dto.request.RegisterRequest;
 import com.thlam05.steriox.modules.auth.dto.response.TokenResponse;
+import com.thlam05.steriox.modules.auth.entity.InvalidatedToken;
+import com.thlam05.steriox.modules.auth.repository.InvalidatedTokenRepository;
 import com.thlam05.steriox.modules.rbac.repository.RoleRepository;
 import com.thlam05.steriox.modules.user.entity.User;
 import com.thlam05.steriox.modules.user.repository.UserRepository;
@@ -26,6 +31,7 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final InvalidatedTokenRepository invalidatedTokenRepository;
 
     public TokenResponse register(RegisterRequest request) {
         if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
@@ -58,5 +64,24 @@ public class AuthService {
 
     private TokenResponse issueToken(User user) {
         return TokenResponse.bearer(jwtService.generateAccessToken(user));
+    }
+
+    public void logout(String token) {
+        SignedJWT signedJWT = jwtService.parseAndValidate(token);
+        try {
+            String tokenId = signedJWT.getJWTClaimsSet().getJWTID();
+            LocalDateTime expireAt = LocalDateTime.ofInstant(
+                    signedJWT.getJWTClaimsSet().getExpirationTime().toInstant(),
+                    ZoneId.systemDefault());
+
+            InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                    .id(tokenId)
+                    .expireAt(expireAt)
+                    .build();
+
+            invalidatedTokenRepository.save(invalidatedToken);
+        } catch (Exception e) {
+            throw new AppException(ResponseStatus.INTERNAL_SERVER_ERROR, "Error when logging out: " + e.getMessage());
+        }
     }
 }
