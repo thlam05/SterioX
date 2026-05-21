@@ -1,6 +1,5 @@
 package com.thlam05.steriox.security.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -22,10 +21,7 @@ import lombok.RequiredArgsConstructor;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private String[] PUBLIC_ENDPOINT = { "/auth/login", "/auth/register", "/ws/**" };
-
-    @Value("${jwt.secretKey}")
-    private String secretKey;
+    private String[] PUBLIC_ENDPOINT = { "/auth/login", "/auth/register", "/auth/refresh", "/ws/**" };
 
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final CustomJwtDecoder customJwtDecoder;

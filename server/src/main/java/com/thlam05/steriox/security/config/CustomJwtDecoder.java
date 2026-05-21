@@ -21,8 +21,8 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class CustomJwtDecoder implements JwtDecoder {
-    @Value("${jwt.secretKey}")
-    private String secretKey;
+    @Value("${jwt.secret-key}")
+    private String SECRET_KEY;
 
     private final JwtService jwtService;
 
@@ -33,7 +33,6 @@ public class CustomJwtDecoder implements JwtDecoder {
 
         try {
             boolean isValid = jwtService.introspect(token);
-            System.out.println(isValid);
 
             if (!isValid)
                 throw new JwtException("Token invalid");
@@ -42,7 +41,7 @@ public class CustomJwtDecoder implements JwtDecoder {
         }
 
         if (Objects.isNull(nimbusJwtDecoder)) {
-            SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HS256");
+            SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "HS256");
             nimbusJwtDecoder = NimbusJwtDecoder.withSecretKey(secretKeySpec)
                     .macAlgorithm(MacAlgorithm.HS256)
                     .build();

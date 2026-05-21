@@ -1,6 +1,6 @@
 package com.thlam05.steriox.modules.auth.entity;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,5 +26,5 @@ public class InvalidatedToken {
     String id;
 
     @Column(name = "expire_at")
-    LocalDateTime expireAt;
+    Date expireAt;
 }

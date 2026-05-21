@@ -9,6 +9,7 @@ import com.thlam05.steriox.common.enums.ResponseStatus;
 import com.thlam05.steriox.common.response.ApiResponse;
 import com.thlam05.steriox.modules.auth.dto.request.LoginRequest;
 import com.thlam05.steriox.modules.auth.dto.request.LogoutRequest;
+import com.thlam05.steriox.modules.auth.dto.request.RefreshRequest;
 import com.thlam05.steriox.modules.auth.dto.request.RegisterRequest;
 import com.thlam05.steriox.modules.auth.dto.response.TokenResponse;
 import com.thlam05.steriox.modules.auth.service.AuthService;
@@ -46,5 +47,13 @@ public class AuthController {
     public ApiResponse<TokenResponse> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
         authService.logout(request);
         return new ApiResponse<>(ResponseStatus.SUCCESS);
+    }
+
+    @PostMapping("/auth/refresh")
+    public ApiResponse<TokenResponse> refresh(@RequestBody RefreshRequest request)
+            throws ParseException, JOSEException {
+        var response = authService.refresh(request);
+
+        return new ApiResponse<>(response);
     }
 }
