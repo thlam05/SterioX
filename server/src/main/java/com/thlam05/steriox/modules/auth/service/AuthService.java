@@ -1,5 +1,6 @@
 package com.thlam05.steriox.modules.auth.service;
 
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Set;
@@ -7,11 +8,13 @@ import java.util.Set;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
 import com.thlam05.steriox.common.enums.ResponseStatus;
 import com.thlam05.steriox.common.enums.RoleType;
 import com.thlam05.steriox.common.exception.AppException;
 import com.thlam05.steriox.modules.auth.dto.request.LoginRequest;
+import com.thlam05.steriox.modules.auth.dto.request.LogoutRequest;
 import com.thlam05.steriox.modules.auth.dto.request.RegisterRequest;
 import com.thlam05.steriox.modules.auth.dto.response.TokenResponse;
 import com.thlam05.steriox.modules.auth.entity.InvalidatedToken;
@@ -66,8 +69,8 @@ public class AuthService {
         return TokenResponse.bearer(jwtService.generateAccessToken(user));
     }
 
-    public void logout(String token) {
-        SignedJWT signedJWT = jwtService.parseAndValidate(token);
+    public void logout(LogoutRequest request) throws ParseException, JOSEException {
+        SignedJWT signedJWT = jwtService.parseAndValidate(request.getToken());
         try {
             String tokenId = signedJWT.getJWTClaimsSet().getJWTID();
             LocalDateTime expireAt = LocalDateTime.ofInstant(

@@ -1,5 +1,6 @@
 package com.thlam05.steriox.security.service;
 
+import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -60,27 +61,35 @@ public class JwtService {
         }
     }
 
-    public SignedJWT parseAndValidate(String token) {
-        try {
-            SignedJWT signedJWT = SignedJWT.parse(token);
-            JWSVerifier verifier = new MACVerifier(secretKey.getBytes());
+    public SignedJWT parseAndValidate(String token) throws ParseException, JOSEException {
+        SignedJWT signedJWT = SignedJWT.parse(token);
+        JWSVerifier verifier = new MACVerifier(secretKey.getBytes());
 
-            boolean verified = signedJWT.verify(verifier);
+        boolean verified = signedJWT.verify(verifier);
 
-            Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
-            boolean isNotExpired = expirationTime.after(new Date());
+        Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+        boolean isNotExpired = expirationTime.after(new Date());
 
-            String tokenId = signedJWT.getJWTClaimsSet().getJWTID();
-            boolean isNotInvalidated = !invalidatedTokenRepository.existsById(tokenId);
+        String tokenId = signedJWT.getJWTClaimsSet().getJWTID();
+        boolean isNotInvalidated = !invalidatedTokenRepository.existsById(tokenId);
 
-            if (verified && isNotExpired && isNotInvalidated) {
-                return signedJWT;
-            } else {
-                throw new AppException(ResponseStatus.BAD_REQUEST, "Invalid or expired token");
-            }
-        } catch (Exception e) {
-            throw new AppException(ResponseStatus.INTERNAL_SERVER_ERROR, "Token cannot be verified: " + e.getMessage());
+        if (!(verified && isNotExpired && isNotInvalidated)) {
+            throw new AppException(ResponseStatus.BAD_REQUEST, "Invalid or expired token");
         }
+
+        return signedJWT;
+    }
+
+    public boolean introspect(String token) throws JOSEException, ParseException {
+        boolean isValid = true;
+
+        try {
+            parseAndValidate(token);
+        } catch (AppException e) {
+            isValid = false;
+        }
+
+        return isValid;
     }
 
     public String extractSubject(String token) {
