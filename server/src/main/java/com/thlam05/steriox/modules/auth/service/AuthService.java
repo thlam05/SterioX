@@ -1,19 +1,15 @@
 package com.thlam05.steriox.modules.auth.service;
 
-import java.util.Set;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.thlam05.steriox.common.enums.ResponseStatus;
-import com.thlam05.steriox.common.enums.RoleType;
 import com.thlam05.steriox.common.exception.AppException;
 import com.thlam05.steriox.modules.auth.dto.request.LoginRequest;
 import com.thlam05.steriox.modules.auth.dto.request.RegisterRequest;
 import com.thlam05.steriox.modules.auth.dto.response.TokenResponse;
-import com.thlam05.steriox.modules.rbac.model.Role;
-import com.thlam05.steriox.modules.auth.model.User;
-import com.thlam05.steriox.modules.auth.repository.AuthRepository;
+import com.thlam05.steriox.modules.user.entity.User;
+import com.thlam05.steriox.modules.user.repository.UserRepository;
 import com.thlam05.steriox.security.service.JwtService;
 
 import lombok.RequiredArgsConstructor;
@@ -22,15 +18,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final AuthRepository authRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
     public TokenResponse register(RegisterRequest request) {
-        if (authRepository.existsByEmailIgnoreCase(request.getEmail())) {
+        if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
             throw new AppException(ResponseStatus.BAD_REQUEST, "Email already exists.");
         }
-        if (authRepository.existsByUsernameIgnoreCase(request.getUsername())) {
+        if (userRepository.existsByUsernameIgnoreCase(request.getUsername())) {
             throw new AppException(ResponseStatus.BAD_REQUEST, "Username already exists.");
         }
         User user = User.builder()
@@ -40,12 +36,12 @@ public class AuthService {
                 // .roles(Set.of(new Role(RoleType.VIEWER.toString())))
                 .avatarImageUrl("https://source.unsplash.com/random/800x600")
                 .build();
-        authRepository.save(user);
+        userRepository.save(user);
         return issueToken(user);
     }
 
     public TokenResponse login(LoginRequest request) {
-        User user = authRepository
+        User user = userRepository
                 .findByEmail(request.getEmail().trim())
                 .orElseThrow(() -> new AppException(ResponseStatus.INVALID_USERNAME_OR_PASSWORD));
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {

@@ -1,8 +1,9 @@
-package com.thlam05.steriox.modules.auth.model;
+package com.thlam05.steriox.modules.user.entity;
 
 import java.util.Set;
 
 import com.thlam05.steriox.common.model.BaseModel;
+import com.thlam05.steriox.modules.rbac.entity.Role;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -19,6 +19,7 @@ public class GlobalExceptionHandler {
             code = ResponseStatus.INTERNAL_SERVER_ERROR;
         }
         ApiResponse<Void> apiResponse = new ApiResponse<>(code);
+        apiResponse.setMessage(exception.getMessage());
 
         return ResponseEntity.status(code.getHttpStatus()).body(apiResponse);
     }

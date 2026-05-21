@@ -19,7 +19,7 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import com.thlam05.steriox.modules.auth.model.User;
+import com.thlam05.steriox.modules.user.entity.User;
 
 @Component
 public class JwtService {

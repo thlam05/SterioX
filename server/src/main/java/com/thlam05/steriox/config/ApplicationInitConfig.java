@@ -1,9 +1,9 @@
 package com.thlam05.steriox.config;
 
 import com.thlam05.steriox.common.enums.RoleType;
-import com.thlam05.steriox.modules.auth.model.Role;
-import com.thlam05.steriox.modules.auth.model.User;
-import com.thlam05.steriox.modules.auth.repository.AuthRepository;
+import com.thlam05.steriox.modules.rbac.entity.Role;
+import com.thlam05.steriox.modules.user.entity.User;
+import com.thlam05.steriox.modules.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,21 +18,21 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class ApplicationInitConfig {
 
-    private final AuthRepository authRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Bean
     ApplicationRunner applicationRunner() {
         return (arg -> {
-            if (authRepository.findByEmail("admin@steriox.com").isEmpty()) {
+            if (userRepository.findByEmail("admin@steriox.com").isEmpty()) {
                 User user = User.builder()
                         .email("admin@steriox.com")
                         .username("admin")
                         .password(passwordEncoder.encode("123456"))
-                        .roles(Set.of(new Role(RoleType.ADMIN.name())))
+                        // .roles(Set.of(new Role(RoleType.ADMIN.name())))
                         .build();
 
-                authRepository.save(user);
+                userRepository.save(user);
             }
         });
     }
