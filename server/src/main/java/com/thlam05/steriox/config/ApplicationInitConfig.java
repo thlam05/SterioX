@@ -1,7 +1,9 @@
 package com.thlam05.steriox.config;
 
+import com.thlam05.steriox.common.enums.ResponseStatus;
 import com.thlam05.steriox.common.enums.RoleType;
-import com.thlam05.steriox.modules.rbac.entity.Role;
+import com.thlam05.steriox.common.exception.AppException;
+import com.thlam05.steriox.modules.rbac.repository.RoleRepository;
 import com.thlam05.steriox.modules.user.entity.User;
 import com.thlam05.steriox.modules.user.repository.UserRepository;
 
@@ -19,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class ApplicationInitConfig {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Bean
@@ -29,7 +32,8 @@ public class ApplicationInitConfig {
                         .email("admin@steriox.com")
                         .username("admin")
                         .password(passwordEncoder.encode("123456"))
-                        // .roles(Set.of(new Role(RoleType.ADMIN.name())))
+                        .roles(Set.of(roleRepository.findById(RoleType.ADMIN.toString())
+                                .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Role not found"))))
                         .build();
 
                 userRepository.save(user);

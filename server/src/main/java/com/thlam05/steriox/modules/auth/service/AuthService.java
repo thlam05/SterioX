@@ -1,13 +1,17 @@
 package com.thlam05.steriox.modules.auth.service;
 
+import java.util.Set;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.thlam05.steriox.common.enums.ResponseStatus;
+import com.thlam05.steriox.common.enums.RoleType;
 import com.thlam05.steriox.common.exception.AppException;
 import com.thlam05.steriox.modules.auth.dto.request.LoginRequest;
 import com.thlam05.steriox.modules.auth.dto.request.RegisterRequest;
 import com.thlam05.steriox.modules.auth.dto.response.TokenResponse;
+import com.thlam05.steriox.modules.rbac.repository.RoleRepository;
 import com.thlam05.steriox.modules.user.entity.User;
 import com.thlam05.steriox.modules.user.repository.UserRepository;
 import com.thlam05.steriox.security.service.JwtService;
@@ -19,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -33,7 +38,8 @@ public class AuthService {
                 .email(request.getEmail().trim())
                 .username(request.getUsername().trim())
                 .password(passwordEncoder.encode(request.getPassword()))
-                // .roles(Set.of(new Role(RoleType.VIEWER.toString())))
+                .roles(Set.of(roleRepository.findById(RoleType.VIEWER.toString())
+                        .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Role not found"))))
                 .avatarImageUrl("https://source.unsplash.com/random/800x600")
                 .build();
         userRepository.save(user);
