@@ -1,1 +1,20 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+:root {
+  --primary: #f9a8d4;
+  --secondary: #fbcfe8;
+  --accent: #ec4899;
+  --background: #fff1f8;
+  --foreground: #4b145b;
+  --surface: #ffe4f2;
+  --muted: #fde8f4;
+  --border: rgba(236, 72, 153, 0.22);
+}
