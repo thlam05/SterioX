@@ -2,19 +2,44 @@
 
 @theme {
   --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
   --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
   --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  --color-surface: var(--surface);
+  --color-surface-foreground: var(--surface-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-border: var(--border);
 }
 
 :root {
-  --primary: #f9a8d4;
-  --secondary: #fbcfe8;
-  --accent: #ec4899;
   --background: #fff1f8;
   --foreground: #4b145b;
+
+  --primary: #f9a8d4;
+  --primary-foreground: #4b145b;
+
+  --secondary: #fbcfe8;
+  --secondary-foreground: #6b21a8;
+
+  --accent: #ec4899;
+  --accent-foreground: #ffffff;
+
   --surface: #ffe4f2;
+  --surface-foreground: #4b145b;
+
   --muted: #fde8f4;
+  --muted-foreground: #86198f;
+
   --border: rgba(236, 72, 153, 0.22);
 }
