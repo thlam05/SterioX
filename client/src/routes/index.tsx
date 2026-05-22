@@ -1,17 +1,10 @@
-import Login from "@/pages/login";
+import LoginPage from "@/pages/LoginPage";
 import { createBrowserRouter } from "react-router";
 
 
 export const router = createBrowserRouter([
   {
     path: "/login",
-    element: <Login />,
-    children: [
-      {
-        path: "/login",
-        element: <Login />
-      }
-
-    ]
+    element: <LoginPage />
   }
 ]);
