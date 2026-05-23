@@ -40,9 +40,11 @@ export default function MainLayout() {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-selection flex flex-col">
-      {/* Header */}
-      <header className="sticky top-0 z-50 h-16 border-b border-accent bg-background px-4 flex items-center justify-between gap-4">
+    // Sửa 1: Thêm h-screen và overflow-hidden ở bọc ngoài cùng để cố định khung màn hình ứng dụng
+    <div className="h-screen w-full bg-background text-foreground font-sans selection:bg-selection flex flex-col overflow-hidden">
+
+      {/* Header (Giữ nguyên) */}
+      <header className="shrink-0 h-16 border-b border-accent bg-background px-4 flex items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <Button
             variant="outline"
@@ -86,9 +88,11 @@ export default function MainLayout() {
         </div>
       </header>
 
-      <div className="flex flex-1 relative">
-        {/* Sidebar */}
-        <aside className={`fixed md:sticky top-16 left-0 bottom-0 z-40 bg-background border-r border-accent transition-all duration-300 flex flex-col justify-between ${isSidebarOpen ? "w-64" : "w-0 md:w-20 overflow-hidden"}`}>
+      {/* Sửa 2: Khống chế chiều cao vùng chứa bên dưới bằng chiều cao còn lại của màn hình */}
+      <div className="flex flex-1 h-[calc(100vh-4rem)] overflow-hidden relative">
+
+        {/* Sửa 3: Thay fixed/sticky thành h-full và thêm tự cuộn độc lập cho sidebar nếu menu quá dài */}
+        <aside className={`h-full bg-background border-r border-accent transition-all duration-300 flex flex-col justify-between overflow-y-auto shrink-0 ${isSidebarOpen ? "w-64" : "w-0 md:w-20"}`}>
           <div className="p-4 space-y-6">
             {/* Main Navigation */}
             <nav className="space-y-1">
@@ -129,8 +133,8 @@ export default function MainLayout() {
           </div>
         </aside>
 
-        {/* Main Content Space */}
-        <main className="flex-1 bg-background p-4 md:p-8 overflow-y-auto">
+        {/* Main Content Space - Giờ đây chỉ có vùng này được cuộn khi content trong Outlet dài */}
+        <main className="flex-1 bg-background p-4 md:p-8 overflow-y-auto h-full">
           <Outlet />
         </main>
       </div>
