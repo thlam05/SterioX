@@ -5,35 +5,24 @@ interface LogoProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-export const Logo: React.FC<LogoProps> = ({ className = '', size = 'md' }) => {
-  const sizeClasses = {
-    sm: {
-      container: 'space-x-1.5',
-      badge: 'w-6 h-6 text-sm',
-      text: 'text-lg'
-    },
-    md: {
-      container: 'space-x-2',
-      badge: 'w-8 h-8 text-base',
-      text: 'text-2xl'
-    },
-    lg: {
-      container: 'space-x-3',
-      badge: 'w-11 h-11 text-xl',
-      text: 'text-4xl'
-    }
-  };
-
-  const currentSize = sizeClasses[size];
+export const Logo: React.FC<LogoProps> = () => {
 
   return (
-    <div className={`flex items-center cursor-pointer select-none font-sans ${currentSize.container} ${className}`}>
-      <div className={`${currentSize.badge} rounded-full bg-primary text-white font-bold flex items-center justify-center`}>
-        S
+    <div className="flex items-center gap-2.5 select-none group cursor-pointer">
+      <div className="flex items-center justify-center w-9 h-9 rounded-full bg-pink-500 transition-colors duration-200 group-hover:bg-pink-600">
+        <span className="text-white text-xl font-bold tracking-tight">
+          S
+        </span>
       </div>
-      <span className={`${currentSize.text} font-black tracking-tight text-foreground`}>
-        SterioX
-      </span>
+
+      <div className="flex items-center font-bold text-xl tracking-tight">
+        <span className="text-slate-800 transition-colors duration-200 group-hover:text-slate-900">
+          Sterio
+        </span>
+        <span className="text-pink-500 ml-0.5">
+          X
+        </span>
+      </div>
     </div>
   );
 };
