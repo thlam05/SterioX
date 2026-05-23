@@ -24,7 +24,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             
             ${error
               ? 'border-2 border-danger-light focus:border-danger'
-              : 'border-2 border-accent focus:border-foreground'
+              : 'border-2 border-accent focus:border-primary'
             }
             
             ${className}

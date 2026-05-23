@@ -1,13 +1,13 @@
 ﻿import type { ButtonHTMLAttributes } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'outline'; // Đã đổi 'secondary' thành 'outline'
   label?: string;
 }
 
 const variantStyles = {
-  primary: 'bg-primary text-foreground hover:bg-primary-light',
-  secondary: 'bg-secondary text-foreground hover:bg-accent hover:text-foreground',
+  primary: 'bg-primary text-foreground hover:bg-primary-light border-2 border-foreground',
+  outline: 'bg-transparent text-foreground border-2 border-foreground hover:bg-foreground hover:text-background',
 };
 
 export function Button({
@@ -24,7 +24,6 @@ export function Button({
     px-4 py-2 font-medium text-sm rounded-xl 
     cursor-pointer
     transition-all duration-200 
-    border-2 border-foreground
     active:scale-[0.98]
     disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none
   `.replace(/\s+/g, ' ').trim();
