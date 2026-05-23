@@ -1,17 +1,27 @@
-import Login from "@/pages/login";
+import MainLayout from "@/layouts/MainLayout";
+import HomePageContent from "@/pages/HomePage";
+import LoginPage from "@/pages/LoginPage";
+import RegisterPage from "@/pages/RegisterPage";
 import { createBrowserRouter } from "react-router";
 
 
 export const router = createBrowserRouter([
   {
     path: "/login",
-    element: <Login />,
+    element: <LoginPage />
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />
+  },
+  {
+    path: "/",
+    element: <MainLayout></MainLayout>,
     children: [
       {
-        path: "/login",
-        element: <Login />
+        path: "",
+        element: <HomePageContent></HomePageContent>
       }
-
     ]
   }
 ]);
