@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import {
-  Play,
   Flame,
   Eye,
   ChevronRight,
@@ -12,7 +11,7 @@ import {
   MoreVertical
 } from "lucide-react";
 
-export default function HomePageContent() {
+export default function HomePage() {
   const categories = [
     { name: "Công nghệ & Đời sống", count: "12.4k đang xem", icon: Code, bgEmoji: "💻", color: "text-primary" },
     { name: "Giải đấu Trò chơi", count: "45.2k đang xem", icon: Gamepad2, bgEmoji: "🎮", color: "text-info" },
