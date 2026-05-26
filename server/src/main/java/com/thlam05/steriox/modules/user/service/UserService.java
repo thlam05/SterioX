@@ -3,6 +3,8 @@ package com.thlam05.steriox.modules.user.service;
 import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +56,24 @@ public class UserService {
     public List<UserResponse> getAll() {
         List<User> users = userRepository.findAll();
         return userMapper.toUserResponses(users);
+    }
+
+    public UserResponse getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            String id = authentication.getName();
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "User not found"));
+            return userMapper.toUserResponse(user);
+        }
+
+        return null;
+    }
+
+    public UserResponse getCurrentUser(String id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "User not found"));
+        return userMapper.toUserResponse(user);
     }
 
     @PreAuthorize("hasAuthority('UPDATE:USER')")
