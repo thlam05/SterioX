@@ -2,19 +2,43 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Logo from "@/components/ui/Logo";
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, Navigate, useNavigate } from "react-router";
+import { authApi } from "@/api/authApi";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function LoginPage() {
+  const navigate = useNavigate();
+  const { isAuthenticated, login } = useAuthStore();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [loginError, setLoginError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setLoginError("");
 
+    const isValid = validateSubmition();
+
+    if (isValid) {
+      authApi.login({ email, password })
+        .then((data) => {
+          login({ user: data.user, token: data.token, rememberMe });
+          navigate("/");
+        })
+        .catch((error) => {
+          setLoginError(
+            error?.message || "Đăng nhập thất bại. Vui lòng thử lại sau.",
+          );
+        });
+    }
+  };
+
+  const validateSubmition = () => {
     let isValid = true;
 
     if (!email) {
@@ -37,15 +61,12 @@ export default function LoginPage() {
       setPasswordError("");
     }
 
-    if (isValid) {
-      console.log({
-        email,
-        password,
-        rememberMe,
-      });
-      // Proceed with login logic
-    }
-  };
+    return isValid;
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col justify-between font-sans selection:bg-selection">
@@ -110,7 +131,7 @@ export default function LoginPage() {
           </div>
 
           {/* Login Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
               <label className="block text-xs font-black tracking-wider mb-2 text-foreground">
                 Địa chỉ Email
@@ -169,6 +190,12 @@ export default function LoginPage() {
                 </label>
               </div>
             </div>
+
+            {loginError && (
+              <p className="rounded-xl border border-danger/40 bg-danger/10 px-4 py-3 text-sm font-medium text-danger">
+                {loginError}
+              </p>
+            )}
 
             {/* Submit Button */}
             <Button

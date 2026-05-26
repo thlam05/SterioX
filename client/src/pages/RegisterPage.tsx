@@ -2,13 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Logo from "@/components/ui/Logo";
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, Navigate, useNavigate } from "react-router";
 import { authApi } from "@/api/authApi";
-import { type UserResponse } from "@/api/userApi";
 import { useAuthStore } from "@/stores/authStore";
 
 export default function RegisterPage() {
-  const { login } = useAuthStore();
+  const navigate = useNavigate();
+  const { isAuthenticated, login } = useAuthStore();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -16,7 +16,6 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
 
-  // States quản lý lỗi validate
   const [nameError, setNameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -31,13 +30,10 @@ export default function RegisterPage() {
     const isValid = validateSubmition();
 
     if (isValid) {
-      let token: string = "";
-      let user: UserResponse | null = null;
       authApi.register({ email, username: name, password })
         .then((data) => {
-          token = data.token;
-          user = data.user;
-          login({ user, token, rememberMe: true });
+          login({ user: data.user, token: data.token, rememberMe: true });
+          navigate("/");
         })
         .catch((error) => {
           setRegisterError(
@@ -88,6 +84,10 @@ export default function RegisterPage() {
     }
 
     return isValid;
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
   }
 
   return (
