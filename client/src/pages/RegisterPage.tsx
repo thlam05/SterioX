@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Logo from "@/components/ui/Logo";
 import { useState } from "react";
+import { Link } from "react-router";
+import { authApi } from "@/api/authApi";
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -10,8 +12,72 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
 
+  // States quản lý lỗi validate
+  const [nameError, setNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [agreeTermsError, setAgreeTermsError] = useState("");
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    let isValid = true;
+
+    if (!name.trim()) {
+      setNameError("Họ và tên không được để trống.");
+      isValid = false;
+    } else if (name.trim().length < 2) {
+      setNameError("Họ và tên phải có ít nhất 2 ký tự.");
+      isValid = false;
+    } else {
+      setNameError("");
+    }
+
+    if (!email) {
+      setEmailError("Email không được để trống.");
+      isValid = false;
+    } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(email)) {
+      setEmailError("Email không hợp lệ.");
+      isValid = false;
+    } else {
+      setEmailError("");
+    }
+
+    if (!password) {
+      setPasswordError("Mật khẩu không được để trống.");
+      isValid = false;
+    } else if (password.length < 6) {
+      setPasswordError("Mật khẩu phải có ít nhất 6 ký tự.");
+      isValid = false;
+    } else {
+      setPasswordError("");
+    }
+
+    if (!agreeTerms) {
+      setAgreeTermsError("Bạn phải đồng ý với điều khoản dịch vụ để tiếp tục.");
+      isValid = false;
+    } else {
+      setAgreeTermsError("");
+    }
+
+    if (isValid) {
+      console.log({
+        name,
+        email,
+        password,
+        agreeTerms,
+      });
+
+      authApi.register({ email, username: name, password })
+        .then((data) => {
+          console.log("Đăng ký thành công:", data);
+          // Chuyển hướng hoặc hiển thị thông báo thành công
+        })
+        .catch((error) => {
+          console.error("Lỗi đăng ký:", error);
+          // Hiển thị lỗi từ API nếu có
+        });
+    }
   };
 
   return (
@@ -21,9 +87,11 @@ export default function RegisterPage() {
         <Logo />
         <div className="hidden md:flex items-center space-x-4 text-sm font-bold">
           <span className="text-secondary">Đã có tài khoản?</span>
-          <Button variant="outline">
-            Đăng nhập
-          </Button>
+          <Link to="/login">
+            <Button variant="outline">
+              Đăng nhập
+            </Button>
+          </Link>
         </div>
       </header>
 
@@ -75,7 +143,7 @@ export default function RegisterPage() {
           </div>
 
           {/* Register Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
               <label className="block text-xs font-black tracking-wider mb-2 text-foreground">
                 Họ và tên
@@ -84,9 +152,10 @@ export default function RegisterPage() {
                 type="text"
                 placeholder="Nhập họ và tên của bạn"
                 value={name}
+                error={!!nameError}
                 onChange={(e) => setName(e.target.value)}
-                required
               />
+              {nameError && <p className="text-danger text-xs mt-1">{nameError}</p>}
             </div>
 
             <div>
@@ -94,12 +163,13 @@ export default function RegisterPage() {
                 Địa chỉ Email
               </label>
               <Input
-                type="email"
+                type="text"
                 placeholder="example@email.com"
                 value={email}
+                error={!!emailError}
                 onChange={(e) => setEmail(e.target.value)}
-                required
               />
+              {emailError && <p className="text-danger text-xs mt-1">{emailError}</p>}
             </div>
 
             <div>
@@ -109,10 +179,11 @@ export default function RegisterPage() {
               <div className="relative">
                 <Input
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Tối thiểu 8 ký tự"
+                  placeholder="Tối thiểu 6 ký tự"
                   value={password}
+                  error={!!passwordError}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
+                  className="pr-12"
                 />
                 <button
                   type="button"
@@ -122,24 +193,27 @@ export default function RegisterPage() {
                   {showPassword ? 'Ẩn' : 'Hiện'}
                 </button>
               </div>
+              {passwordError && <p className="text-danger text-xs mt-1">{passwordError}</p>}
             </div>
 
             {/* Terms Checkbox */}
-            <div className="flex items-start gap-3 pt-2">
-              <input
-                type="checkbox"
-                id="terms"
-                checked={agreeTerms}
-                onChange={(e) => setAgreeTerms(e.target.checked)}
-                className="mt-1 h-4 w-4 rounded border-accent text-primary focus:ring-primary-light"
-                required
-              />
-              <label htmlFor="terms" className="text-xs text-secondary leading-relaxed">
-                Tôi đồng ý với{' '}
-                <a href="#" className="underline text-foreground font-medium">Điều khoản dịch vụ</a>{' '}
-                và{' '}
-                <a href="#" className="underline text-foreground font-medium">Chính sách bảo mật</a> của SterioX.
-              </label>
+            <div>
+              <div className="flex items-start gap-3 pt-2">
+                <input
+                  type="checkbox"
+                  id="terms"
+                  checked={agreeTerms}
+                  onChange={(e) => setAgreeTerms(e.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-accent text-primary focus:ring-primary-light"
+                />
+                <label htmlFor="terms" className="text-xs text-secondary leading-relaxed">
+                  Tôi đồng ý với{' '}
+                  <a href="#" className="underline text-foreground font-medium">Điều khoản dịch vụ</a>{' '}
+                  và{' '}
+                  <a href="#" className="underline text-foreground font-medium">Chính sách bảo mật</a> của SterioX.
+                </label>
+              </div>
+              {agreeTermsError && <p className="text-danger text-xs mt-1">{agreeTermsError}</p>}
             </div>
 
             {/* Submit Button */}
@@ -155,7 +229,7 @@ export default function RegisterPage() {
           {/* Mobile Register Link */}
           <div className="mt-6 text-center text-sm md:hidden">
             <span className="text-secondary">Đã có tài khoản? </span>
-            <a href="#" className="text-primary font-bold hover:underline">Đăng nhập</a>
+            <Link to="/login" className="text-primary font-bold hover:underline">Đăng nhập</Link>
           </div>
         </div>
       </main>

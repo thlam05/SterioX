@@ -17,11 +17,13 @@ import {
   Flame,
   Eye,
 } from "lucide-react";
-import { Outlet } from "react-router";
+import { Link, Outlet } from "react-router";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function MainLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const { isAuthenticated } = useAuthStore();
 
   const navigationItems = [
     { icon: Home, label: "Trang chủ", active: true },
@@ -71,21 +73,31 @@ export default function MainLayout() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            className="p-2 border-none bg-transparent text-foreground hover:bg-accent relative"
-          >
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>
-          </Button>
-          <Button variant="primary" className="hidden sm:flex items-center gap-2">
-            <Flame className="w-4 h-4" /> Lên sóng ngay
-          </Button>
-          <div className="w-9 h-9 rounded-full bg-accent text-foreground flex items-center justify-center font-bold border border-primary">
-            <User className="w-5 h-5" />
+        {isAuthenticated ? (
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              className="p-2 border-none bg-transparent text-foreground hover:bg-accent relative"
+            >
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>
+            </Button>
+            <Button variant="primary" className="hidden sm:flex items-center gap-2">
+              <Flame className="w-4 h-4" /> Lên sóng ngay
+            </Button>
+            <div className="w-9 h-9 rounded-full bg-accent text-foreground flex items-center justify-center font-bold border border-primary">
+              <User className="w-5 h-5" />
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Link to="/login">
+              <Button className="px-4 py-2 border-accent text-foreground hover:bg-accent">
+                Đăng nhập
+              </Button>
+            </Link>
+          </div>
+        )}
       </header>
 
       {/* Sửa 2: Khống chế chiều cao vùng chứa bên dưới bằng chiều cao còn lại của màn hình */}

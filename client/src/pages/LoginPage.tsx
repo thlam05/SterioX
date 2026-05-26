@@ -2,15 +2,49 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Logo from "@/components/ui/Logo";
 import { useState } from "react";
+import { Link } from "react-router";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    let isValid = true;
+
+    if (!email) {
+      setEmailError("Email không được để trống.");
+      isValid = false;
+    } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(email)) {
+      setEmailError("Email không hợp lệ.");
+      isValid = false;
+    } else {
+      setEmailError("");
+    }
+
+    if (!password) {
+      setPasswordError("Mật khẩu không được để trống.");
+      isValid = false;
+    } else if (password.length < 6) {
+      setPasswordError("Mật khẩu phải có ít nhất 6 ký tự.");
+      isValid = false;
+    } else {
+      setPasswordError("");
+    }
+
+    if (isValid) {
+      console.log({
+        email,
+        password,
+        rememberMe,
+      });
+      // Proceed with login logic
+    }
   };
 
   return (
@@ -20,9 +54,11 @@ export default function LoginPage() {
         <Logo />
         <div className="hidden md:flex items-center space-x-4 text-sm font-bold">
           <span className="text-secondary">Chưa có tài khoản?</span>
-          <Button variant="outline">
-            Đăng ký
-          </Button>
+          <Link to="/register">
+            <Button variant="outline">
+              Đăng ký
+            </Button>
+          </Link>
         </div>
       </header>
 
@@ -69,7 +105,7 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="flex items-center my-6">
             <div className="flex-grow border-t border-accent"></div>
-            <span className="px-4 text-xs font-bold text-secondary tracking-widest">Hoặc bằng Email</span>
+            <span className="px-4 text-xs font-bold text-secondary tracking-widest">HOẶC BẰNG EMAIL</span>
             <div className="flex-grow border-t border-accent"></div>
           </div>
 
@@ -80,12 +116,13 @@ export default function LoginPage() {
                 Địa chỉ Email
               </label>
               <Input
-                type="email"
+                type="text"
                 placeholder="example@email.com"
                 value={email}
+                error={!!emailError}
                 onChange={(e) => setEmail(e.target.value)}
-                required
               />
+              {emailError && <p className="text-danger text-xs mt-1">{emailError}</p>}
             </div>
 
             <div>
@@ -102,17 +139,19 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   placeholder="Nhập mật khẩu của bạn"
                   value={password}
+                  error={!!passwordError}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
+                  className="pr-12"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-secondary hover:text-foreground focus:outline-none"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-secondary hover:text-foreground focus:outline-none select-none"
                 >
                   {showPassword ? "Ẩn" : "Hiện"}
                 </button>
               </div>
+              {passwordError && <p className="text-danger text-xs mt-1">{passwordError}</p>}
             </div>
 
             {/* Remember Me Checkbox */}
@@ -123,9 +162,9 @@ export default function LoginPage() {
                   id="remember"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 rounded border-accent text-primary focus:ring-primary-light"
+                  className="h-4 w-4 rounded border-accent text-primary focus:ring-primary-light cursor-pointer"
                 />
-                <label htmlFor="remember" className="text-xs text-secondary font-medium">
+                <label htmlFor="remember" className="text-xs text-secondary font-medium cursor-pointer select-none">
                   Ghi nhớ đăng nhập
                 </label>
               </div>
@@ -144,7 +183,7 @@ export default function LoginPage() {
           {/* Mobile Register Link */}
           <div className="mt-6 text-center text-sm md:hidden">
             <span className="text-secondary">Chưa có tài khoản? </span>
-            <a href="#" className="text-primary font-bold hover:underline">Đăng ký</a>
+            <Link to="/register" className="text-primary font-bold hover:underline">Đăng ký</Link>
           </div>
         </div>
       </main>
