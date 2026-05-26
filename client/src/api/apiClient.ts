@@ -29,6 +29,9 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (error.response) {
+      return Promise.reject(error.response.data);
+    }
     return Promise.reject(error);
   },
 );

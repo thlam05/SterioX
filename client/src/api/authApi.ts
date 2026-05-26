@@ -1,4 +1,5 @@
 import { api, type ApiResponse } from "@/api/apiClient";
+import type { UserResponse } from "./userApi";
 
 export type LoginRequest = {
   email: string;
@@ -16,14 +17,19 @@ export type TokenResponse = {
   tokenType: string;
 };
 
+export type LoginResponse = {
+  token: string;
+  user: UserResponse
+};
+
 export const authApi = {
   async login(payload: LoginRequest) {
-    const response = await api.post<ApiResponse<TokenResponse>>("/auth/login", payload);
+    const response = await api.post<ApiResponse<LoginResponse>>("/auth/login", payload);
     return response.data.data;
   },
 
   async register(payload: RegisterRequest) {
-    const response = await api.post<ApiResponse<TokenResponse>>("/auth/register", payload);
+    const response = await api.post<ApiResponse<LoginResponse>>("/auth/register", payload);
     return response.data.data;
   },
 

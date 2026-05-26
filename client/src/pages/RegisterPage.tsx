@@ -4,8 +4,12 @@ import Logo from "@/components/ui/Logo";
 import { useState } from "react";
 import { Link } from "react-router";
 import { authApi } from "@/api/authApi";
+import { type UserResponse } from "@/api/userApi";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function RegisterPage() {
+  const { login } = useAuthStore();
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,9 +22,32 @@ export default function RegisterPage() {
   const [passwordError, setPasswordError] = useState("");
   const [agreeTermsError, setAgreeTermsError] = useState("");
 
+  const [registerError, setRegisterError] = useState("");
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setRegisterError("");
 
+    const isValid = validateSubmition();
+
+    if (isValid) {
+      let token: string = "";
+      let user: UserResponse | null = null;
+      authApi.register({ email, username: name, password })
+        .then((data) => {
+          token = data.token;
+          user = data.user;
+          login({ user, token, rememberMe: true });
+        })
+        .catch((error) => {
+          setRegisterError(
+            error?.message || "Đăng ký thất bại. Vui lòng thử lại sau.",
+          );
+        });
+    }
+  };
+
+  const validateSubmition = () => {
     let isValid = true;
 
     if (!name.trim()) {
@@ -60,25 +87,8 @@ export default function RegisterPage() {
       setAgreeTermsError("");
     }
 
-    if (isValid) {
-      console.log({
-        name,
-        email,
-        password,
-        agreeTerms,
-      });
-
-      authApi.register({ email, username: name, password })
-        .then((data) => {
-          console.log("Đăng ký thành công:", data);
-          // Chuyển hướng hoặc hiển thị thông báo thành công
-        })
-        .catch((error) => {
-          console.error("Lỗi đăng ký:", error);
-          // Hiển thị lỗi từ API nếu có
-        });
-    }
-  };
+    return isValid;
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col justify-between font-sans selection:bg-selection">
@@ -215,6 +225,12 @@ export default function RegisterPage() {
               </div>
               {agreeTermsError && <p className="text-danger text-xs mt-1">{agreeTermsError}</p>}
             </div>
+
+            {registerError && (
+              <p className="rounded-xl border border-danger/40 bg-danger/10 px-4 py-3 text-sm font-medium text-danger">
+                {registerError}
+              </p>
+            )}
 
             {/* Submit Button */}
             <Button
