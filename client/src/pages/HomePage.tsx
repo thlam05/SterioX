@@ -32,7 +32,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="w-full bg-background text-foreground font-sans p-4 md:p-8 space-y-10">
+    <div className="w-full bg-background text-foreground font-sans space-y-10">
 
       {/* Bố cục lưới tổng thể điều chỉnh theo yêu cầu đề bài */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 auto-rows-auto">

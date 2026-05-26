@@ -13,7 +13,6 @@ import {
   Bell,
   Menu,
   X,
-  User,
   Flame,
   Eye,
 } from "lucide-react";
@@ -21,17 +20,19 @@ import { Link, Outlet } from "react-router";
 import { useAuthStore } from "@/stores/authStore";
 
 export default function MainLayout() {
+  const { user } = useAuthStore();
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const { isAuthenticated } = useAuthStore();
 
   const navigationItems = [
-    { icon: Home, label: "Trang chủ", active: true },
-    { icon: Tv, label: "Livestream" },
-    { icon: Compass, label: "Khám phá" },
-    { icon: Heart, label: "Theo dõi" },
-    { icon: History, label: "Lịch sử xem" },
-    { icon: Settings, label: "Cài đặt" }
+    { icon: Home, label: "Trang chủ", path: "/", active: true },
+    { icon: Tv, label: "Livestream", path: "/livestream" },
+    { icon: Compass, label: "Khám phá", path: "/livestream" },
+    { icon: Heart, label: "Theo dõi", path: "/livestream" },
+    { icon: History, label: "Lịch sử xem", path: "/livestream" },
+    { icon: Settings, label: "Cài đặt", path: "/setting" }
   ];
 
   const channels = [
@@ -86,7 +87,11 @@ export default function MainLayout() {
               <Flame className="w-4 h-4" /> Lên sóng ngay
             </Button>
             <div className="w-9 h-9 rounded-full bg-accent text-foreground flex items-center justify-center font-bold border border-primary">
-              <User className="w-5 h-5" />
+              <img
+                src={user?.avatarImageUrl}
+                alt={user?.username || "Avatar"}
+                className="w-full h-full rounded-full object-cover"
+              />
             </div>
           </div>
         ) : (
@@ -109,14 +114,14 @@ export default function MainLayout() {
             {/* Main Navigation */}
             <nav className="space-y-1">
               {navigationItems.map((item, index) => (
-                <a
+                <Link
                   key={index}
-                  href="#"
+                  to={item.path}
                   className={`flex items-center gap-4 px-3 py-3 rounded-xl text-sm font-medium transition-colors ${item.active ? "bg-selection text-primary" : "text-foreground hover:bg-accent"}`}
                 >
                   <item.icon className={`w-5 h-5 ${item.active ? "text-primary" : "text-secondary"}`} />
                   <span className={!isSidebarOpen ? "md:hidden" : ""}>{item.label}</span>
-                </a>
+                </Link>
               ))}
             </nav>
 
