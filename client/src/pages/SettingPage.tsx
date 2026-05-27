@@ -13,14 +13,17 @@ import {
   Smartphone
 } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
+import { userApi } from "@/api/userApi";
 
 export default function SettingsContent() {
-  const { user } = useAuthStore();
+  const { user, updateUser } = useAuthStore();
 
   const [activeTab, setActiveTab] = useState("profile");
 
   const [newUsername, setNewUsername] = useState(user?.username ?? "");
   const [newEmail, setNewEmail] = useState(user?.email ?? "");
+  const [profileError, setProfileError] = useState("");
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
 
   const [notifyLive, setNotifyLive] = useState(true);
   const [notifyChat, setNotifyChat] = useState(false);
@@ -42,7 +45,35 @@ export default function SettingsContent() {
   const handleCancelChanges = () => {
     setNewUsername(user?.username ?? "");
     setNewEmail(user?.email ?? "");
+    setProfileError("");
   };
+
+  const handleUpdateProfile = async () => {
+    if (!user || !isProfileChanged || isUpdatingProfile) return;
+
+    setProfileError("");
+    setIsUpdatingProfile(true);
+
+    try {
+      const updatedUser = await userApi.updateUser(user.id, {
+        username: newUsername,
+        email: newEmail,
+        avatarImageUrl: user.avatarImageUrl,
+        roles: user.roles,
+      });
+
+      updateUser(updatedUser);
+    } catch (error) {
+      console.log(error);
+      setProfileError(
+        error && typeof error === "object" && "message" in error
+          ? String(error.message)
+          : "Cập nhật hồ sơ thất bại. Vui lòng thử lại sau.",
+      );
+    } finally {
+      setIsUpdatingProfile(false);
+    }
+  }
 
   return (
     <div className="w-full bg-background text-foreground font-sans space-y-8 md:space-y-10 overflow-x-hidden">
@@ -136,13 +167,19 @@ export default function SettingsContent() {
                     defaultValue="Sinh viên năm 3 khoa công nghệ phần mềm tại hcmus. đam mê phát triển hệ thống backend, java spring boot và cấu hình docker đa dịch vụ."
                   />
                 </div> */}
+
+                {profileError && (
+                  <p className="rounded-xl border border-danger/40 bg-danger/10 px-4 py-3 text-sm font-medium text-danger">
+                    {profileError}
+                  </p>
+                )}
               </div>
 
               <div className="border-t border-accent pt-6 flex flex-col sm:flex-row sm:justify-end gap-3">
                 <Button
                   variant="outline"
                   className="text-xs font-bold border-accent px-4 py-2 rounded-xl w-full sm:w-auto"
-                  disabled={!isProfileChanged}
+                  disabled={!isProfileChanged || isUpdatingProfile}
                   onClick={handleCancelChanges}
                 >
                   Hủy bỏ thay đổi
@@ -150,9 +187,10 @@ export default function SettingsContent() {
                 <Button
                   variant="primary"
                   className="text-xs font-bold px-4 py-2 rounded-xl w-full sm:w-auto"
-                  disabled={!isProfileChanged}
+                  disabled={!isProfileChanged || isUpdatingProfile}
+                  onClick={handleUpdateProfile}
                 >
-                  Lưu cấu hình hệ thống
+                  {isUpdatingProfile ? "Đang lưu..." : "Lưu cấu hình hệ thống"}
                 </Button>
               </div>
             </div>

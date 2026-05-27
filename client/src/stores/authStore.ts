@@ -6,6 +6,7 @@ type AuthState = {
   token: string | null;
   isAuthenticated: boolean;
   login: (payload: { user: UserResponse; token: string; rememberMe?: boolean }) => void;
+  updateUser: (user: UserResponse) => void;
   logout: () => void;
   hydrate: () => void;
 };
@@ -68,6 +69,16 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
 
     set({ user, token, isAuthenticated: true });
+  },
+
+  updateUser: (user) => {
+    const storage = getActiveStorage();
+
+    if (storage) {
+      storage.setItem(USER_KEY, JSON.stringify(user));
+    }
+
+    set({ user });
   },
 
   logout: () => {
