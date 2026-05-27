@@ -76,7 +76,7 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
-    @PreAuthorize("hasAuthority('UPDATE:USER')")
+    @PreAuthorize("hasAuthority('UPDATE:USER') or authentication.principal.claims['sub'] == #id")
     public UserResponse update(String id, UpdateUserRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "User not found"));

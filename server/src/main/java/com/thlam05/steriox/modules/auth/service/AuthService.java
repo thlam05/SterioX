@@ -52,7 +52,7 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .roles(Set.of(roleRepository.findById(RoleType.VIEWER.toString())
                         .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Role not found"))))
-                .avatarImageUrl("https://source.unsplash.com/random/800x600")
+                .avatarImageUrl("https://picsum.photos/400/400")
                 .build();
         userRepository.save(user);
         String token = jwtService.generateAccessToken(user);
