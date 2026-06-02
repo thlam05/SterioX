@@ -32,6 +32,7 @@ public interface StreamMapper {
                 .title(stream.getTitle())
                 .description(stream.getDescription())
                 .status(stream.getStatus())
+                .thumbnail(stream.getThumbnail())
                 .currentViewers(stream.getCurrentViewers())
                 .maxViewers(stream.getMaxViewers())
                 .totalLikes(stream.getTotalLikes())

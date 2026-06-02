@@ -48,6 +48,9 @@ public class Stream extends BaseModel {
     @Column(name = "status", length = 20)
     String status;
 
+    @Column(name = "thumbnail")
+    String thumbnail;
+
     @Column(name = "current_viewers")
     Integer currentViewers;
 

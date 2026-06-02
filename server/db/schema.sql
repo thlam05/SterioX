@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS streams (
     title VARCHAR(255) NOT NULL,
     description TEXT,
     status VARCHAR(20) DEFAULT 'scheduled', 
+    thumbnail TEXT,
     playback_url TEXT, 
     current_viewers INT DEFAULT 0,
     max_viewers INT DEFAULT 0,

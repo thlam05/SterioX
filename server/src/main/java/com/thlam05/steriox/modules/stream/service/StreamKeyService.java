@@ -1,6 +1,7 @@
 package com.thlam05.steriox.modules.stream.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -27,20 +28,35 @@ public class StreamKeyService {
     public StreamKeyResponse create(CreateStreamKeyRequest request) {
         validateCreateRequest(request);
 
-        if (streamKeyRepository.existsById(request.getStreamKey())) {
-            throw new AppException(ResponseStatus.BAD_REQUEST, "Stream key already exists");
-        }
-
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "User not found"));
 
-        StreamKey streamKey = streamKeyMapper.toStreamKey(request);
-        streamKey.setUser(user);
-        if (streamKey.getIsActive() == null) {
-            streamKey.setIsActive(true);
-        }
+        // Generate unique stream key
+        String generatedKey = generateUniqueStreamKey();
+
+        // Generate stream URL based on the key
+        String streamUrl = generateStreamUrl(generatedKey);
+
+        StreamKey streamKey = StreamKey.builder()
+                .streamKey(generatedKey)
+                .user(user)
+                .streamUrl(streamUrl)
+                .isActive(request.getIsActive() != null ? request.getIsActive() : true)
+                .build();
 
         return streamKeyMapper.toStreamKeyResponse(streamKeyRepository.save(streamKey));
+    }
+
+    private String generateUniqueStreamKey() {
+        String key;
+        do {
+            key = UUID.randomUUID().toString().replace("-", "");
+        } while (streamKeyRepository.existsById(key));
+        return key;
+    }
+
+    private String generateStreamUrl(String streamKey) {
+        return String.format("rtmp://stream.steriox.local/live/%s", streamKey);
     }
 
     public List<StreamKeyResponse> getAll() {
@@ -53,8 +69,8 @@ public class StreamKeyService {
         return streamKeyMapper.toStreamKeyResponse(streamKey);
     }
 
-    public List<StreamKeyResponse> getByUserId(String userId) {
-        return streamKeyMapper.toStreamKeyResponses(streamKeyRepository.findByUserId(userId));
+    public StreamKeyResponse getByUserId(String userId) {
+        return streamKeyMapper.toStreamKeyResponse(streamKeyRepository.findByUserId(userId));
     }
 
     public StreamKeyResponse update(String key, UpdateStreamKeyRequest request) {
@@ -81,12 +97,6 @@ public class StreamKeyService {
     private void validateCreateRequest(CreateStreamKeyRequest request) {
         if (request.getUserId() == null || request.getUserId().isBlank()) {
             throw new AppException(ResponseStatus.BAD_REQUEST, "User ID is required");
-        }
-        if (request.getStreamKey() == null || request.getStreamKey().isBlank()) {
-            throw new AppException(ResponseStatus.BAD_REQUEST, "Stream key is required");
-        }
-        if (request.getStreamUrl() == null || request.getStreamUrl().isBlank()) {
-            throw new AppException(ResponseStatus.BAD_REQUEST, "Stream URL is required");
         }
     }
 }

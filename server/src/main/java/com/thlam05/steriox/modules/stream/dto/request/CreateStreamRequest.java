@@ -21,10 +21,7 @@ public class CreateStreamRequest {
     String title;
     String description;
     String status;
-    String playbackUrl;
-    Integer currentViewers;
-    Integer maxViewers;
-    Integer totalLikes;
+    String thumbnail;
     LocalDateTime scheduledAt;
     LocalDateTime startedAt;
     LocalDateTime endedAt;

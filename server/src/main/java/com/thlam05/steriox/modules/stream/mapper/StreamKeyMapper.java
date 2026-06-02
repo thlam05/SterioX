@@ -12,6 +12,7 @@ import com.thlam05.steriox.modules.stream.entity.StreamKey;
 
 @Mapper(componentModel = "spring")
 public interface StreamKeyMapper {
+    @Mapping(target = "streamKey", ignore = true)
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     StreamKey toStreamKey(CreateStreamKeyRequest request);

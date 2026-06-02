@@ -22,6 +22,7 @@ public class StreamResponse {
     String title;
     String description;
     String status;
+    String thumbnail;
     Integer currentViewers;
     Integer maxViewers;
     Integer totalLikes;

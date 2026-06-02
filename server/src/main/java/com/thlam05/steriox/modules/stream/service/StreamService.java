@@ -80,6 +80,9 @@ public class StreamService {
         if (request.getStatus() != null) {
             stream.setStatus(request.getStatus());
         }
+        if (request.getThumbnail() != null) {
+            stream.setThumbnail(request.getThumbnail());
+        }
         if (request.getCurrentViewers() != null) {
             stream.setCurrentViewers(request.getCurrentViewers());
         }
