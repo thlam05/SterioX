@@ -31,20 +31,19 @@ public class StreamKeyService {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "User not found"));
 
-        // Generate unique stream key
-        String generatedKey = generateUniqueStreamKey();
+        StreamKey streamKey = streamKeyRepository.findByUserId(request.getUserId())
+                .orElse(new StreamKey());
 
-        // Generate stream URL based on the key
+        String generatedKey = generateUniqueStreamKey();
         String streamUrl = generateStreamUrl(generatedKey);
 
-        StreamKey streamKey = StreamKey.builder()
-                .streamKey(generatedKey)
-                .user(user)
-                .streamUrl(streamUrl)
-                .isActive(request.getIsActive() != null ? request.getIsActive() : true)
-                .build();
+        streamKey.setStreamKey(generatedKey);
+        streamKey.setUser(user);
+        streamKey.setStreamUrl(streamUrl);
+        streamKey.setIsActive(request.getIsActive() != null ? request.getIsActive() : true);
 
-        return streamKeyMapper.toStreamKeyResponse(streamKeyRepository.save(streamKey));
+        StreamKey savedKey = streamKeyRepository.save(streamKey);
+        return streamKeyMapper.toStreamKeyResponse(savedKey);
     }
 
     private String generateUniqueStreamKey() {
@@ -70,7 +69,10 @@ public class StreamKeyService {
     }
 
     public StreamKeyResponse getByUserId(String userId) {
-        return streamKeyMapper.toStreamKeyResponse(streamKeyRepository.findByUserId(userId));
+        StreamKey streamKey = streamKeyRepository.findByUserId(userId)
+                .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND));
+
+        return streamKeyMapper.toStreamKeyResponse(streamKey);
     }
 
     public StreamKeyResponse update(String key, UpdateStreamKeyRequest request) {
