@@ -16,8 +16,9 @@ import {
   Flame,
   Eye,
 } from "lucide-react";
-import { Link, Outlet } from "react-router";
 import { useAuthStore } from "@/stores/authStore";
+import { Link } from "react-router";
+import { Outlet } from "react-router";
 
 export default function MainLayout() {
   const { user } = useAuthStore();
@@ -83,9 +84,11 @@ export default function MainLayout() {
               <Bell className="w-5 h-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>
             </Button>
-            <Button variant="primary" className="hidden sm:flex items-center gap-2">
-              <Flame className="w-4 h-4" /> Lên sóng ngay
-            </Button>
+            <Link to={"/stream/settings"}>
+              <Button variant="primary" className="hidden sm:flex items-center gap-2">
+                <Flame className="w-4 h-4" /> Lên sóng ngay
+              </Button>
+            </Link>
             <div className="w-9 h-9 rounded-full bg-accent text-foreground flex items-center justify-center font-bold border border-primary">
               <img
                 src={user?.avatarImageUrl}

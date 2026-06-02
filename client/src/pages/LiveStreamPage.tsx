@@ -18,7 +18,7 @@ import {
   AlertCircle
 } from "lucide-react";
 
-export default function LiveStreamPage() {
+export default function LivestreamPage() {
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
   const [chatMessage, setChatMessage] = useState("");

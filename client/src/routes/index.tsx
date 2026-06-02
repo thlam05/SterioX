@@ -1,6 +1,7 @@
 import MainLayout from "@/layouts/MainLayout";
 import HomePage from "@/pages/HomePage";
-import LiveStreamPage from "@/pages/LiveStreamPage";
+import LivestreamPage from "@/pages/LivestreamPage";
+import LivestreamSettingPage from "@/pages/LivestreamSettingPage";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import SettingPage from "@/pages/SettingPage";
@@ -26,11 +27,15 @@ export const router = createBrowserRouter([
       },
       {
         path: "/livestream",
-        element: <LiveStreamPage></LiveStreamPage>
+        element: <LivestreamPage></LivestreamPage>
       },
       {
         path: "/setting",
         element: <SettingPage></SettingPage>
+      },
+      {
+        path: "/stream/settings",
+        element: <LivestreamSettingPage></LivestreamSettingPage>
       }
     ]
   }
