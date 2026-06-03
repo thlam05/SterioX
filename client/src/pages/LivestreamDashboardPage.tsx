@@ -266,7 +266,7 @@ export default function LivestreamDashboard() {
                   onChange={(e) => setChatMessage(e.target.value)}
                 />
               </div>
-              <Button type="submit" variant="primary" className="p-2 h-10 w-10 flex items-center justify-center shrink-0">
+              <Button variant="primary" className="px-4 py-2 rounded-xl flex items-center justify-center">
                 <Send className="w-4 h-4" />
               </Button>
             </form>
