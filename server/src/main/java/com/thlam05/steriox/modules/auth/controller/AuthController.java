@@ -11,6 +11,7 @@ import com.thlam05.steriox.modules.auth.dto.request.LoginRequest;
 import com.thlam05.steriox.modules.auth.dto.request.LogoutRequest;
 import com.thlam05.steriox.modules.auth.dto.request.RefreshRequest;
 import com.thlam05.steriox.modules.auth.dto.request.RegisterRequest;
+import com.thlam05.steriox.modules.auth.dto.response.LoginResponse;
 import com.thlam05.steriox.modules.auth.dto.response.TokenResponse;
 import com.thlam05.steriox.modules.auth.service.AuthService;
 
@@ -32,15 +33,15 @@ public class AuthController {
     }
 
     @PostMapping("/auth/login")
-    public ApiResponse<TokenResponse> login(@RequestBody LoginRequest request) {
+    public ApiResponse<LoginResponse> login(@RequestBody LoginRequest request) {
         var response = authService.login(request);
-        return new ApiResponse<TokenResponse>(response);
+        return new ApiResponse<LoginResponse>(response);
     }
 
     @PostMapping("/auth/register")
-    public ApiResponse<TokenResponse> register(@RequestBody RegisterRequest request) {
+    public ApiResponse<LoginResponse> register(@RequestBody RegisterRequest request) {
         var response = authService.register(request);
-        return new ApiResponse<TokenResponse>(response);
+        return new ApiResponse<LoginResponse>(response);
     }
 
     @PostMapping("/auth/logout")

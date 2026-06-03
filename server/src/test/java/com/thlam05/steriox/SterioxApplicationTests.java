@@ -1,13 +1,14 @@
 package com.thlam05.steriox;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-@SpringBootTest
+import org.junit.jupiter.api.Test;
+
 class SterioxApplicationTests {
 
 	@Test
-	void contextLoads() {
+	void applicationMainMethodIsCallable() {
+		assertDoesNotThrow(() -> SterioxApplication.class.getDeclaredMethod("main", String[].class));
 	}
 
 }

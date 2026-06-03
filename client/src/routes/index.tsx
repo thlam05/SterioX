@@ -1,7 +1,11 @@
 import MainLayout from "@/layouts/MainLayout";
-import HomePageContent from "@/pages/HomePage";
+import HomePage from "@/pages/HomePage";
+import LivestreamDashboard from "@/pages/LivestreamDashboardPage";
+import LivestreamPage from "@/pages/LivestreamPage";
+import LivestreamSettingPage from "@/pages/LivestreamSettingPage";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
+import SettingPage from "@/pages/SettingPage";
 import { createBrowserRouter } from "react-router";
 
 
@@ -20,7 +24,23 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "",
-        element: <HomePageContent></HomePageContent>
+        element: <HomePage></HomePage>
+      },
+      {
+        path: "/livestream",
+        element: <LivestreamPage></LivestreamPage>
+      },
+      {
+        path: "/setting",
+        element: <SettingPage></SettingPage>
+      },
+      {
+        path: "/stream/settings",
+        element: <LivestreamSettingPage></LivestreamSettingPage>
+      },
+      {
+        path: "/stream/dashboard",
+        element: <LivestreamDashboard></LivestreamDashboard>
       }
     ]
   }

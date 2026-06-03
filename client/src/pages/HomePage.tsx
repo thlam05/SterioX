@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import {
-  Play,
   Flame,
   Eye,
   ChevronRight,
@@ -12,7 +11,7 @@ import {
   MoreVertical
 } from "lucide-react";
 
-export default function HomePageContent() {
+export default function HomePage() {
   const categories = [
     { name: "Công nghệ & Đời sống", count: "12.4k đang xem", icon: Code, bgEmoji: "💻", color: "text-primary" },
     { name: "Giải đấu Trò chơi", count: "45.2k đang xem", icon: Gamepad2, bgEmoji: "🎮", color: "text-info" },
@@ -33,7 +32,7 @@ export default function HomePageContent() {
   ];
 
   return (
-    <div className="w-full bg-background text-foreground font-sans p-4 md:p-8 space-y-10">
+    <div className="w-full bg-background text-foreground font-sans space-y-10">
 
       {/* Bố cục lưới tổng thể điều chỉnh theo yêu cầu đề bài */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 auto-rows-auto">

@@ -16,11 +16,13 @@ import com.thlam05.steriox.modules.auth.dto.request.LoginRequest;
 import com.thlam05.steriox.modules.auth.dto.request.LogoutRequest;
 import com.thlam05.steriox.modules.auth.dto.request.RefreshRequest;
 import com.thlam05.steriox.modules.auth.dto.request.RegisterRequest;
+import com.thlam05.steriox.modules.auth.dto.response.LoginResponse;
 import com.thlam05.steriox.modules.auth.dto.response.TokenResponse;
 import com.thlam05.steriox.modules.auth.entity.InvalidatedToken;
 import com.thlam05.steriox.modules.auth.repository.InvalidatedTokenRepository;
 import com.thlam05.steriox.modules.rbac.repository.RoleRepository;
 import com.thlam05.steriox.modules.user.entity.User;
+import com.thlam05.steriox.modules.user.mapper.UserMapper;
 import com.thlam05.steriox.modules.user.repository.UserRepository;
 import com.thlam05.steriox.security.service.JwtService;
 
@@ -35,8 +37,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final InvalidatedTokenRepository invalidatedTokenRepository;
+    private final UserMapper userMapper;
 
-    public TokenResponse register(RegisterRequest request) {
+    public LoginResponse register(RegisterRequest request) {
         if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
             throw new AppException(ResponseStatus.BAD_REQUEST, "Email already exists.");
         }
@@ -49,24 +52,22 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .roles(Set.of(roleRepository.findById(RoleType.VIEWER.toString())
                         .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Role not found"))))
-                .avatarImageUrl("https://source.unsplash.com/random/800x600")
+                .avatarImageUrl("https://picsum.photos/400/400")
                 .build();
         userRepository.save(user);
-        return issueToken(user);
+        String token = jwtService.generateAccessToken(user);
+        return new LoginResponse(token, userMapper.toUserResponse(user));
     }
 
-    public TokenResponse login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
         User user = userRepository
                 .findByEmail(request.getEmail().trim())
                 .orElseThrow(() -> new AppException(ResponseStatus.INVALID_USERNAME_OR_PASSWORD));
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new AppException(ResponseStatus.INVALID_USERNAME_OR_PASSWORD);
         }
-        return issueToken(user);
-    }
-
-    private TokenResponse issueToken(User user) {
-        return TokenResponse.bearer(jwtService.generateAccessToken(user));
+        String token = jwtService.generateAccessToken(user);
+        return new LoginResponse(token, userMapper.toUserResponse(user));
     }
 
     public void logout(LogoutRequest request) throws ParseException, JOSEException {

@@ -36,6 +36,12 @@ public class UserController {
         return new ApiResponse<>(response);
     }
 
+    @GetMapping("/users/me")
+    public ApiResponse<UserResponse> getCurrentUser() {
+        UserResponse response = userService.getCurrentUser();
+        return new ApiResponse<>(response);
+    }
+
     @GetMapping("/users/{id}")
     public ApiResponse<UserResponse> getById(@PathVariable String id) {
         UserResponse response = userService.getById(id);
