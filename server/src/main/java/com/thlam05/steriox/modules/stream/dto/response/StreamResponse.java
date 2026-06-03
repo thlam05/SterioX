@@ -23,6 +23,9 @@ public class StreamResponse {
     String description;
     String status;
     String thumbnail;
+    String latency;
+    boolean dvr;
+    boolean vod;
     Integer currentViewers;
     Integer maxViewers;
     Integer totalLikes;

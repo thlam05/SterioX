@@ -1,15 +1,19 @@
 package com.thlam05.steriox.modules.stream.service;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.thlam05.steriox.common.enums.ResponseStatus;
 import com.thlam05.steriox.common.exception.AppException;
+import com.thlam05.steriox.common.service.S3Service;
 import com.thlam05.steriox.modules.stream.dto.request.CreateStreamRequest;
 import com.thlam05.steriox.modules.stream.dto.request.UpdateStreamRequest;
 import com.thlam05.steriox.modules.stream.dto.response.StreamResponse;
 import com.thlam05.steriox.modules.stream.entity.Stream;
+import com.thlam05.steriox.modules.stream.enums.StreamStatus;
 import com.thlam05.steriox.modules.stream.mapper.StreamMapper;
 import com.thlam05.steriox.modules.stream.repository.StreamRepository;
 import com.thlam05.steriox.modules.user.entity.User;
@@ -23,17 +27,27 @@ public class StreamService {
     private final StreamRepository streamRepository;
     private final StreamMapper streamMapper;
     private final UserRepository userRepository;
+    private final S3Service s3Service;
 
-    public StreamResponse create(CreateStreamRequest request) {
+    public StreamResponse create(CreateStreamRequest request) throws IOException {
         validateCreateRequest(request);
 
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "User not found"));
 
         Stream stream = streamMapper.toStream(request);
+        stream.setCurrentViewers(0);
+        stream.setMaxViewers(0);
+        stream.setTotalLikes(0);
         stream.setUser(user);
+        stream.setStartedAt(LocalDateTime.now());
         if (stream.getStatus() == null) {
-            stream.setStatus("scheduled");
+            stream.setStatus(StreamStatus.PUBLIC.name());
+        }
+
+        if (request.getThumbnail() != null && !request.getThumbnail().isEmpty()) {
+            String thumbnailUrl = s3Service.uploadFile(request.getThumbnail());
+            stream.setThumbnail(thumbnailUrl);
         }
 
         return streamMapper.toStreamResponse(streamRepository.save(stream));
@@ -91,9 +105,6 @@ public class StreamService {
         }
         if (request.getTotalLikes() != null) {
             stream.setTotalLikes(request.getTotalLikes());
-        }
-        if (request.getScheduledAt() != null) {
-            stream.setScheduledAt(request.getScheduledAt());
         }
         if (request.getStartedAt() != null) {
             stream.setStartedAt(request.getStartedAt());

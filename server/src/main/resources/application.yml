@@ -16,9 +16,19 @@ spring:
     jpa:
         hibernate:
             ddl-auto: update
+    servlet:
+        multipart:
+            max-file-size: 10MB
+            max-request-size: 50MB
             
 jwt:
     secret-key: ${JWT_SECRET_KEY:local-dev-secret-key-32bytes!!!}
     valid-duration: ${JWT_EXPIRATION_S:3600}
     refreshable-duration: ${JWT_REFRESHABLE_S:86400}
 
+aws:
+    s3:
+        bucket-name: ${AWS_S3_BUCKET_NAME}
+        region: ${AWS_S3_REGION}
+        access-key: ${AWS_S3_ACCESS_KEY}
+        secret-key: ${AWS_S3_SECRET_KEY}

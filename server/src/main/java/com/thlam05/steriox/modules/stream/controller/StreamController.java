@@ -1,9 +1,12 @@
 package com.thlam05.steriox.modules.stream.controller;
 
+import java.io.IOException;
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -25,8 +28,8 @@ import lombok.RequiredArgsConstructor;
 public class StreamController {
     private final StreamService streamService;
 
-    @PostMapping
-    public ApiResponse<StreamResponse> create(@RequestBody CreateStreamRequest request) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<StreamResponse> create(@ModelAttribute CreateStreamRequest request) throws IOException {
         return new ApiResponse<>(streamService.create(request));
     }
 

@@ -51,6 +51,15 @@ public class Stream extends BaseModel {
     @Column(name = "thumbnail")
     String thumbnail;
 
+    @Column(name = "latency")
+    String latency;
+
+    @Column(name = "dvr")
+    boolean dvr;
+
+    @Column(name = "vod")
+    boolean vod;
+
     @Column(name = "current_viewers")
     Integer currentViewers;
 
@@ -59,9 +68,6 @@ public class Stream extends BaseModel {
 
     @Column(name = "total_likes")
     Integer totalLikes;
-
-    @Column(name = "scheduled_at")
-    LocalDateTime scheduledAt;
 
     @Column(name = "started_at")
     LocalDateTime startedAt;

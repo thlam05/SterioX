@@ -1,6 +1,6 @@
 package com.thlam05.steriox.modules.stream.dto.request;
 
-import java.time.LocalDateTime;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,8 +21,8 @@ public class CreateStreamRequest {
     String title;
     String description;
     String status;
-    String thumbnail;
-    LocalDateTime scheduledAt;
-    LocalDateTime startedAt;
-    LocalDateTime endedAt;
+    String latency;
+    boolean dvr;
+    boolean vod;
+    MultipartFile thumbnail;
 }
