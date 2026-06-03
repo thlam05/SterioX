@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Video,
   Copy,
@@ -19,7 +19,7 @@ import {
   KeyRound,
   Zap
 } from "lucide-react";
-import { streamApi } from "@/api/streamApi";
+import { streamApi, streamKeyApi } from "@/api/streamApi";
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate } from "react-router";
 
@@ -34,10 +34,19 @@ export default function LivestreamSettingPage() {
   const [streamKey, setStreamKey] = useState<string | null>(null);
   const [streamUrl, setStreamUrl] = useState<string>("");
   const [showStreamKey, setShowStreamKey] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<"streamUrl" | "streamKey" | null>(null);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [thumbnail, setThumbnail] = useState<string | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const [titleError, setTitleError] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
+  const [thumbnailError, setThumbnailError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [latency, setLatency] = useState("normal");
   const [dvr, setDvr] = useState(true);
+  const [vod, setVod] = useState(true);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -51,7 +60,7 @@ export default function LivestreamSettingPage() {
 
     const loadStreamKey = async () => {
       try {
-        const data = await streamApi.getStreamKey(user.id);
+        const data = await streamKeyApi.getStreamKey(user.id);
         setStreamKey(data.streamKey ?? null);
         setStreamUrl(data.streamUrl ?? null);
       } catch (error) {
@@ -66,7 +75,7 @@ export default function LivestreamSettingPage() {
     if (!user?.id) return;
 
     try {
-      const data = await streamApi.createStreamKey({ userId: user.id, isActive: false });
+      const data = await streamKeyApi.createStreamKey({ userId: user.id, isActive: false });
       setStreamKey(data.streamKey ?? null);
       setStreamUrl(data.streamUrl ?? null);
     } catch (error) {
@@ -77,17 +86,127 @@ export default function LivestreamSettingPage() {
   const handleCopyStreamKey = () => {
     if (streamKey) {
       navigator.clipboard.writeText(streamKey);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setCopied("streamKey");
+      setTimeout(() => setCopied(null), 2000);
+    }
+  };
+
+  const handleCopyStreamUrl = () => {
+    if (streamUrl) {
+      navigator.clipboard.writeText(streamUrl);
+      setCopied("streamUrl");
+      setTimeout(() => setCopied(null), 2000);
     }
   };
 
   const handleThumbnailChange = () => {
-    setThumbnail("✨ Đã chọn ảnh thumbnail.png");
+    fileInputRef.current?.click();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleThumbnailSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setThumbnailError("Vui lòng chọn tệp hình ảnh hợp lệ.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setThumbnailError("Kích thước ảnh không được vượt quá 5MB.");
+      return;
+    }
+
+    setThumbnailFile(file);
+    setThumbnail(file.name);
+    setThumbnailError("");
+
+    const previewUrl = URL.createObjectURL(file);
+    setThumbnailPreview(previewUrl);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (thumbnailPreview) {
+        URL.revokeObjectURL(thumbnailPreview);
+      }
+    };
+  }, [thumbnailPreview]);
+
+  const validateForm = () => {
+    let isValid = true;
+
+    const trimmedTitle = title.trim();
+    const trimmedDescription = description.trim();
+
+    if (!trimmedTitle) {
+      setTitleError("Tiêu đề không được để trống.");
+      isValid = false;
+    } else if (trimmedTitle.length < 5) {
+      setTitleError("Tiêu đề phải có ít nhất 5 ký tự.");
+      isValid = false;
+    } else if (trimmedTitle.length > 100) {
+      setTitleError("Tiêu đề không được quá 100 ký tự.");
+      isValid = false;
+    } else {
+      setTitleError("");
+    }
+
+    if (!trimmedDescription) {
+      setDescriptionError("Mô tả không được để trống.");
+      isValid = false;
+    } else if (trimmedDescription.length < 10) {
+      setDescriptionError("Mô tả phải có ít nhất 10 ký tự.");
+      isValid = false;
+    } else {
+      setDescriptionError("");
+    }
+
+    if (!thumbnailFile) {
+      setThumbnailError("Vui lòng chọn ảnh thumbnail cho buổi livestream.");
+      isValid = false;
+    } else {
+      setThumbnailError("");
+    }
+
+    return isValid;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    setSubmitError("");
+    if (!validateForm()) {
+      return;
+    }
+
+    if (!user?.id) {
+      setSubmitError("Bạn cần đăng nhập để lưu thiết lập livestream.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await streamApi.createStream({
+        userId: user.id,
+        title,
+        description,
+        status,
+        thumbnail: thumbnailFile,
+        latency,
+        dvr,
+        vod
+      });
+    } catch (error) {
+      console.error("Failed to save livestream settings", error);
+      setSubmitError("Không thể lưu thiết lập lúc này. Vui lòng thử lại sau.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -114,22 +233,25 @@ export default function LivestreamSettingPage() {
                   placeholder="Nhập tiêu đề hấp dẫn..."
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
+                  className={titleError ? "border-danger" : ""}
                   required
                 />
                 <div className="flex justify-between text-[10px] font-medium text-secondary">
                   <span>Mẹo: Tiêu đề ngắn gọn sẽ thu hút hơn</span>
                   <span className={title.length > 90 ? "text-danger" : ""}>{title.length}/100</span>
                 </div>
+                {titleError && <p className="text-danger text-xs mt-1">{titleError}</p>}
               </div>
 
               <div className="space-y-2">
                 <label className="text-xs font-bold tracking-widest opacity-60 uppercase">Mô tả</label>
                 <textarea
-                  className="w-full min-h-[160px] px-4 py-3 bg-background border border-accent rounded-2xl text-sm focus:border-primary outline-none transition-all resize-none"
+                  className={`w-full min-h-[160px] px-4 py-3 bg-background border rounded-2xl text-sm focus:border-primary outline-none transition-all resize-none ${descriptionError ? "border-danger" : "border-accent"}`}
                   placeholder="Bạn muốn chia sẻ điều gì trong buổi live này?"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                 />
+                {descriptionError && <p className="text-danger text-xs mt-1">{descriptionError}</p>}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -163,14 +285,28 @@ export default function LivestreamSettingPage() {
                   <label className="text-xs font-bold tracking-widest opacity-60 uppercase">Hình thu nhỏ</label>
                   <div
                     onClick={handleThumbnailChange}
-                    className="group relative border border-dashed border-accent hover:border-primary rounded-3xl aspect-video flex flex-col items-center justify-center cursor-pointer overflow-hidden transition-all bg-accent"
+                    className={`group relative border border-dashed rounded-3xl aspect-video flex flex-col items-center justify-center cursor-pointer overflow-hidden transition-all bg-accent ${thumbnailError ? "border-danger" : "border-accent hover:border-primary"}`}
                   >
-                    {thumbnail ? (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-background p-4 text-center">
-                        <ImageIcon className="w-8 h-8 text-success mb-2" />
-                        <p className="text-xs font-bold text-foreground truncate w-full px-4">{thumbnail}</p>
-                        <p className="text-[10px] text-secondary mt-1 underline">Nhấp để thay đổi</p>
-                      </div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleThumbnailSelect}
+                    />
+                    {thumbnailPreview ? (
+                      <>
+                        <img
+                          src={thumbnailPreview}
+                          alt="Thumbnail preview"
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/70 p-4 text-center">
+                          <ImageIcon className="w-8 h-8 text-success mb-2" />
+                          <p className="text-xs font-bold text-foreground truncate w-full px-4">{thumbnail}</p>
+                          <p className="text-[10px] text-secondary mt-1 underline">Nhấp để thay đổi</p>
+                        </div>
+                      </>
                     ) : (
                       <div className="text-center p-6">
                         <div className="w-12 h-12 rounded-full bg-background flex items-center justify-center mx-auto mb-3 shadow-sm group-hover:scale-110 transition-transform">
@@ -181,13 +317,19 @@ export default function LivestreamSettingPage() {
                       </div>
                     )}
                   </div>
+                  {thumbnailError && <p className="text-danger text-xs mt-1">{thumbnailError}</p>}
                 </div>
               </div>
 
 
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-accent">
-                {/* <Button variant="outline" type="button">Hủy thay đổi</Button> */}
-                <Button variant="primary" type="submit" disabled={!streamKey}>Lưu thiết lập phát sóng</Button>
+              <div className="flex flex-col gap-3 pt-4 border-t border-accent">
+                {submitError && <p className="text-danger text-xs">{submitError}</p>}
+                <div className="flex items-center justify-end gap-3">
+                  {/* <Button variant="outline" type="button">Hủy thay đổi</Button> */}
+                  <Button variant="primary" type="submit" disabled={!streamKey || isSubmitting}>
+                    {isSubmitting ? "Đang lưu..." : "Lưu thiết lập phát sóng"}
+                  </Button>
+                </div>
               </div>
             </form>
           </section>
@@ -210,8 +352,8 @@ export default function LivestreamSettingPage() {
                     <label className="text-[10px] font-bold text-secondary uppercase tracking-tighter">Server URL</label>
                     <div className="relative group">
                       <Input readOnly value={streamUrl} className="bg-accent font-mono text-[11px] pr-10 border-accent" />
-                      <button onClick={() => { }} className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-primary transition-colors">
-                        <Copy className="w-4 h-4" />
+                      <button type="button" onClick={handleCopyStreamUrl} className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-primary transition-colors">
+                        {copied === "streamUrl" ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
                       </button>
                     </div>
                   </div>
@@ -234,8 +376,8 @@ export default function LivestreamSettingPage() {
                         <button onClick={() => setShowStreamKey(!showStreamKey)} className="p-1.5 text-secondary hover:text-foreground">
                           {showStreamKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
-                        <button onClick={handleCopyStreamKey} className="p-1.5 text-secondary hover:text-foreground">
-                          {copied ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
+                        <button type="button" onClick={handleCopyStreamKey} className="p-1.5 text-secondary hover:text-foreground">
+                          {copied === "streamKey" ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
@@ -286,8 +428,8 @@ export default function LivestreamSettingPage() {
             <div className="space-y-1">
               <div className="flex items-center justify-between py-3 border-b border-accent">
                 <div className="space-y-0.5">
-                  <p className="text-xs font-bold">Chế độ tua lại (DVR)</p>
-                  <p className="text-[10px] text-secondary italic">Cho phép người xem tua lại</p>
+                  <p className={`text-xs font-bold ${dvr ? "text-foreground" : "text-secondary"}`}>Chế độ tua lại (DVR)</p>
+                  <p className={`text-[10px] italic ${dvr ? "text-secondary" : "text-secondary opacity-70"}`}>Cho phép người xem tua lại</p>
                 </div>
                 <button onClick={() => setDvr(!dvr)}>
                   {dvr ? <ToggleRight className="w-8 h-8 text-primary" /> : <ToggleLeft className="w-8 h-8 text-secondary" />}
@@ -296,10 +438,16 @@ export default function LivestreamSettingPage() {
 
               <div className="flex items-center justify-between py-3">
                 <div className="space-y-0.5">
-                  <p className="text-xs font-bold opacity-50">Lưu bản ghi (VOD)</p>
-                  <p className="text-[10px] text-secondary italic opacity-50">Tự động lưu sau khi kết thúc</p>
+                  <p className={`text-xs font-bold ${vod ? "text-foreground" : "text-secondary"}`}>Lưu bản ghi (VOD)</p>
+                  <p className={`text-[10px] italic ${vod ? "text-secondary" : "text-secondary opacity-70"}`}>Tự động lưu sau khi kết thúc</p>
                 </div>
-                <ToggleRight className="w-8 h-8 text-primary opacity-20 cursor-not-allowed" />
+                <button type="button" onClick={() => setVod(!vod)}>
+                  {vod ? (
+                    <ToggleRight className="w-8 h-8 text-primary" />
+                  ) : (
+                    <ToggleLeft className="w-8 h-8 text-secondary" />
+                  )}
+                </button>
               </div>
             </div>
 
