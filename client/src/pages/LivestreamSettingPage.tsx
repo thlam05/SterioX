@@ -23,6 +23,18 @@ import { streamApi, streamKeyApi } from "@/api/streamApi";
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate } from "react-router";
 
+const streamStatus = {
+  public: "PUBLIC",
+  unlisted: "UNLISTED",
+  private: "PRIVATE"
+}
+
+const streamLatency = {
+  normal: "NORMAL",
+  low: "LOW",
+  ultra: "ULTRA"
+}
+
 export default function LivestreamSettingPage() {
   const { isAuthenticated, user } = useAuthStore();
 
@@ -30,7 +42,7 @@ export default function LivestreamSettingPage() {
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("public");
+  const [status, setStatus] = useState(streamStatus.public);
   const [streamKey, setStreamKey] = useState<string | null>(null);
   const [streamUrl, setStreamUrl] = useState<string>("");
   const [showStreamKey, setShowStreamKey] = useState(false);
@@ -44,7 +56,7 @@ export default function LivestreamSettingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [latency, setLatency] = useState("normal");
+  const [latency, setLatency] = useState(streamLatency.normal);
   const [dvr, setDvr] = useState(true);
   const [vod, setVod] = useState(true);
 
@@ -210,7 +222,7 @@ export default function LivestreamSettingPage() {
   };
 
   return (
-    <main className="w-full bg-background text-foreground font-sans p-4 md:p-8 relative">
+    <main className="w-full bg-background text-foreground font-sans space-y-10 relative">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {/* Cột trái: Điền các thông số livestream */}
@@ -259,9 +271,9 @@ export default function LivestreamSettingPage() {
                   <label className="text-xs font-bold tracking-widest opacity-60 uppercase">Quyền riêng tư</label>
                   <div className="space-y-3">
                     {[
-                      { id: 'public', label: 'Công khai', desc: 'Ai cũng thấy', icon: Globe },
-                      { id: 'unlisted', label: 'Không công khai', desc: 'Chỉ người có link', icon: Link2 },
-                      { id: 'private', label: 'Riêng tư', desc: 'Chỉ mình bạn', icon: Lock },
+                      { id: streamStatus.public, label: 'Công khai', desc: 'Ai cũng thấy', icon: Globe },
+                      { id: streamStatus.unlisted, label: 'Không công khai', desc: 'Chỉ người có link', icon: Link2 },
+                      { id: streamStatus.private, label: 'Riêng tư', desc: 'Chỉ mình bạn', icon: Lock },
                     ].map((item) => (
                       <label
                         key={item.id}
@@ -413,13 +425,13 @@ export default function LivestreamSettingPage() {
             <div className="space-y-3">
               <label className="text-xs font-bold text-secondary uppercase">Độ trễ (Latency)</label>
               <div className="flex p-1 bg-accent rounded-xl border border-accent">
-                {['normal', 'low', 'ultra'].map((l) => (
+                {[streamLatency.normal, streamLatency.low, streamLatency.ultra].map((l) => (
                   <button
                     key={l}
                     onClick={() => setLatency(l)}
                     className={`flex-1 py-2 text-[10px] font-bold rounded-lg transition-all ${latency === l ? "bg-background text-primary shadow-sm" : "text-secondary hover:text-foreground"}`}
                   >
-                    {l === 'normal' ? 'Thường' : l === 'low' ? 'Thấp' : 'Cực thấp'}
+                    {l === streamLatency.normal ? 'Thường' : l === streamLatency.low ? 'Thấp' : 'Cực thấp'}
                   </button>
                 ))}
               </div>

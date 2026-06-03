@@ -44,7 +44,7 @@ export default function LivestreamPage() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans flex flex-col">
       {/* Thân trang chính chia làm hai vùng: luồng phát và khung chat */}
-      <div className="flex-grow flex flex-col lg:flex-row w-full max-w-[1600px] mx-auto p-4 gap-4">
+      <div className="flex-grow flex flex-col lg:flex-row w-full max-w-[1600px] mx-auto gap-4">
 
         {/* Vùng bên trái: Trình phát video và thông tin chi tiết */}
         <div className="flex-1 flex flex-col gap-4">
