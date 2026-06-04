@@ -38,6 +38,11 @@ public class StreamController {
         return new ApiResponse<>(streamService.getAll());
     }
 
+    @GetMapping("/user/{userId}")
+    public ApiResponse<StreamResponse> getStreamOnlineByUserId(@PathVariable String userId) {
+        return new ApiResponse<>(streamService.getStreamOnlineByUserId(userId));
+    }
+
     @GetMapping("/{id}")
     public ApiResponse<StreamResponse> getById(@PathVariable String id) {
         return new ApiResponse<>(streamService.getById(id));

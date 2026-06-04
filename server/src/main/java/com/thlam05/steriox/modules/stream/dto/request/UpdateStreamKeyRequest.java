@@ -16,5 +16,4 @@ import lombok.AccessLevel;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateStreamKeyRequest {
     String streamUrl;
-    Boolean isActive;
 }

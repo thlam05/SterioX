@@ -22,6 +22,7 @@ public class StreamResponse {
     String title;
     String description;
     String status;
+    Boolean isActive;
     String thumbnail;
     String latency;
     boolean dvr;

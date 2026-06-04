@@ -20,6 +20,8 @@ public interface StreamMapper {
     @Mapping(target = "totalLikes", ignore = true)
     @Mapping(target = "startedAt", ignore = true)
     @Mapping(target = "endedAt", ignore = true)
+    @Mapping(target = "playUrl", ignore = true)
+    @Mapping(target = "isActive", ignore = true)
     Stream toStream(CreateStreamRequest request);
 
     default StreamResponse toStreamResponse(Stream stream) {
@@ -33,6 +35,7 @@ public interface StreamMapper {
                 .title(stream.getTitle())
                 .description(stream.getDescription())
                 .status(stream.getStatus())
+                .isActive(stream.getIsActive())
                 .thumbnail(stream.getThumbnail())
                 .currentViewers(stream.getCurrentViewers())
                 .maxViewers(stream.getMaxViewers())

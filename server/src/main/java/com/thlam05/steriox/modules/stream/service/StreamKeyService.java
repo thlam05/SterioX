@@ -40,7 +40,6 @@ public class StreamKeyService {
         streamKey.setStreamKey(generatedKey);
         streamKey.setUser(user);
         streamKey.setStreamUrl(streamUrl);
-        streamKey.setIsActive(request.getIsActive() != null ? request.getIsActive() : true);
 
         StreamKey savedKey = streamKeyRepository.save(streamKey);
         return streamKeyMapper.toStreamKeyResponse(savedKey);
@@ -55,7 +54,7 @@ public class StreamKeyService {
     }
 
     private String generateStreamUrl(String streamKey) {
-        return String.format("rtmp://stream.steriox.local/live/%s", streamKey);
+        return "rtmp://localhost:1935/hls";
     }
 
     public List<StreamKeyResponse> getAll() {
@@ -81,9 +80,6 @@ public class StreamKeyService {
 
         if (request.getStreamUrl() != null) {
             streamKey.setStreamUrl(request.getStreamUrl());
-        }
-        if (request.getIsActive() != null) {
-            streamKey.setIsActive(request.getIsActive());
         }
 
         return streamKeyMapper.toStreamKeyResponse(streamKeyRepository.save(streamKey));

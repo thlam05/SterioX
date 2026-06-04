@@ -48,6 +48,12 @@ public class Stream extends BaseModel {
     @Column(name = "status", length = 20)
     String status;
 
+    @Column(name = "is_active")
+    Boolean isActive;
+
+    @Column(name = "play_url")
+    String playUrl;
+
     @Column(name = "thumbnail")
     String thumbnail;
 
