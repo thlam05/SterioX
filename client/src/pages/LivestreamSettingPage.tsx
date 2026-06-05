@@ -213,6 +213,8 @@ export default function LivestreamSettingPage() {
         dvr,
         vod
       });
+      navigate("/stream/dashboard");
+      return;
     } catch (error) {
       console.error("Failed to save livestream settings", error);
       setSubmitError("Không thể lưu thiết lập lúc này. Vui lòng thử lại sau.");

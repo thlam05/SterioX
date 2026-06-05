@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { VideoPlayer } from "@/components/stream/VideoPlayer";
 import {
   Radio,
   Tv,
@@ -21,12 +22,45 @@ import {
   Sparkles,
   Share2
 } from "lucide-react";
+import { useAuthStore } from "@/stores/authStore";
+import { useNavigate } from "react-router";
+import { streamApi, type StreamResponse } from "@/api/streamApi";
 
 export default function LivestreamDashboard() {
+  const { user, isAuthenticated } = useAuthStore();
+
+  const navigate = useNavigate();
+
+  const [stream, setStream] = useState<StreamResponse | null>(null);
   const [streamTitle, setStreamTitle] = useState("Lập trình hệ thống phân tán hiệu năng cao với Java và Spring Boot");
   const [category, setCategory] = useState("Công nghệ & Lập trình");
   const [chatMessage, setChatMessage] = useState("");
   const [isLive, setIsLive] = useState(true);
+  const defaultVideoSource = "http://localhost:5555/hls/ebf71facd3374ce1bccba3525f507e83.m3u84";
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+
+    const fetchStreaming = async () => {
+      try {
+        const streamResponse = await streamApi.getStreamOnlineOfUSer(user.id);
+        console.log(streamResponse);
+        setStream(streamResponse);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    fetchStreaming();
+
+  }, [user, isAuthenticated]);
 
   const mockMetrics = {
     viewers: "2,450",
@@ -51,6 +85,7 @@ export default function LivestreamDashboard() {
   ];
 
   return (
+
     <div className="w-full bg-background text-foreground font-sans space-y-6 selection:bg-selection">
 
       {/* Thống kê nhanh trạng thái dòng chảy */}
@@ -125,38 +160,8 @@ export default function LivestreamDashboard() {
         <div className="lg:col-span-2 space-y-6">
 
           {/* Trình xem trước luồng video */}
-          <div className="relative aspect-video rounded-3xl bg-foreground border border-accent overflow-hidden group">
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 text-background space-y-3">
-              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center border border-primary text-primary">
-                <Radio className="w-8 h-8 animate-pulse" />
-              </div>
-              <div>
-                <p className="text-lg font-bold text-background">Màn hình xem trước của nguồn phát</p>
-                <p className="text-xs text-accent">Đang đồng bộ dữ liệu hình ảnh trực tiếp từ phần mềm mã hóa</p>
-              </div>
-            </div>
-
-            {/* Các lớp phủ thông tin trên khung phát */}
-            <div className="absolute top-4 left-4 flex gap-2">
-              <span className="bg-danger text-background text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-background animate-ping"></span> Live
-              </span>
-              <span className="bg-foreground/80 text-background text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm">
-                Nginx Load Balancer
-              </span>
-            </div>
-
-            <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center bg-foreground/60 backdrop-blur-md p-3 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              <div className="flex items-center gap-3 text-background">
-                <Button variant="outline" className="p-1 h-8 w-8 text-background border-accent bg-transparent hover:bg-background hover:text-foreground">
-                  <Volume2 className="w-4 h-4" />
-                </Button>
-                <span className="text-xs font-medium text-accent">Âm thanh hệ thống ổn định</span>
-              </div>
-              <Button variant="outline" className="p-1 h-8 w-8 text-background border-accent bg-transparent hover:bg-background hover:text-foreground">
-                <Maximize2 className="w-4 h-4" />
-              </Button>
-            </div>
+          <div className="relative aspect-video rounded-3xl border border-accent overflow-hidden group bg-black">
+            <VideoPlayer src={"http://localhost:5555/hls/ebf71facd3374ce1bccba3525f507e83.m3u8"}></VideoPlayer>
           </div>
 
           {/* Bảng điều khiển tác vụ cốt lõi */}
