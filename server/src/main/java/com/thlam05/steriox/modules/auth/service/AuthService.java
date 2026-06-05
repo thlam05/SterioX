@@ -12,10 +12,12 @@ import com.nimbusds.jwt.SignedJWT;
 import com.thlam05.steriox.common.enums.ResponseStatus;
 import com.thlam05.steriox.common.enums.RoleType;
 import com.thlam05.steriox.common.exception.AppException;
+import com.thlam05.steriox.modules.auth.dto.request.IntrospectRequest;
 import com.thlam05.steriox.modules.auth.dto.request.LoginRequest;
 import com.thlam05.steriox.modules.auth.dto.request.LogoutRequest;
 import com.thlam05.steriox.modules.auth.dto.request.RefreshRequest;
 import com.thlam05.steriox.modules.auth.dto.request.RegisterRequest;
+import com.thlam05.steriox.modules.auth.dto.response.IntrospectResponse;
 import com.thlam05.steriox.modules.auth.dto.response.LoginResponse;
 import com.thlam05.steriox.modules.auth.dto.response.TokenResponse;
 import com.thlam05.steriox.modules.auth.entity.InvalidatedToken;
@@ -90,5 +92,10 @@ public class AuthService {
     public TokenResponse refresh(RefreshRequest request) throws ParseException, JOSEException {
         String token = jwtService.refreshToken(request.getToken());
         return TokenResponse.bearer(token);
+    }
+
+    public IntrospectResponse introspect(IntrospectRequest request) {
+        boolean valid = jwtService.introspect(request.getToken());
+        return new IntrospectResponse(valid);
     }
 }

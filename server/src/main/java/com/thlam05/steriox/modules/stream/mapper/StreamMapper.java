@@ -43,6 +43,9 @@ public interface StreamMapper {
                 .startedAt(stream.getStartedAt())
                 .endedAt(stream.getEndedAt())
                 .createdAt(stream.getCreatedAt())
+                .latency(stream.getLatency())
+                .playUrl(stream.getPlayUrl())
+
                 .build();
     }
 

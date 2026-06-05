@@ -24,7 +24,8 @@ import lombok.RequiredArgsConstructor;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private String[] PUBLIC_ENDPOINT = { "/auth/login", "/auth/register", "/auth/refresh", "/ws/**" };
+    private String[] PUBLIC_ENDPOINT = { "/auth/login", "/auth/register", "/auth/refresh", "/auth/introspec",
+            "/ws/**" };
 
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     private final CustomJwtDecoder customJwtDecoder;
