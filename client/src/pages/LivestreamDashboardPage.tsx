@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
-import { VideoPlayer } from "@/components/stream/VideoPlayer";
+import { CustomStreamPlayer } from "@/components/stream/CustomStreamPlayer";
 import {
   Radio,
   Tv,
@@ -161,7 +161,7 @@ export default function LivestreamDashboard() {
 
           {/* Trình xem trước luồng video */}
           <div className="relative aspect-video rounded-3xl border border-accent overflow-hidden group bg-black">
-            <VideoPlayer src={"http://localhost:5555/hls/ebf71facd3374ce1bccba3525f507e83.m3u8"}></VideoPlayer>
+            <CustomStreamPlayer src={"http://localhost:5555/hls/ebf71facd3374ce1bccba3525f507e83.m3u8"}></CustomStreamPlayer>
           </div>
 
           {/* Bảng điều khiển tác vụ cốt lõi */}
