@@ -9,22 +9,17 @@ import {
   MessageSquare,
   Heart,
   Sliders,
-  Shield,
   Activity,
   Send,
-  Zap,
   Clock,
   AlertTriangle,
-  Play,
-  Square,
   Sparkles,
   Share2,
   AlertCircle,
   Copy,
   Check,
   Eye,
-  EyeOff,
-  KeyRound
+  EyeOff
 } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate } from "react-router";
@@ -45,7 +40,6 @@ export default function LivestreamDashboard() {
   const [streamTitle, setStreamTitle] = useState("Lập trình hệ thống phân tán hiệu năng cao với Java và Spring Boot");
   const [category, setCategory] = useState("Công nghệ & Lập trình");
   const [chatMessage, setChatMessage] = useState("");
-  const [isLive, setIsLive] = useState(true);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -135,8 +129,8 @@ export default function LivestreamDashboard() {
           </div>
           <div>
             <p className="text-xs text-secondary font-medium">Trạng thái</p>
-            <span className={`text-sm font-black flex items-center gap-1 ${isLive ? 'text-danger' : 'text-secondary'}`}>
-              {isLive ? 'Trực tiếp' : 'Ngoại tuyến'}
+            <span className={`text-sm font-black flex items-center gap-1 ${stream?.isActive ? 'text-danger' : 'text-secondary'}`}>
+              {stream?.isActive ? 'Trực tiếp' : 'Ngoại tuyến'}
             </span>
           </div>
         </div>
@@ -147,7 +141,7 @@ export default function LivestreamDashboard() {
           </div>
           <div>
             <p className="text-xs text-secondary font-medium">Người xem</p>
-            <span className="text-sm font-black text-foreground">{mockMetrics.viewers}</span>
+            <span className="text-sm font-black text-foreground">{stream?.currentViewers}</span>
           </div>
         </div>
 
@@ -157,7 +151,7 @@ export default function LivestreamDashboard() {
           </div>
           <div>
             <p className="text-xs text-secondary font-medium">Lượt thích</p>
-            <span className="text-sm font-black text-foreground">{mockMetrics.likes}</span>
+            <span className="text-sm font-black text-foreground">{stream?.totalLikes}</span>
           </div>
         </div>
 
@@ -219,66 +213,46 @@ export default function LivestreamDashboard() {
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-3">
-              {isLive ? (
-                <Button
-                  onClick={() => setIsLive(false)}
-                  className="bg-danger text-background hover:bg-danger-light hover:text-foreground font-bold px-6 flex items-center gap-2 rounded-xl"
-                >
-                  <Square className="w-4 h-4 fill-current" /> Tạm dừng phát trực tiếp
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => setIsLive(true)}
-                  className="bg-success text-background hover:bg-success-light hover:text-foreground font-bold px-6 flex items-center gap-2 rounded-xl"
-                >
-                  <Play className="w-4 h-4 fill-current" /> Tiếp tục phát trực tiếp
-                </Button>
-              )}
-            </div>
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="block text-xs font-black tracking-wider mb-2 text-foreground">
+                  Stream URL
+                </label>
+                <div className="relative group">
+                  <Input readOnly value={streamUrl ? streamUrl : ""} className="bg-accent font-mono text-[11px] pr-10 border-accent" />
+                  <button type="button" onClick={handleCopyStreamUrl} className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-primary transition-colors">
+                    {copied === "streamUrl" ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
 
-            {!stream && (
-              <div className="space-y-4">
-                <div className="space-y-1.5">
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-end">
                   <label className="block text-xs font-black tracking-wider mb-2 text-foreground">
-                    Stream URL
+                    Stream Key
                   </label>
-                  <div className="relative group">
-                    <Input readOnly value={streamUrl ? streamUrl : ""} className="bg-accent font-mono text-[11px] pr-10 border-accent" />
-                    <button type="button" onClick={handleCopyStreamUrl} className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-primary transition-colors">
-                      {copied === "streamUrl" ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
+                  <span className="text-[9px] font-bold text-danger flex items-center gap-1 bg-selection px-1.5 py-0.5 rounded uppercase">
+                    <AlertCircle className="w-3 h-3" /> Bảo mật
+                  </span>
+                </div>
+                <div className="relative group">
+                  <Input
+                    type={showStreamKey ? "text" : "password"}
+                    readOnly
+                    value={streamKey ? streamKey : ""}
+                    className="bg-accent font-mono text-[11px] pr-20 tracking-widest border-accent"
+                  />
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
+                    <button onClick={() => setShowStreamKey(!showStreamKey)} className="p-1.5 text-secondary hover:text-foreground">
+                      {showStreamKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                    <button type="button" onClick={handleCopyStreamKey} className="p-1.5 text-secondary hover:text-foreground">
+                      {copied === "streamKey" ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
-
-                <div className="space-y-1.5">
-                  <div className="flex justify-between items-end">
-                    <label className="block text-xs font-black tracking-wider mb-2 text-foreground">
-                      Stream Key
-                    </label>
-                    <span className="text-[9px] font-bold text-danger flex items-center gap-1 bg-selection px-1.5 py-0.5 rounded uppercase">
-                      <AlertCircle className="w-3 h-3" /> Bảo mật
-                    </span>
-                  </div>
-                  <div className="relative group">
-                    <Input
-                      type={showStreamKey ? "text" : "password"}
-                      readOnly
-                      value={streamKey ? streamKey : ""}
-                      className="bg-accent font-mono text-[11px] pr-20 tracking-widest border-accent"
-                    />
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-                      <button onClick={() => setShowStreamKey(!showStreamKey)} className="p-1.5 text-secondary hover:text-foreground">
-                        {showStreamKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                      <button type="button" onClick={handleCopyStreamKey} className="p-1.5 text-secondary hover:text-foreground">
-                        {copied === "streamKey" ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </div>
-                </div>
               </div>
-            )}
+            </div>
 
             <div className="border-t border-accent pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>

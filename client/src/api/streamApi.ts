@@ -19,6 +19,7 @@ export type StreamResponse = {
   dvr: boolean;
   vod: boolean;
   playUrl: string;
+  isActive: boolean;
   currentViewers: number;
   maxViewers: number;
   totalLikes: number;
