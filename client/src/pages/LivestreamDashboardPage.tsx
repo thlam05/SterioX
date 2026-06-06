@@ -257,7 +257,7 @@ export default function LivestreamDashboard() {
             <div className="border-t border-accent pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-black tracking-wider mb-2 text-foreground">
-                  Tiêu đề buổi phát sóng
+                  Tiêu đề buổi phát sóngs
                 </label>
                 <Input
                   type="text"
