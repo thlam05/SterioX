@@ -16,5 +16,4 @@ import lombok.AccessLevel;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateStreamKeyRequest {
     String userId;
-    Boolean isActive;
 }

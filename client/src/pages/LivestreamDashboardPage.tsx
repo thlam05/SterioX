@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { CustomStreamPlayer } from "@/components/stream/CustomStreamPlayer";
 import {
   Radio,
   Tv,
@@ -8,25 +9,92 @@ import {
   MessageSquare,
   Heart,
   Sliders,
-  Shield,
   Activity,
-  Maximize2,
-  Volume2,
   Send,
-  Zap,
   Clock,
   AlertTriangle,
-  Play,
-  Square,
   Sparkles,
-  Share2
+  Share2,
+  AlertCircle,
+  Copy,
+  Check,
+  Eye,
+  EyeOff
 } from "lucide-react";
+import { useAuthStore } from "@/stores/authStore";
+import { useNavigate } from "react-router";
+import { streamApi, streamKeyApi, type StreamResponse } from "@/api/streamApi";
 
 export default function LivestreamDashboard() {
+  const { user, isAuthenticated } = useAuthStore();
+
+  const navigate = useNavigate();
+
+
+  const [streamKey, setStreamKey] = useState<string | null>(null);
+  const [streamUrl, setStreamUrl] = useState<string | null>(null);
+  const [showStreamKey, setShowStreamKey] = useState(false);
+  const [copied, setCopied] = useState<"streamUrl" | "streamKey" | null>(null);
+
+  const [stream, setStream] = useState<StreamResponse | null>(null);
   const [streamTitle, setStreamTitle] = useState("Lập trình hệ thống phân tán hiệu năng cao với Java và Spring Boot");
   const [category, setCategory] = useState("Công nghệ & Lập trình");
   const [chatMessage, setChatMessage] = useState("");
-  const [isLive, setIsLive] = useState(true);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+
+    const fetchStreaming = async () => {
+      try {
+        const streamResponse = await streamApi.getStreamOnlineOfUSer(user.id);
+        setStream(streamResponse);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    fetchStreaming();
+
+  }, [user, isAuthenticated]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const loadStreamKey = async () => {
+      try {
+        const data = await streamKeyApi.getStreamKey(user.id);
+        setStreamKey(data.streamKey ?? null);
+        setStreamUrl(data.streamUrl ?? null);
+      } catch (error) {
+        console.error("Failed to load stream key", error);
+      }
+    };
+
+    loadStreamKey();
+  }, [user?.id]);
+
+  const handleCopyStreamKey = () => {
+    if (streamKey) {
+      navigator.clipboard.writeText(streamKey);
+      setCopied("streamKey");
+      setTimeout(() => setCopied(null), 2000);
+    }
+  };
+
+  const handleCopyStreamUrl = () => {
+    if (streamUrl) {
+      navigator.clipboard.writeText(streamUrl);
+      setCopied("streamUrl");
+      setTimeout(() => setCopied(null), 2000);
+    }
+  };
 
   const mockMetrics = {
     viewers: "2,450",
@@ -54,15 +122,15 @@ export default function LivestreamDashboard() {
     <div className="w-full bg-background text-foreground font-sans space-y-6 selection:bg-selection">
 
       {/* Thống kê nhanh trạng thái dòng chảy */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className="bg-background border border-accent p-4 rounded-2xl flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-danger">
             <Radio className="w-5 h-5 animate-pulse" />
           </div>
           <div>
             <p className="text-xs text-secondary font-medium">Trạng thái</p>
-            <span className={`text-sm font-black flex items-center gap-1 ${isLive ? 'text-danger' : 'text-secondary'}`}>
-              {isLive ? 'Trực tiếp' : 'Ngoại tuyến'}
+            <span className={`text-sm font-black flex items-center gap-1 ${stream?.isActive ? 'text-danger' : 'text-secondary'}`}>
+              {stream?.isActive ? 'Trực tiếp' : 'Ngoại tuyến'}
             </span>
           </div>
         </div>
@@ -73,7 +141,7 @@ export default function LivestreamDashboard() {
           </div>
           <div>
             <p className="text-xs text-secondary font-medium">Người xem</p>
-            <span className="text-sm font-black text-foreground">{mockMetrics.viewers}</span>
+            <span className="text-sm font-black text-foreground">{stream?.currentViewers}</span>
           </div>
         </div>
 
@@ -83,7 +151,7 @@ export default function LivestreamDashboard() {
           </div>
           <div>
             <p className="text-xs text-secondary font-medium">Lượt thích</p>
-            <span className="text-sm font-black text-foreground">{mockMetrics.likes}</span>
+            <span className="text-sm font-black text-foreground">{stream?.totalLikes}</span>
           </div>
         </div>
 
@@ -125,38 +193,8 @@ export default function LivestreamDashboard() {
         <div className="lg:col-span-2 space-y-6">
 
           {/* Trình xem trước luồng video */}
-          <div className="relative aspect-video rounded-3xl bg-foreground border border-accent overflow-hidden group">
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 text-background space-y-3">
-              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center border border-primary text-primary">
-                <Radio className="w-8 h-8 animate-pulse" />
-              </div>
-              <div>
-                <p className="text-lg font-bold text-background">Màn hình xem trước của nguồn phát</p>
-                <p className="text-xs text-accent">Đang đồng bộ dữ liệu hình ảnh trực tiếp từ phần mềm mã hóa</p>
-              </div>
-            </div>
-
-            {/* Các lớp phủ thông tin trên khung phát */}
-            <div className="absolute top-4 left-4 flex gap-2">
-              <span className="bg-danger text-background text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-background animate-ping"></span> Live
-              </span>
-              <span className="bg-foreground/80 text-background text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm">
-                Nginx Load Balancer
-              </span>
-            </div>
-
-            <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center bg-foreground/60 backdrop-blur-md p-3 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              <div className="flex items-center gap-3 text-background">
-                <Button variant="outline" className="p-1 h-8 w-8 text-background border-accent bg-transparent hover:bg-background hover:text-foreground">
-                  <Volume2 className="w-4 h-4" />
-                </Button>
-                <span className="text-xs font-medium text-accent">Âm thanh hệ thống ổn định</span>
-              </div>
-              <Button variant="outline" className="p-1 h-8 w-8 text-background border-accent bg-transparent hover:bg-background hover:text-foreground">
-                <Maximize2 className="w-4 h-4" />
-              </Button>
-            </div>
+          <div className="relative aspect-video rounded-3xl border border-accent overflow-hidden group bg-black">
+            <CustomStreamPlayer src={stream?.playUrl ? stream.playUrl : ""}></CustomStreamPlayer>
           </div>
 
           {/* Bảng điều khiển tác vụ cốt lõi */}
@@ -175,30 +213,45 @@ export default function LivestreamDashboard() {
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-3">
-              {isLive ? (
-                <Button
-                  onClick={() => setIsLive(false)}
-                  className="bg-danger text-background hover:bg-danger-light hover:text-foreground font-bold px-6 flex items-center gap-2 rounded-xl"
-                >
-                  <Square className="w-4 h-4 fill-current" /> Dừng phát trực tiếp
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => setIsLive(true)}
-                  className="bg-success text-background hover:bg-success-light hover:text-foreground font-bold px-6 flex items-center gap-2 rounded-xl"
-                >
-                  <Play className="w-4 h-4 fill-current" /> Bắt đầu phát trực tiếp
-                </Button>
-              )}
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="block text-xs font-black tracking-wider mb-2 text-foreground">
+                  Stream URL
+                </label>
+                <div className="relative group">
+                  <Input readOnly value={streamUrl ? streamUrl : ""} className="bg-accent font-mono text-[11px] pr-10 border-accent" />
+                  <button type="button" onClick={handleCopyStreamUrl} className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-primary transition-colors">
+                    {copied === "streamUrl" ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
 
-              <Button variant="outline" className="font-bold px-4 flex items-center gap-2 border-accent">
-                <Zap className="w-4 h-4 text-warning" /> Kích hoạt quảng cáo ngắn
-              </Button>
-
-              <Button variant="outline" className="font-bold px-4 flex items-center gap-2 border-accent">
-                <Shield className="w-4 h-4 text-info" /> Chế độ chậm (Chat)
-              </Button>
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-end">
+                  <label className="block text-xs font-black tracking-wider mb-2 text-foreground">
+                    Stream Key
+                  </label>
+                  <span className="text-[9px] font-bold text-danger flex items-center gap-1 bg-selection px-1.5 py-0.5 rounded uppercase">
+                    <AlertCircle className="w-3 h-3" /> Bảo mật
+                  </span>
+                </div>
+                <div className="relative group">
+                  <Input
+                    type={showStreamKey ? "text" : "password"}
+                    readOnly
+                    value={streamKey ? streamKey : ""}
+                    className="bg-accent font-mono text-[11px] pr-20 tracking-widest border-accent"
+                  />
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
+                    <button onClick={() => setShowStreamKey(!showStreamKey)} className="p-1.5 text-secondary hover:text-foreground">
+                      {showStreamKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                    <button type="button" onClick={handleCopyStreamKey} className="p-1.5 text-secondary hover:text-foreground">
+                      {copied === "streamKey" ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="border-t border-accent pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">

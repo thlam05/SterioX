@@ -18,6 +18,8 @@ export type StreamResponse = {
   latency: string;
   dvr: boolean;
   vod: boolean;
+  playUrl: string;
+  isActive: boolean;
   currentViewers: number;
   maxViewers: number;
   totalLikes: number;
@@ -64,5 +66,9 @@ export const streamApi = {
       }
     })
     return response.data.data;
+  },
+  async getStreamOnlineOfUSer(userId: string) {
+    const response = await api.get<ApiResponse<StreamResponse>>(`/streams/user/${userId}`)
+    return response.data.data;
   }
-}
+} 

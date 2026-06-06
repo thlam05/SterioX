@@ -1,19 +1,17 @@
-package com.thlam05.steriox.modules.stream.dto.request;
+package com.thlam05.steriox.modules.auth.dto.response;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import lombok.AccessLevel;
 
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpdateStreamKeyRequest {
-    String streamUrl;
+public class IntrospectResponse {
+    boolean valid;
 }

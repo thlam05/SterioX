@@ -1,6 +1,5 @@
 package com.thlam05.steriox.security.config;
 
-import java.text.ParseException;
 import java.util.Objects;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -13,7 +12,6 @@ import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Component;
 
-import com.nimbusds.jose.JOSEException;
 import com.thlam05.steriox.security.service.JwtService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,14 +29,10 @@ public class CustomJwtDecoder implements JwtDecoder {
     @Override
     public Jwt decode(String token) throws JwtException {
 
-        try {
-            boolean isValid = jwtService.introspect(token);
+        boolean isValid = jwtService.introspect(token);
 
-            if (!isValid)
-                throw new JwtException("Token invalid");
-        } catch (JOSEException | ParseException e) {
-            throw new JwtException(e.getMessage());
-        }
+        if (!isValid)
+            throw new JwtException("Token invalid");
 
         if (Objects.isNull(nimbusJwtDecoder)) {
             SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "HS256");

@@ -20,6 +20,5 @@ public class StreamKeyResponse {
     String streamKey;
     String userId;
     String streamUrl;
-    Boolean isActive;
     LocalDateTime updatedAt;
 }

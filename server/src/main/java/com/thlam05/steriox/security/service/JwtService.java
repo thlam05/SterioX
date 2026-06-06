@@ -50,11 +50,11 @@ public class JwtService {
         return jwtValidator.validate(token, isRefresh);
     }
 
-    public boolean introspect(String token) throws JOSEException, ParseException {
+    public boolean introspect(String token) {
         boolean isValid = true;
         try {
             verify(token, false);
-        } catch (AppException e) {
+        } catch (AppException | JOSEException | ParseException e) {
             isValid = false;
         }
         return isValid;

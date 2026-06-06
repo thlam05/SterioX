@@ -25,7 +25,6 @@ public interface StreamKeyMapper {
                 .streamKey(entity.getStreamKey())
                 .userId(entity.getUser() != null ? entity.getUser().getId() : null)
                 .streamUrl(entity.getStreamUrl())
-                .isActive(entity.getIsActive())
                 .updatedAt(entity.getUpdatedAt())
                 .build();
     }

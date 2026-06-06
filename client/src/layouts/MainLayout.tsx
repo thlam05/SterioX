@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Logo from "@/components/ui/Logo";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Home,
   Tv,
@@ -19,9 +19,10 @@ import {
 import { useAuthStore } from "@/stores/authStore";
 import { Link } from "react-router";
 import { Outlet } from "react-router";
+import { authApi, type TokenResponse } from "@/api/authApi";
 
 export default function MainLayout() {
-  const { user } = useAuthStore();
+  const { user, token, logout, setToken } = useAuthStore();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -42,6 +43,30 @@ export default function MainLayout() {
     { name: "AudioSpace", viewers: "920", live: false, avatar: "A" },
     { name: "DesignLife", viewers: "1.2k", live: true, avatar: "D" },
   ];
+
+  useEffect(() => {
+    if (!token) return;
+
+    const introspecToken = async () => {
+      try {
+        const valid = await authApi.introspec(token);
+
+        if (!valid) {
+          try {
+            const tokenResponse: TokenResponse = await authApi.refresh(token);
+            setToken(tokenResponse.accessToken);
+          } catch (err) {
+            console.log(err);
+            logout();
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    introspecToken();
+  }, [token]);
 
   return (
     // Sửa 1: Thêm h-screen và overflow-hidden ở bọc ngoài cùng để cố định khung màn hình ứng dụng

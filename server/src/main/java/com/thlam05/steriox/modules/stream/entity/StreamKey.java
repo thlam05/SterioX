@@ -42,9 +42,6 @@ public class StreamKey {
     @Column(name = "stream_url", nullable = false)
     String streamUrl;
 
-    @Column(name = "is_active")
-    Boolean isActive;
-
     @LastModifiedDate
     @Column(name = "updated_at")
     LocalDateTime updatedAt;
