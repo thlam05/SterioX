@@ -23,6 +23,25 @@ export const CustomStreamPlayer = ({ src }: StreamPlayerProps) => {
   const [volume, setVolume] = useState(80);
   const [isMuted, setIsMuted] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isAtLiveEdge, setIsAtLiveEdge] = useState(true);
+
+  const checkLiveStatus = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    let currentLivePosition = video.duration;
+
+    if (hlsRef.current && hlsRef.current.liveSyncPosition) {
+      currentLivePosition = hlsRef.current.liveSyncPosition;
+    } else if (video.seekable && video.seekable.length > 0) {
+      currentLivePosition = video.seekable.end(video.seekable.length - 1);
+    }
+
+    if (currentLivePosition - video.currentTime > 2) {
+      setIsAtLiveEdge(false);
+    } else {
+      setIsAtLiveEdge(true);
+    }
+  };
 
   useEffect(() => {
     const video = videoRef.current;
@@ -65,12 +84,14 @@ export const CustomStreamPlayer = ({ src }: StreamPlayerProps) => {
     video.addEventListener('play', handleNativePlay);
     video.addEventListener('pause', handleNativePause);
     document.addEventListener('fullscreenchange', handleFullscreenChange);
+    video.addEventListener('timeupdate', checkLiveStatus);
 
     return () => {
       if (hlsRef.current) hlsRef.current.destroy();
       video.removeEventListener('play', handleNativePlay);
       video.removeEventListener('pause', handleNativePause);
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      video.removeEventListener('timeupdate', checkLiveStatus);
     };
   }, [src]);
 
@@ -113,6 +134,29 @@ export const CustomStreamPlayer = ({ src }: StreamPlayerProps) => {
     }
   };
 
+  const jumpToLiveEdge = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (hlsRef.current) {
+      const livePosition = hlsRef.current.liveSyncPosition;
+
+      if (livePosition !== null && livePosition > 0) {
+        video.currentTime = livePosition;
+      } else {
+        video.currentTime = video.duration - 1;
+      }
+    }
+    else if (video.seekable && video.seekable.length > 0) {
+      const latestSeekableTime = video.seekable.end(video.seekable.length - 1);
+      video.currentTime = latestSeekableTime;
+    }
+
+    if (video.paused) {
+      video.play().catch((err) => console.log(err));
+    }
+  };
+
   return (
     <div ref={containerRef} className="relative group rounded-2xl bg-foreground overflow-hidden shadow-xl aspect-video w-full max-w-[1200px] mx-auto select-none font-sans">
       <video
@@ -122,10 +166,16 @@ export const CustomStreamPlayer = ({ src }: StreamPlayerProps) => {
         onClick={togglePlay}
       />
 
-      <div className="absolute top-4 left-4 flex gap-2 z-10 pointer-events-none">
-        <span className="bg-danger text-background text-xs font-black px-3 py-1 rounded-md flex items-center gap-1.5 shadow-md">
-          <Radio className="w-3.5 h-3.5 animate-pulse" /> Trực tiếp
-        </span>
+      <div className="absolute top-4 left-4 flex gap-2 z-10">
+        <button
+          type="button"
+          onClick={jumpToLiveEdge}
+          className={`${isAtLiveEdge ? 'bg-danger text-background' : 'bg-neutral-600 text-white hover:bg-neutral-500'
+            } text-xs font-black px-3 py-1 rounded-md flex items-center gap-1.5 shadow-md transition-all cursor-pointer`}
+        >
+          <Radio className={`w-3.5 h-3.5 ${isAtLiveEdge ? 'animate-pulse text-background' : 'text-neutral-400'}`} />
+          Live
+        </button>
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-foreground via-foreground/75 to-transparent p-4 flex flex-col space-y-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
