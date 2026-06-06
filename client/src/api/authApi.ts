@@ -1,4 +1,5 @@
 import { api, type ApiResponse } from "@/api/apiClient";
+import axios from 'axios';
 import type { UserResponse } from "./userApi";
 
 export type LoginRequest = {
@@ -22,6 +23,10 @@ export type LoginResponse = {
   user: UserResponse
 };
 
+export type InstrspecResponse = {
+  valid: boolean;
+}
+
 export const authApi = {
   async login(payload: LoginRequest) {
     const response = await api.post<ApiResponse<LoginResponse>>("/auth/login", payload);
@@ -42,4 +47,12 @@ export const authApi = {
     const response = await api.post<ApiResponse<TokenResponse>>("/auth/refresh", { token });
     return response.data.data;
   },
+
+  async introspec(token: string) {
+    const publicApi = axios.create({
+      baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:8080/api",
+    });
+    const response = await publicApi.post<ApiResponse<InstrspecResponse>>("/auth/introspec", { token });
+    return response.data.data.valid;
+  }
 };

@@ -8,6 +8,7 @@ type AuthState = {
   login: (payload: { user: UserResponse; token: string; rememberMe?: boolean }) => void;
   updateUser: (user: UserResponse) => void;
   logout: () => void;
+  setToken: (token: string) => void;
   hydrate: () => void;
 };
 
@@ -84,6 +85,17 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     clearAuthStorage();
     set({ user: null, token: null, isAuthenticated: false });
+  },
+
+  setToken: (token: string) => {
+    if (isBrowser) {
+      const storage = getActiveStorage();
+      if (!storage) return;
+      storage.setItem(TOKEN_KEY, token);
+    }
+    set({
+      token: token
+    });
   },
 
   hydrate: () => {
