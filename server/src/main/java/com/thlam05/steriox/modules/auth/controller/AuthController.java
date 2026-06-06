@@ -59,7 +59,7 @@ public class AuthController {
         return new ApiResponse<>(response);
     }
 
-    @GetMapping("/auth/introspec")
+    @PostMapping("/auth/introspec")
     public ApiResponse<IntrospectResponse> introspect(
             @RequestBody IntrospectRequest request) {
         var response = authService.introspect(request);

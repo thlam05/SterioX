@@ -26,7 +26,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
         ApiResponse<?> apiResponse = ApiResponse.builder()
                 .code(code.getCode())
-                .message(code.getMessage())
+                .message("token invalid")
                 .build();
 
         ObjectMapper objectMapper = new ObjectMapper();
