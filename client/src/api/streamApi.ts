@@ -18,6 +18,7 @@ export type StreamResponse = {
   latency: string;
   dvr: boolean;
   vod: boolean;
+  playUrl: string;
   currentViewers: number;
   maxViewers: number;
   totalLikes: number;
