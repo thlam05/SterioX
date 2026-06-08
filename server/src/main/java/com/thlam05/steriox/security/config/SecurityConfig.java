@@ -37,6 +37,7 @@ public class SecurityConfig {
         httpSecurity.authorizeHttpRequests(request -> request
                 .requestMatchers(PUBLIC_ENDPOINT).permitAll()
                 .requestMatchers(HttpMethod.GET, "/streams", "/streams/*").permitAll()
+                .requestMatchers("/ws/**", "/ws-chat/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().authenticated());
 
