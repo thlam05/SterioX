@@ -30,10 +30,10 @@ export default function MainLayout() {
 
   const navigationItems = [
     { icon: Home, label: "Trang chủ", path: "/", active: true },
-    { icon: Tv, label: "Livestream", path: "/livestream" },
-    { icon: Compass, label: "Khám phá", path: "/livestream" },
-    { icon: Heart, label: "Theo dõi", path: "/livestream" },
-    { icon: History, label: "Lịch sử xem", path: "/livestream" },
+    { icon: Tv, label: "Livestream", path: "/livestreams" },
+    { icon: Compass, label: "Khám phá", path: "/livestreams" },
+    { icon: Heart, label: "Theo dõi", path: "/livestreams" },
+    { icon: History, label: "Lịch sử xem", path: "/livestreams" },
     { icon: Settings, label: "Cài đặt", path: "/setting" }
   ];
 

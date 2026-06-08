@@ -24,6 +24,7 @@ export type StreamResponse = {
   maxViewers: number;
   totalLikes: number;
   scheduledAt: Date;
+  categoryIds: string[];
   startedAt: Date;
   endedAt: Date;
   createdAt: Date;
@@ -38,11 +39,12 @@ export type CreateStreamRequest = {
   userId: string;
   title: string;
   description: string;
-  status: string,
-  thumbnail: File | null,
-  latency: string,
-  dvr: boolean,
-  vod: boolean
+  status: string;
+  thumbnail: File | null;
+  latency: string;
+  dvr: boolean;
+  vod: boolean;
+  categoryIds: string[];
 }
 
 export const streamKeyApi = {
@@ -69,6 +71,10 @@ export const streamApi = {
   },
   async getStreamOnlineOfUSer(userId: string) {
     const response = await api.get<ApiResponse<StreamResponse>>(`/streams/user/${userId}`)
+    return response.data.data;
+  },
+  async getStreamById(id: string) {
+    const response = await api.get<ApiResponse<StreamResponse>>(`/streams/${id}`);
     return response.data.data;
   }
 } 

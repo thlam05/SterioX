@@ -1,6 +1,7 @@
 package com.thlam05.steriox.modules.stream.entity;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import com.thlam05.steriox.common.model.BaseModel;
 import com.thlam05.steriox.modules.user.entity.User;
@@ -12,6 +13,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -38,6 +41,10 @@ public class Stream extends BaseModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     User user;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "stream_category", joinColumns = @JoinColumn(name = "stream_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
+    Set<Category> categories;
 
     @Column(name = "title", nullable = false)
     String title;

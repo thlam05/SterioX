@@ -2,7 +2,10 @@ package com.thlam05.steriox.modules.stream.service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -12,10 +15,12 @@ import com.thlam05.steriox.common.service.S3Service;
 import com.thlam05.steriox.modules.stream.dto.request.CreateStreamRequest;
 import com.thlam05.steriox.modules.stream.dto.request.UpdateStreamRequest;
 import com.thlam05.steriox.modules.stream.dto.response.StreamResponse;
+import com.thlam05.steriox.modules.stream.entity.Category;
 import com.thlam05.steriox.modules.stream.entity.Stream;
 import com.thlam05.steriox.modules.stream.entity.StreamKey;
 import com.thlam05.steriox.modules.stream.enums.StreamStatus;
 import com.thlam05.steriox.modules.stream.mapper.StreamMapper;
+import com.thlam05.steriox.modules.stream.repository.CategoryRepository;
 import com.thlam05.steriox.modules.stream.repository.StreamKeyRepository;
 import com.thlam05.steriox.modules.stream.repository.StreamRepository;
 import com.thlam05.steriox.modules.user.entity.User;
@@ -28,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class StreamService {
     private final StreamRepository streamRepository;
     private final StreamKeyRepository streamKeyRepository;
+    private final CategoryRepository categoryRepository;
     private final StreamMapper streamMapper;
     private final UserRepository userRepository;
     private final S3Service s3Service;
@@ -49,6 +55,17 @@ public class StreamService {
         stream.setTotalLikes(0);
         stream.setUser(user);
         stream.setStartedAt(LocalDateTime.now());
+        if (request.getCategoryIds() != null && !request.getCategoryIds().isEmpty()) {
+            if (request.getCategoryIds().stream().anyMatch(id -> id == null || id.isBlank())) {
+                throw new AppException(ResponseStatus.BAD_REQUEST, "Category IDs must not be blank");
+            }
+            List<Category> categories = categoryRepository.findAllById(request.getCategoryIds());
+            Set<String> foundCategoryIds = categories.stream().map(Category::getId).collect(Collectors.toSet());
+            if (!request.getCategoryIds().stream().filter(id -> id != null).allMatch(foundCategoryIds::contains)) {
+                throw new AppException(ResponseStatus.BAD_REQUEST, "Some categories not found");
+            }
+            stream.setCategories(new HashSet<>(categories));
+        }
         if (stream.getStatus() == null) {
             stream.setStatus(StreamStatus.PUBLIC.name());
         }

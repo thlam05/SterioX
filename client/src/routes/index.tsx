@@ -1,3 +1,4 @@
+import { streamApi, type StreamResponse } from "@/api/streamApi";
 import MainLayout from "@/layouts/MainLayout";
 import HomePage from "@/pages/HomePage";
 import LivestreamDashboard from "@/pages/LivestreamDashboardPage";
@@ -7,7 +8,6 @@ import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import SettingPage from "@/pages/SettingPage";
 import { createBrowserRouter } from "react-router";
-
 
 export const router = createBrowserRouter([
   {
@@ -20,27 +20,37 @@ export const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: <MainLayout></MainLayout>,
+    element: <MainLayout />,
     children: [
       {
-        path: "",
-        element: <HomePage></HomePage>
+        index: true,
+        element: <HomePage />
       },
       {
-        path: "/livestream",
-        element: <LivestreamPage></LivestreamPage>
+        path: "livestreams/:livestreamId",
+        loader: async ({ params }): Promise<StreamResponse | null> => {
+          try {
+            if (!params.livestreamId) return null;
+            const stream = await streamApi.getStreamById(params.livestreamId);
+            return stream;
+          } catch (err) {
+            console.error(err);
+            return null;
+          }
+        },
+        element: <LivestreamPage />
       },
       {
-        path: "/setting",
-        element: <SettingPage></SettingPage>
+        path: "setting",
+        element: <SettingPage />
       },
       {
-        path: "/stream/settings",
-        element: <LivestreamSettingPage></LivestreamSettingPage>
+        path: "livestreams/settings",
+        element: <LivestreamSettingPage />
       },
       {
-        path: "/stream/dashboard",
-        element: <LivestreamDashboard></LivestreamDashboard>
+        path: "livestreams/dashboard",
+        element: <LivestreamDashboard />
       }
     ]
   }
