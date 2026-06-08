@@ -22,6 +22,8 @@ public class CategoryService {
     private final CategoryMapper categoryMapper;
 
     public CategoryResponse create(CreateCategoryRequest request) {
+        validateCreateRequest(request);
+
         Category category = categoryMapper.toCategory(request);
         return categoryMapper.toCategoryResponse(categoryRepository.save(category));
     }
@@ -40,6 +42,7 @@ public class CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Category not found"));
 
+        validateUpdateRequest(request);
         categoryMapper.updateCategoryFromRequest(request, category);
         return categoryMapper.toCategoryResponse(categoryRepository.save(category));
     }
@@ -49,5 +52,41 @@ public class CategoryService {
             throw new AppException(ResponseStatus.NOT_FOUND, "Category not found");
         }
         categoryRepository.deleteById(id);
+    }
+
+    private void validateCreateRequest(CreateCategoryRequest request) {
+        if (request == null) {
+            throw new AppException(ResponseStatus.BAD_REQUEST, "Category request is required");
+        }
+        if (request.getParentId() != null && categoryRepository.existsById(request.getParentId())) {
+            throw new AppException(ResponseStatus.NOT_FOUND, "Parent category is not found");
+        }
+        if (request.getName() == null || request.getName().isBlank()) {
+            throw new AppException(ResponseStatus.BAD_REQUEST, "Category name is required");
+        }
+        if (request.getSlug() == null || request.getSlug().isBlank()) {
+            throw new AppException(ResponseStatus.BAD_REQUEST, "Category slug is required");
+        }
+        if (request.getLevel() != null && request.getLevel() < 0) {
+            throw new AppException(ResponseStatus.BAD_REQUEST, "Category level must not be negative");
+        }
+    }
+
+    private void validateUpdateRequest(UpdateCategoryRequest request) {
+        if (request == null) {
+            throw new AppException(ResponseStatus.BAD_REQUEST, "Category update request is required");
+        }
+        if (request.getParentId() != null && categoryRepository.existsById(request.getParentId())) {
+            throw new AppException(ResponseStatus.NOT_FOUND, "Parent category is not found");
+        }
+        if (request.getName() != null && request.getName().isBlank()) {
+            throw new AppException(ResponseStatus.BAD_REQUEST, "Category name must not be blank");
+        }
+        if (request.getSlug() != null && request.getSlug().isBlank()) {
+            throw new AppException(ResponseStatus.BAD_REQUEST, "Category slug must not be blank");
+        }
+        if (request.getLevel() != null && request.getLevel() < 0) {
+            throw new AppException(ResponseStatus.BAD_REQUEST, "Category level must not be negative");
+        }
     }
 }

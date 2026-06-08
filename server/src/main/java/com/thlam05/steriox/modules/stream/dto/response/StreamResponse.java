@@ -1,6 +1,7 @@
 package com.thlam05.steriox.modules.stream.dto.response;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,4 +35,5 @@ public class StreamResponse {
     LocalDateTime startedAt;
     LocalDateTime endedAt;
     LocalDateTime createdAt;
+    List<String> categoryIds;
 }

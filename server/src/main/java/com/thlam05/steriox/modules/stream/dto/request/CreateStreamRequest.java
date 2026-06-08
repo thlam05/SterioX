@@ -1,5 +1,7 @@
 package com.thlam05.steriox.modules.stream.dto.request;
 
+import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AllArgsConstructor;
@@ -25,4 +27,5 @@ public class CreateStreamRequest {
     boolean dvr;
     boolean vod;
     MultipartFile thumbnail;
+    List<String> categoryIds;
 }

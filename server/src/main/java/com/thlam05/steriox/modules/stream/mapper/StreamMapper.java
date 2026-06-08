@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 
 import com.thlam05.steriox.modules.stream.dto.request.CreateStreamRequest;
 import com.thlam05.steriox.modules.stream.dto.response.StreamResponse;
+import com.thlam05.steriox.modules.stream.entity.Category;
 import com.thlam05.steriox.modules.stream.entity.Stream;
 
 @Mapper(componentModel = "spring")
@@ -22,6 +23,7 @@ public interface StreamMapper {
     @Mapping(target = "endedAt", ignore = true)
     @Mapping(target = "playUrl", ignore = true)
     @Mapping(target = "isActive", ignore = true)
+    @Mapping(target = "categories", ignore = true)
     Stream toStream(CreateStreamRequest request);
 
     default StreamResponse toStreamResponse(Stream stream) {
@@ -45,7 +47,9 @@ public interface StreamMapper {
                 .createdAt(stream.getCreatedAt())
                 .latency(stream.getLatency())
                 .playUrl(stream.getPlayUrl())
-
+                .categoryIds(stream.getCategories() != null
+                        ? stream.getCategories().stream().map(Category::getId).collect(Collectors.toList())
+                        : null)
                 .build();
     }
 
