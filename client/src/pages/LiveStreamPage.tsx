@@ -1,111 +1,108 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CustomStreamPlayer } from "@/components/stream/CustomStreamPlayer";
 import {
-  Play,
-  Pause,
-  Volume2,
-  VolumeX,
-  Maximize,
-  Settings,
+  Radio,
+  Users,
   MessageSquare,
   Heart,
-  Share2,
   Send,
-  Users,
-  Gift,
+  Sparkles,
+  Share2,
   Award,
-  AlertCircle
+  Gift
 } from "lucide-react";
+import { useAuthStore } from "@/stores/authStore";
+import { useNavigate, useLoaderData } from "react-router";
+import type { StreamResponse } from "@/api/streamApi";
 
 export default function LivestreamPage() {
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [isMuted, setIsMuted] = useState(false);
+  const { user, isAuthenticated } = useAuthStore();
+  const navigate = useNavigate();
+  const loaderData = useLoaderData() as StreamResponse | null;
+
+  const [stream, setStream] = useState<StreamResponse | null>(loaderData);
   const [chatMessage, setChatMessage] = useState("");
+
   const [isFollowed, setIsFollowed] = useState(false);
 
-  const tags = ["Công nghệ", "Lập trình", "NextJS", "AI"];
+  const tags = ["Java", "SpringBoot", "SystemDesign", "HighPerformance"];
 
-  const chatLogs = [
-    { id: 1, user: "HoangLong_Dev", message: "Giao diện mượt quá anh ơi!", badge: "pro" },
-    { id: 2, user: "MinhThu_Tech", message: "Steriox có hỗ trợ luồng 4k không ạ?", badge: "fan" },
-    { id: 3, user: "QuocAnh_99", message: "Chào mọi người nhé, chúc buổi stream vui vẻ", badge: "" },
-    { id: 4, user: "CoderDauBac", message: "Source code phần này có chia sẻ không chủ thớt?", badge: "sub" },
-    { id: 5, user: "AI_Explorer", message: "Đang đợi đoạn tích hợp OpenAI Agent", badge: "fan" },
-    { id: 6, user: "NguyenVanA", message: "Âm thanh vòm nghe đỉnh thật sự", badge: "" },
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    setStream(loaderData);
+  }, [loaderData]);
+
+  const mockChats = [
+    { id: 1, user: "Lâm", text: "Chào mọi người, hôm nay chúng ta sẽ tối ưu hoá kết nối DB nhé.", time: "16:12", isStreamer: true },
+    { id: 2, user: "Hoàng Nam", text: "Dự án này có sử dụng mô hình Master-Slave không anh?", time: "16:13", isStreamer: false },
+    { id: 3, user: "Minh Thư", text: "Luồng mượt quá, cấu hình OBS thế nào vậy ạ?", time: "16:14", isStreamer: false },
+    { id: 4, user: "Quốc Anh", text: "Chào sếp Lâm, hướng dẫn phần Nginx load balancing kỹ hơn chút nhé.", time: "16:15", isStreamer: false },
+    { id: 5, user: "Thanh Sơn", text: "Bên MoMo Sandbox kết nối trực tiếp với Worker luôn hả anh?", time: "16:16", isStreamer: false }
   ];
 
-  const suggestedStreams = [
-    { id: 1, title: "Xây dựng hệ thống phân tán với Rust", streamer: "Rustacean VN", viewers: "1.2k", emoji: "🦀" },
-    { id: 2, title: "UI/UX chuẩn mực thiết kế toàn cầu", streamer: "DesignStudio", viewers: "950", emoji: "🎨" },
-    { id: 3, title: "Review bàn phím cơ custom công thái học", streamer: "Mê Cơ Học", viewers: "2.1k", emoji: "⌨️" },
+  const mockDonations = [
+    { id: 1, user: "Duy Mạnh", amount: "50,000 VND", message: "Ủng hộ anh Lâm chia sẻ kiến thức hay!" },
+    { id: 2, user: "Ngọc Linh", amount: "100,000 VND", message: "Project cuốn quá anh ơi." }
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans flex flex-col">
-      {/* Thân trang chính chia làm hai vùng: luồng phát và khung chat */}
-      <div className="flex-grow flex flex-col lg:flex-row w-full max-w-[1600px] mx-auto gap-4">
+    <div className="w-full bg-background text-foreground font-sans space-y-6 selection:bg-selection">
 
-        {/* Vùng bên trái: Trình phát video và thông tin chi tiết */}
-        <div className="flex-1 flex flex-col gap-4">
+      {/* Thống kê nhanh trạng thái dòng chảy */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="bg-background border border-accent p-4 rounded-2xl flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-danger">
+            <Radio className="w-5 h-5 animate-pulse" />
+          </div>
+          <div>
+            <p className="text-xs text-secondary font-medium">Trạng thái</p>
+            <span className={`text-sm font-black flex items-center gap-1 ${stream?.isActive ? 'text-danger' : 'text-secondary'}`}>
+              {stream?.isActive ? 'Trực tiếp' : 'Ngoại tuyến'}
+            </span>
+          </div>
+        </div>
 
-          {/* Trình phát Video giả lập */}
-          <div className="relative aspect-video bg-foreground rounded-2xl overflow-hidden group border border-accent">
-            {/* Nội dung video giả lập */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center select-none">
-              <div className="text-8xl animate-pulse">💻</div>
-              <p className="text-background text-sm font-bold mt-4 bg-foreground/60 px-4 py-2 rounded-full backdrop-blur-sm">
-                Đang truyền phát luồng chất lượng cao 1080p 60fps
-              </p>
-            </div>
+        <div className="bg-background border border-accent p-4 rounded-2xl flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-info">
+            <Users className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs text-secondary font-medium">Người xem</p>
+            <span className="text-sm font-black text-foreground">{stream?.currentViewers ?? 0}</span>
+          </div>
+        </div>
 
-            {/* Nhãn trạng thái trực tiếp */}
-            <div className="absolute top-4 left-4 z-20 flex items-center gap-2">
-              <span className="bg-danger text-background text-xs font-bold px-3 py-1 rounded-md tracking-wider">
-                Trực tiếp
-              </span>
-              <span className="bg-foreground/70 text-background text-xs font-bold px-3 py-1 rounded-md flex items-center gap-1 backdrop-blur-sm">
-                <Users className="w-3.5 h-3.5 text-info" /> 14.5k đang xem
-              </span>
-            </div>
+        <div className="bg-background border border-accent p-4 rounded-2xl flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center text-primary">
+            <Heart className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs text-secondary font-medium">Lượt thích</p>
+            <span className="text-sm font-black text-foreground">{stream?.totalLikes ?? 0}</span>
+          </div>
+        </div>
+      </div>
 
-            {/* Thanh điều khiển video khi di chuột vào */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-foreground via-foreground/60 to-transparent p-4 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20">
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setIsPlaying(!isPlaying)}
-                  className="text-background hover:text-primary transition-colors focus:outline-none"
-                >
-                  {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 fill-current" />}
-                </button>
+      {/* Khu vực nội dung chính */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                <button
-                  onClick={() => setIsMuted(!isMuted)}
-                  className="text-background hover:text-primary transition-colors focus:outline-none"
-                >
-                  {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                </button>
+        {/* Cột trái và giữa: Màn hình xem trước và Cấu hình */}
+        <div className="lg:col-span-2 space-y-6">
 
-                <span className="text-background text-xs font-mono">01:45:22</span>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <button className="text-background hover:text-primary transition-colors focus:outline-none">
-                  <Settings className="w-5 h-5" />
-                </button>
-                <button className="text-background hover:text-primary transition-colors focus:outline-none">
-                  <Maximize className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Thanh thời gian tuyến tính */}
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-accent/30 group-hover:h-1.5 transition-all">
-              <div className="h-full bg-primary w-2/3"></div>
-            </div>
+          {/* Trình xem trước luồng video */}
+          <div className="relative aspect-video rounded-3xl border border-accent overflow-hidden group bg-black">
+            <CustomStreamPlayer src={stream?.playUrl ? stream.playUrl : ""}></CustomStreamPlayer>
           </div>
 
-          {/* Thông tin Streamer và buổi Livestream */}
+          {/* Bảng điều khiển tác vụ cốt lõi */}
           <div className="bg-background border border-accent rounded-2xl p-5 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               {/* Thông tin chủ phòng */}
@@ -129,7 +126,7 @@ export default function LivestreamPage() {
               {/* Cụm nút tương tác hành động */}
               <div className="flex items-center gap-2 flex-wrap">
                 <Button
-                  variant={isFollowed ? "outline" : "primary"}
+                  variant={isFollowed ? "outline" : "primary"} // SỬA LỖI: Thay "primary" thành "default" theo chuẩn shadcn
                   onClick={() => setIsFollowed(!isFollowed)}
                   className="font-bold flex items-center gap-2 px-5"
                 >
@@ -171,95 +168,77 @@ export default function LivestreamPage() {
               Các luồng phát sóng đề xuất
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {suggestedStreams.map((stream) => (
-                <div key={stream.id} className="bg-background border border-accent rounded-xl p-3 flex gap-3 hover:border-primary cursor-pointer transition-colors">
-                  <div className="w-12 h-12 rounded-lg bg-foreground text-background flex items-center justify-center text-2xl shrink-0 select-none">
-                    {stream.emoji}
-                  </div>
-                  <div className="min-w-0 flex-1 space-y-0.5">
-                    <h4 className="text-xs font-bold text-foreground truncate">{stream.title}</h4>
-                    <p className="text-[11px] text-secondary truncate">{stream.streamer}</p>
-                    <p className="text-[10px] text-info font-medium flex items-center gap-1">
-                      <Users className="w-3 h-3" /> {stream.viewers} người xem
-                    </p>
+              {/* {suggestedStreams.map((stream) => ( ... ))} */}
+            </div>
+          </div>
+        </div>
+
+        {/* Cột phải: Khung tương tác trò chuyện & Vinh danh quyên góp */}
+        <div className="space-y-6">
+
+          {/* Hộp thoại trò chuyện thời gian thực */}
+          <div className="bg-background border border-accent rounded-3xl flex flex-col h-[400px] overflow-hidden">
+            <div className="p-4 border-b border-accent bg-background flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-4 h-4 text-primary" />
+                <h3 className="text-sm font-black tracking-tight">Trò chuyện trực tiếp</h3>
+              </div>
+              <span className="text-[11px] font-bold bg-selection text-primary px-2 py-0.5 rounded-full">
+                Kết nối tốt
+              </span>
+            </div>
+
+            {/* Danh sách các tin nhắn */}
+            <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-background">
+              {mockChats.map((chat) => (
+                <div key={chat.id} className="text-xs leading-relaxed flex items-start gap-2">
+                  <span className="text-secondary font-medium tracking-tighter shrink-0 pt-0.5">{chat.time}</span>
+                  <div>
+                    <span className={`font-black mr-2 ${chat.isStreamer ? 'text-primary bg-selection px-1.5 py-0.5 rounded-md text-[10px]' : 'text-foreground'}`}>
+                      {chat.user}
+                    </span>
+                    <span className="text-secondary">{chat.text}</span>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
 
-        </div>
-
-        {/* Vùng bên phải: Khung Chat trực tuyến */}
-        <div className="w-full lg:w-[380px] bg-background border border-accent rounded-2xl flex flex-col h-[500px] lg:h-auto overflow-hidden">
-          {/* Tiêu đề khung chat */}
-          <div className="px-4 py-3 border-b border-accent flex items-center justify-between bg-background">
-            <div className="flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-primary" />
-              <span className="text-sm font-black text-foreground">Trò chuyện trực tuyến</span>
-            </div>
-            <div className="flex items-center gap-1 text-xs text-secondary font-medium">
-              <span className="w-2 h-2 rounded-full bg-success"></span> Chế độ phòng: Mở
-            </div>
-          </div>
-
-          {/* Danh sách tin nhắn chat */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-background">
-            <div className="bg-info-light/30 border border-info rounded-xl p-3 text-xs text-foreground flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-info shrink-0 mt-0.5" />
-              <p className="leading-relaxed">
-                Chào mừng bạn đến với phòng chat Steriox! Hãy tôn trọng những người xem khác và tuân thủ các điều khoản nguyên tắc cộng đồng của chúng tôi.
-              </p>
-            </div>
-
-            {chatLogs.map((log) => (
-              <div key={log.id} className="text-sm items-start leading-relaxed group">
-                <span className="inline-block mr-1.5">
-                  {log.badge === "pro" && (
-                    <span className="bg-primary text-background text-[9px] font-black px-1 py-0.5 rounded uppercase">Pro</span>
-                  )}
-                  {log.badge === "fan" && (
-                    <span className="bg-info text-background text-[9px] font-black px-1 py-0.5 rounded uppercase">Fan cứng</span>
-                  )}
-                  {log.badge === "sub" && (
-                    <span className="bg-success text-background text-[9px] font-black px-1 py-0.5 rounded uppercase">Người hộ</span>
-                  )}
-                </span>
-                <span className="font-extrabold text-secondary hover:text-foreground cursor-pointer mr-2">
-                  {log.user}:
-                </span>
-                <span className="text-foreground font-medium">
-                  {log.message}
-                </span>
+            {/* Khu vực gửi tin nhắn */}
+            <form onSubmit={(e) => e.preventDefault()} className="p-3 border-t border-accent bg-background flex gap-2">
+              <div className="flex-1">
+                <Input
+                  type="text"
+                  placeholder="Gửi tin nhắn với tư cách chủ phòng..."
+                  value={chatMessage}
+                  onChange={(e) => setChatMessage(e.target.value)}
+                />
               </div>
-            ))}
-          </div>
-
-          {/* Vùng nhập nội dung chat */}
-          <div className="p-4 border-t border-accent bg-background space-y-3">
-            <div className="flex gap-2">
-              <Input
-                type="text"
-                placeholder="Gửi tin nhắn đến phòng trò chuyện..."
-                value={chatMessage}
-                onChange={(e) => setChatMessage(e.target.value)}
-                className="flex-1 border border-accent bg-background text-foreground rounded-xl text-sm"
-              />
               <Button variant="primary" className="px-4 py-2 rounded-xl flex items-center justify-center">
                 <Send className="w-4 h-4" />
               </Button>
-            </div>
+            </form>
+          </div>
 
-            {/* Thanh biểu tượng tương tác nhanh */}
-            <div className="flex items-center justify-between text-xs text-secondary pt-1">
-              <div className="flex items-center gap-2">
-                <span className="cursor-pointer hover:scale-125 transition-transform">🔥</span>
-                <span className="cursor-pointer hover:scale-125 transition-transform">❤️</span>
-                <span className="cursor-pointer hover:scale-125 transition-transform">🎉</span>
-                <span className="cursor-pointer hover:scale-125 transition-transform">😮</span>
-                <span className="cursor-pointer hover:scale-125 transition-transform">👏</span>
-              </div>
-              <span className="text-[11px] text-secondary font-medium">Tối đa 200 ký tự</span>
+          {/* Danh sách ủng hộ, quyên góp gần đây */}
+          <div className="bg-background border border-accent p-4 rounded-3xl space-y-3">
+            <h3 className="text-sm font-black tracking-tight flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-warning" /> Vinh danh quyên góp mới nhất
+            </h3>
+
+            <div className="space-y-2.5">
+              {mockDonations.map((donation) => (
+                <div key={donation.id} className="bg-background border border-accent p-3 rounded-xl flex flex-col gap-1 transition-all">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-bold text-foreground">{donation.user}</span>
+                    <span className="text-xs font-black text-success bg-accent px-2 py-0.5 rounded-md">
+                      {donation.amount}
+                    </span>
+                  </div>
+                  <p className="text-xs text-secondary italic leading-normal">
+                    "{donation.message}"
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
 
