@@ -2,6 +2,8 @@ package com.thlam05.steriox.modules.stream.service;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.thlam05.steriox.common.enums.ResponseStatus;
@@ -21,6 +23,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
+    @CacheEvict(value = "categories", allEntries = true)
     public CategoryResponse create(CreateCategoryRequest request) {
         validateCreateRequest(request);
 
@@ -34,6 +37,7 @@ public class CategoryService {
         return categoryMapper.toCategoryResponse(category);
     }
 
+    @Cacheable(value = "categories")
     public List<CategoryResponse> getAll() {
         return categoryMapper.toCategoryResponses(categoryRepository.findAll());
     }
@@ -58,7 +62,8 @@ public class CategoryService {
         if (request == null) {
             throw new AppException(ResponseStatus.BAD_REQUEST, "Category request is required");
         }
-        if (request.getParentId() != null && categoryRepository.existsById(request.getParentId())) {
+        if (request.getParentId() != null && categoryRepository.existsById(request.getParentId()) == false) {
+            System.out.println(request.getParentId());
             throw new AppException(ResponseStatus.NOT_FOUND, "Parent category is not found");
         }
         if (request.getName() == null || request.getName().isBlank()) {
@@ -76,7 +81,7 @@ public class CategoryService {
         if (request == null) {
             throw new AppException(ResponseStatus.BAD_REQUEST, "Category update request is required");
         }
-        if (request.getParentId() != null && categoryRepository.existsById(request.getParentId())) {
+        if (request.getParentId() != null && categoryRepository.existsById(request.getParentId()) == false) {
             throw new AppException(ResponseStatus.NOT_FOUND, "Parent category is not found");
         }
         if (request.getName() != null && request.getName().isBlank()) {
