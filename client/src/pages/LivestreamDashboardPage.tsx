@@ -19,7 +19,8 @@ import {
   Copy,
   Check,
   Eye,
-  EyeOff
+  EyeOff,
+  Power
 } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate } from "react-router";
@@ -40,6 +41,8 @@ export default function LivestreamDashboard() {
   const [streamTitle, setStreamTitle] = useState("Lập trình hệ thống phân tán hiệu năng cao với Java và Spring Boot");
   const [category, setCategory] = useState("Công nghệ & Lập trình");
   const [chatMessage, setChatMessage] = useState("");
+
+  const [enableOnStream, setEnableOnStream] = useState<boolean>(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -79,6 +82,37 @@ export default function LivestreamDashboard() {
 
     loadStreamKey();
   }, [user?.id]);
+
+  useEffect(() => {
+    if (!stream || !stream.playUrl) return;
+
+    const playUrl = stream.playUrl;
+    let isMounted = true;
+
+    const checkStreamStatus = async () => {
+      try {
+        const response = await fetch(playUrl, { method: 'HEAD' });
+
+        if (isMounted) {
+          if (response.ok) {
+            setEnableOnStream(true);
+          } else {
+            setEnableOnStream(false);
+          }
+        }
+      } catch (error) {
+        if (isMounted) {
+          setEnableOnStream(false);
+        }
+      }
+    };
+
+    checkStreamStatus();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [stream]);
 
   const handleCopyStreamKey = () => {
     if (streamKey) {
@@ -204,6 +238,13 @@ export default function LivestreamDashboard() {
                 <Sliders className="w-5 h-5 text-primary" /> Công cụ thao tác nhanh
               </h3>
               <div className="flex gap-2">
+                <Button
+                  variant="primary"
+                  disabled={!enableOnStream}
+                  className="text-xs font-bold flex items-center gap-1.5 text-danger border-accent"
+                >
+                  <Power className="w-3.5 h-3.5" /> On stream
+                </Button>
                 <Button variant="outline" className="text-xs font-bold flex items-center gap-1.5 text-danger border-accent">
                   <AlertTriangle className="w-3.5 h-3.5" /> Báo cáo sự cố
                 </Button>
