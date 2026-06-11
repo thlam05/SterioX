@@ -45,7 +45,7 @@ export const router = createBrowserRouter([
         element: <SettingPage />
       },
       {
-        path: "livestreams/create",
+        path: "livestreams/setup",
         element: <LivestreamSetupPage />
       },
       {

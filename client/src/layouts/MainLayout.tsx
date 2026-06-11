@@ -109,7 +109,7 @@ export default function MainLayout() {
               <Bell className="w-5 h-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>
             </Button>
-            <Link to={"/livestreams/create"}>
+            <Link to={"/livestreams/setup"}>
               <Button variant="primary" className="hidden sm:flex items-center gap-2">
                 <Flame className="w-4 h-4" /> Lên sóng ngay
               </Button>

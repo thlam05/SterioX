@@ -18,15 +18,12 @@ import {
   Link2,
   KeyRound,
   Zap,
-  Layers,
-  Code,
-  Gamepad2,
-  Music,
-  MonitorPlay
+  ChevronRight
 } from "lucide-react";
 import { streamApi, streamKeyApi } from "@/api/streamApi";
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate } from "react-router";
+import { categoryApi, type CategoryResponse } from "@/api/categoryApi";
 
 const streamStatus = {
   public: "PUBLIC",
@@ -58,6 +55,7 @@ export default function LivestreamSetupPage() {
   const [titleError, setTitleError] = useState("");
   const [descriptionError, setDescriptionError] = useState("");
   const [thumbnailError, setThumbnailError] = useState("");
+  const [categoryError, setCategoryError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -65,20 +63,22 @@ export default function LivestreamSetupPage() {
   const [dvr, setDvr] = useState(true);
   const [vod, setVod] = useState(true);
 
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-
-  const availableCategories = [
-    { id: 'tech', name: 'Công nghệ & Đời sống', icon: Code },
-    { id: 'gaming', name: 'Giải đấu Trò chơi', icon: Gamepad2 },
-    { id: 'music', name: 'Âm nhạc Trực tuyến', icon: Music },
-    { id: 'education', name: 'Học tập & Sáng tạo', icon: MonitorPlay },
-  ];
+  const [parentCategory, setParentCategory] = useState<string>('');
+  const [subCategory, setSubCategory] = useState<string>('');
+  const [categoriesData, setCategoriesData] = useState<CategoryResponse[]>([]);
 
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/login");
       return;
     }
+
+    const fetchCategories = async () => {
+      const categories = await categoryApi.getCategories();
+      if (categories) setCategoriesData(categories);
+    }
+
+    fetchCategories();
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
@@ -167,6 +167,7 @@ export default function LivestreamSetupPage() {
 
     const trimmedTitle = title.trim();
     const trimmedDescription = description.trim();
+    const selectedParentCategory = parentCategory.trim();
 
     if (!trimmedTitle) {
       setTitleError("Tiêu đề không được để trống.");
@@ -198,6 +199,13 @@ export default function LivestreamSetupPage() {
       setThumbnailError("");
     }
 
+    if (!selectedParentCategory) {
+      setCategoryError("Vui lòng chọn chuyên mục cấp 1 và cấp 2.");
+      isValid = false;
+    } else {
+      setCategoryError("");
+    }
+
     return isValid;
   };
 
@@ -217,8 +225,21 @@ export default function LivestreamSetupPage() {
     setIsSubmitting(true);
 
     try {
-      // await streamApi.createStream();
-      navigate("/stream/dashboard");
+      const categoryIds = [];
+      if (parentCategory) categoryIds.push(parentCategory);
+      if (subCategory) categoryIds.push(subCategory);
+      await streamApi.createStream({
+        userId: user.id,
+        title,
+        description,
+        status,
+        thumbnail: thumbnailFile,
+        latency,
+        dvr,
+        vod,
+        categoryIds
+      });
+      navigate("/livestreams/dashboard");
       return;
     } catch (error) {
       console.error("Failed to save livestream settings", error);
@@ -228,12 +249,12 @@ export default function LivestreamSetupPage() {
     }
   };
 
-  const handleToggleCategory = (id: string) => {
-    if (selectedCategories.includes(id)) {
-      setSelectedCategories(selectedCategories.filter(catId => catId !== id));
-    } else {
-      setSelectedCategories([...selectedCategories, id]);
-    }
+  const activeParent = categoriesData.find(cat => cat.id === parentCategory);
+
+  const handleParentSelect = (id: string) => {
+    setParentCategory(id);
+    setSubCategory('');
+    setCategoryError('');
   };
 
   return (
@@ -281,49 +302,88 @@ export default function LivestreamSetupPage() {
                 {descriptionError && <p className="text-danger text-xs mt-1">{descriptionError}</p>}
               </div>
 
-              {/* Thêm ui phần chuyên mục đa lựa chọn */}
-              <div className="space-y-3">
+              {/* UI phần chuyên mục phân cấp: Chọn cấp 1 xong rồi chọn cấp 2 */}
+              <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <label className="text-xs font-bold tracking-widest opacity-60 uppercase">Chuyên mục (Chọn nhiều)</label>
+                  <label className="text-xs font-bold tracking-widest opacity-60 uppercase">Chuyên mục phân cấp</label>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {availableCategories.map((cat) => {
-                    const isSelected = selectedCategories.includes(cat.id);
-                    return (
-                      <button
-                        key={cat.id}
-                        type="button"
-                        onClick={() => handleToggleCategory(cat.id)}
-                        className={`flex items-center justify-between p-4 rounded-2xl border text-left transition-all ${isSelected
-                          ? "border-primary bg-selection text-foreground"
-                          : "border-accent bg-background text-secondary hover:border-primary/50 hover:text-foreground"
-                          }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <cat.icon className={`w-5 h-5 ${isSelected ? "text-primary" : "text-secondary"}`} />
-                          <span className="text-sm font-bold">{cat.name}</span>
-                        </div>
-                        <div className={`w-4 h-4 rounded border flex items-center justify-center ${isSelected ? "border-primary bg-primary text-background" : "border-accent"}`}>
-                          {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-                <div className="flex flex-wrap gap-2 pt-1">
-                  {selectedCategories.length === 0 ? (
-                    <span className="text-[10px] italic text-secondary">Chưa chọn chuyên mục nào, vui lòng chọn ít nhất một để người xem dễ tìm thấy</span>
-                  ) : (
-                    selectedCategories.map((id) => {
-                      const cat = availableCategories.find(c => c.id === id);
-                      return (
-                        <span key={id} className="text-[10px] font-bold bg-primary text-background px-2 py-1 rounded-md">
-                          {cat?.name}
-                        </span>
-                      );
-                    })
+
+                <div className="space-y-4">
+                  {/* Cấp 1: Chọn chuyên mục chính */}
+                  <div className="space-y-2">
+                    <span className="text-[11px] font-bold text-secondary">Bước 1: Chọn chuyên mục chính</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {categoriesData.map((cat) => {
+                        const isSelected = parentCategory === cat.id;
+                        return (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            onClick={() => handleParentSelect(cat.id)}
+                            className={`flex items-center justify-between p-4 rounded-2xl border text-left transition-all ${isSelected
+                              ? "border-primary bg-selection text-foreground"
+                              : "border-accent bg-background text-secondary hover:border-primary/50 hover:text-foreground"
+                              }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="text-sm font-bold">{cat.name}</span>
+                            </div>
+                            <ChevronRight className={`w-4 h-4 transition-transform ${isSelected ? "text-primary rotate-90" : "text-accent"}`} />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Cấp 2: Chọn chuyên mục phụ (Chỉ hiển thị khi đã chọn cấp 1) */}
+                  {parentCategory && activeParent && (
+                    <div className="space-y-2 pt-2 border-t border-accent border-dashed animate-in fade-in slide-in-from-top-2 duration-200">
+                      <span className="text-[11px] font-bold text-secondary">Bước 2: Chọn danh mục chi tiết thuộc {activeParent.name}</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {activeParent.subCategories && activeParent.subCategories.map((sub) => {
+                          const isSubSelected = subCategory === sub.id;
+                          return (
+                            <button
+                              key={sub.id}
+                              type="button"
+                              onClick={() => setSubCategory(sub.id)}
+                              className={`flex items-center justify-between p-4 rounded-2xl border text-left transition-all ${isSubSelected
+                                ? "border-primary bg-selection text-foreground"
+                                : "border-accent bg-background text-secondary hover:border-primary/50 hover:text-foreground"
+                                }`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="text-sm font-bold">{sub.name}</span>
+                              </div>
+                              <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${isSubSelected ? "border-primary" : "border-accent"}`}>
+                                {isSubSelected && <div className="w-2 h-2 rounded-full bg-primary" />}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   )}
                 </div>
+
+                {/* Trạng thái hiển thị lựa chọn hiện tại */}
+                <div className="p-3 bg-accent/30 rounded-xl flex items-center gap-2 text-xs">
+                  <span className="font-bold text-secondary">Đã chọn:</span>
+                  {parentCategory ? (
+                    <div className="flex items-center gap-1.5 font-bold text-foreground">
+                      <span>{activeParent?.name}</span>
+                      {subCategory && (
+                        <>
+                          <ChevronRight className="w-3 h-3 text-secondary" />
+                          <span className="text-primary">{activeParent?.subCategories && activeParent?.subCategories.find(s => s.id === subCategory)?.name}</span>
+                        </>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="italic text-secondary">Vui lòng chọn đầy đủ chuyên mục 2 cấp</span>
+                  )}
+                </div>
+                {categoryError && <p className="text-danger text-xs mt-1">{categoryError}</p>}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -398,7 +458,7 @@ export default function LivestreamSetupPage() {
                 {submitError && <p className="text-danger text-xs">{submitError}</p>}
                 <div className="flex items-center justify-end gap-3">
                   {/* <Button variant="outline" type="button">Hủy thay đổi</Button> */}
-                  <Button variant="primary" type="submit" disabled={!streamKey || isSubmitting}>
+                  <Button variant="primary" type="submit" disabled={!streamKey || isSubmitting || !parentCategory}>
                     {isSubmitting ? "Đang lưu..." : "Lưu thiết lập phát sóng"}
                   </Button>
                 </div>
