@@ -1,6 +1,7 @@
 package com.thlam05.steriox.modules.stream.dto.response;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +23,7 @@ public class CategoryResponse {
     String parentId;
     String slug;
     Integer level;
+    Set<CategoryResponse> subCategories;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
 }

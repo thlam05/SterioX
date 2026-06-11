@@ -50,11 +50,9 @@ public class StreamService {
         Stream stream = streamMapper.toStream(request);
         stream.setPlayUrl(generatePlayUrl(streamKey));
         stream.setIsActive(true);
-        stream.setCurrentViewers(0);
-        stream.setMaxViewers(0);
+        stream.setTotalViews(0);
         stream.setTotalLikes(0);
         stream.setUser(user);
-        stream.setStartedAt(LocalDateTime.now());
         if (request.getCategoryIds() != null && !request.getCategoryIds().isEmpty()) {
             if (request.getCategoryIds().stream().anyMatch(id -> id == null || id.isBlank())) {
                 throw new AppException(ResponseStatus.BAD_REQUEST, "Category IDs must not be blank");
@@ -115,6 +113,28 @@ public class StreamService {
         streamRepository.deleteById(id);
     }
 
+    public StreamResponse startStream(String id) {
+        Stream stream = streamRepository.findById(id)
+                .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Stream not found"));
+
+        stream.setIsActive(true);
+        stream.setOnStream(true);
+        stream.setStartedAt(LocalDateTime.now());
+        stream = streamRepository.save(stream);
+        return streamMapper.toStreamResponse(stream);
+    }
+
+    public StreamResponse stopStream(String id) {
+        Stream stream = streamRepository.findById(id)
+                .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Stream not found"));
+
+        stream.setIsActive(false);
+        stream.setOnStream(false);
+        stream.setEndedAt(LocalDateTime.now());
+        stream = streamRepository.save(stream);
+        return streamMapper.toStreamResponse(stream);
+    }
+
     private void mergeStreamFields(Stream stream, UpdateStreamRequest request) {
         if (request.getTitle() != null) {
             stream.setTitle(request.getTitle());
@@ -131,11 +151,8 @@ public class StreamService {
         if (request.getThumbnail() != null) {
             stream.setThumbnail(request.getThumbnail());
         }
-        if (request.getCurrentViewers() != null) {
-            stream.setCurrentViewers(request.getCurrentViewers());
-        }
-        if (request.getMaxViewers() != null) {
-            stream.setMaxViewers(request.getMaxViewers());
+        if (request.getTotalViews() != null) {
+            stream.setTotalViews(request.getTotalViews());
         }
         if (request.getTotalLikes() != null) {
             stream.setTotalLikes(request.getTotalLikes());

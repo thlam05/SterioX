@@ -24,13 +24,13 @@ public class StreamResponse {
     String description;
     String status;
     Boolean isActive;
+    Boolean onStream;
     String thumbnail;
     String playUrl;
     String latency;
     boolean dvr;
     boolean vod;
-    Integer currentViewers;
-    Integer maxViewers;
+    Integer totalViews;
     Integer totalLikes;
     LocalDateTime startedAt;
     LocalDateTime endedAt;

@@ -24,7 +24,7 @@ public class UpdateStreamRequest {
     Boolean isActive;
     String thumbnail;
     Integer currentViewers;
-    Integer maxViewers;
+    Integer totalViews;
     Integer totalLikes;
     LocalDateTime scheduledAt;
     LocalDateTime startedAt;

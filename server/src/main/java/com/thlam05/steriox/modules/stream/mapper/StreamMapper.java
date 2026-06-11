@@ -16,14 +16,14 @@ public interface StreamMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "thumbnail", ignore = true)
-    @Mapping(target = "currentViewers", ignore = true)
-    @Mapping(target = "maxViewers", ignore = true)
+    @Mapping(target = "totalViews", ignore = true)
     @Mapping(target = "totalLikes", ignore = true)
     @Mapping(target = "startedAt", ignore = true)
     @Mapping(target = "endedAt", ignore = true)
     @Mapping(target = "playUrl", ignore = true)
     @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "categories", ignore = true)
+    @Mapping(target = "onStream", ignore = true)
     Stream toStream(CreateStreamRequest request);
 
     default StreamResponse toStreamResponse(Stream stream) {
@@ -38,9 +38,9 @@ public interface StreamMapper {
                 .description(stream.getDescription())
                 .status(stream.getStatus())
                 .isActive(stream.getIsActive())
+                .onStream(stream.getOnStream())
                 .thumbnail(stream.getThumbnail())
-                .currentViewers(stream.getCurrentViewers())
-                .maxViewers(stream.getMaxViewers())
+                .totalViews(stream.getTotalViews())
                 .totalLikes(stream.getTotalLikes())
                 .startedAt(stream.getStartedAt())
                 .endedAt(stream.getEndedAt())

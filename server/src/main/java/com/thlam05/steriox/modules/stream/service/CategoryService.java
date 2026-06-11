@@ -1,6 +1,10 @@
 package com.thlam05.steriox.modules.stream.service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -39,7 +43,29 @@ public class CategoryService {
 
     @Cacheable(value = "categories")
     public List<CategoryResponse> getAll() {
-        return categoryMapper.toCategoryResponses(categoryRepository.findAll());
+        List<CategoryResponse> allCategories = categoryMapper.toCategoryResponses(categoryRepository.findAll());
+        Map<String, CategoryResponse> categoryMap = allCategories.stream()
+                .collect(Collectors.toMap(CategoryResponse::getId, category -> category));
+
+        List<CategoryResponse> categories = new ArrayList<>();
+
+        for (CategoryResponse category : allCategories) {
+            String parentId = category.getParentId();
+
+            if (parentId == null || parentId.isEmpty()) {
+                categories.add(category);
+            } else {
+                CategoryResponse parent = categoryMap.get(parentId);
+                if (parent != null) {
+                    if (parent.getSubCategories() == null) {
+                        parent.setSubCategories(new HashSet<>());
+                    }
+                    parent.getSubCategories().add(category);
+                }
+            }
+        }
+
+        return categories;
     }
 
     public CategoryResponse update(String id, UpdateCategoryRequest request) {

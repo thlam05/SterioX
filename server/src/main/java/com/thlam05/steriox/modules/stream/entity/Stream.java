@@ -58,6 +58,9 @@ public class Stream extends BaseModel {
     @Column(name = "is_active")
     Boolean isActive;
 
+    @Column(name = "on_stream")
+    Boolean onStream;
+
     @Column(name = "play_url")
     String playUrl;
 
@@ -73,11 +76,8 @@ public class Stream extends BaseModel {
     @Column(name = "vod")
     boolean vod;
 
-    @Column(name = "current_viewers")
-    Integer currentViewers;
-
-    @Column(name = "max_viewers")
-    Integer maxViewers;
+    @Column(name = "total_views")
+    Integer totalViews;
 
     @Column(name = "total_likes")
     Integer totalLikes;
