@@ -30,7 +30,7 @@ export default function MainLayout() {
 
   const navigationItems = [
     { icon: Home, label: "Trang chủ", path: "/", active: true },
-    { icon: Tv, label: "Livestream", path: "/livestreams" },
+    { icon: Tv, label: "Livestream", path: "/livestreams/dashboard" },
     { icon: Compass, label: "Khám phá", path: "/livestreams" },
     { icon: Heart, label: "Theo dõi", path: "/livestreams" },
     { icon: History, label: "Lịch sử xem", path: "/livestreams" },
@@ -109,7 +109,7 @@ export default function MainLayout() {
               <Bell className="w-5 h-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>
             </Button>
-            <Link to={"/stream/settings"}>
+            <Link to={"/livestreams/create"}>
               <Button variant="primary" className="hidden sm:flex items-center gap-2">
                 <Flame className="w-4 h-4" /> Lên sóng ngay
               </Button>

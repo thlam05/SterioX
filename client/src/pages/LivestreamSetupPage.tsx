@@ -17,7 +17,12 @@ import {
   Lock,
   Link2,
   KeyRound,
-  Zap
+  Zap,
+  Layers,
+  Code,
+  Gamepad2,
+  Music,
+  MonitorPlay
 } from "lucide-react";
 import { streamApi, streamKeyApi } from "@/api/streamApi";
 import { useAuthStore } from "@/stores/authStore";
@@ -35,7 +40,7 @@ const streamLatency = {
   ultra: "ULTRA"
 }
 
-export default function LivestreamSettingPage() {
+export default function LivestreamSetupPage() {
   const { isAuthenticated, user } = useAuthStore();
 
   const navigate = useNavigate();
@@ -59,6 +64,15 @@ export default function LivestreamSettingPage() {
   const [latency, setLatency] = useState(streamLatency.normal);
   const [dvr, setDvr] = useState(true);
   const [vod, setVod] = useState(true);
+
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
+  const availableCategories = [
+    { id: 'tech', name: 'Công nghệ & Đời sống', icon: Code },
+    { id: 'gaming', name: 'Giải đấu Trò chơi', icon: Gamepad2 },
+    { id: 'music', name: 'Âm nhạc Trực tuyến', icon: Music },
+    { id: 'education', name: 'Học tập & Sáng tạo', icon: MonitorPlay },
+  ];
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -203,16 +217,7 @@ export default function LivestreamSettingPage() {
     setIsSubmitting(true);
 
     try {
-      await streamApi.createStream({
-        userId: user.id,
-        title,
-        description,
-        status,
-        thumbnail: thumbnailFile,
-        latency,
-        dvr,
-        vod
-      });
+      // await streamApi.createStream();
       navigate("/stream/dashboard");
       return;
     } catch (error) {
@@ -220,6 +225,14 @@ export default function LivestreamSettingPage() {
       setSubmitError("Không thể lưu thiết lập lúc này. Vui lòng thử lại sau.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleToggleCategory = (id: string) => {
+    if (selectedCategories.includes(id)) {
+      setSelectedCategories(selectedCategories.filter(catId => catId !== id));
+    } else {
+      setSelectedCategories([...selectedCategories, id]);
     }
   };
 
@@ -268,6 +281,51 @@ export default function LivestreamSettingPage() {
                 {descriptionError && <p className="text-danger text-xs mt-1">{descriptionError}</p>}
               </div>
 
+              {/* Thêm ui phần chuyên mục đa lựa chọn */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <label className="text-xs font-bold tracking-widest opacity-60 uppercase">Chuyên mục (Chọn nhiều)</label>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {availableCategories.map((cat) => {
+                    const isSelected = selectedCategories.includes(cat.id);
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => handleToggleCategory(cat.id)}
+                        className={`flex items-center justify-between p-4 rounded-2xl border text-left transition-all ${isSelected
+                          ? "border-primary bg-selection text-foreground"
+                          : "border-accent bg-background text-secondary hover:border-primary/50 hover:text-foreground"
+                          }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <cat.icon className={`w-5 h-5 ${isSelected ? "text-primary" : "text-secondary"}`} />
+                          <span className="text-sm font-bold">{cat.name}</span>
+                        </div>
+                        <div className={`w-4 h-4 rounded border flex items-center justify-center ${isSelected ? "border-primary bg-primary text-background" : "border-accent"}`}>
+                          {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {selectedCategories.length === 0 ? (
+                    <span className="text-[10px] italic text-secondary">Chưa chọn chuyên mục nào, vui lòng chọn ít nhất một để người xem dễ tìm thấy</span>
+                  ) : (
+                    selectedCategories.map((id) => {
+                      const cat = availableCategories.find(c => c.id === id);
+                      return (
+                        <span key={id} className="text-[10px] font-bold bg-primary text-background px-2 py-1 rounded-md">
+                          {cat?.name}
+                        </span>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <label className="text-xs font-bold tracking-widest opacity-60 uppercase">Quyền riêng tư</label>
@@ -281,7 +339,7 @@ export default function LivestreamSettingPage() {
                         key={item.id}
                         className={`flex items-center gap-4 p-4 rounded-2xl border cursor-pointer transition-all hover:border-primary/50 ${status === item.id ? "border-primary bg-selection" : "border-accent"}`}
                       >
-                        <input type="radio" name="status" className="hidden" onChange={() => setStatus(item.id)} />
+                        <input type="radio" name="status" className="hidden" checked={status === item.id} onChange={() => setStatus(item.id)} />
                         <item.icon className={`w-5 h-5 ${status === item.id ? "text-primary" : "text-secondary"}`} />
                         <div className="flex-grow">
                           <p className="text-sm font-bold">{item.label}</p>
@@ -387,7 +445,7 @@ export default function LivestreamSettingPage() {
                         className="bg-accent font-mono text-[11px] pr-20 tracking-widest border-accent"
                       />
                       <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-                        <button onClick={() => setShowStreamKey(!showStreamKey)} className="p-1.5 text-secondary hover:text-foreground">
+                        <button type="button" onClick={() => setShowStreamKey(!showStreamKey)} className="p-1.5 text-secondary hover:text-foreground">
                           {showStreamKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                         <button type="button" onClick={handleCopyStreamKey} className="p-1.5 text-secondary hover:text-foreground">
@@ -411,7 +469,6 @@ export default function LivestreamSettingPage() {
                 <Button
                   onClick={handleCreateStreamKey}
                   variant="primary"
-                  // size="sm"
                   className="w-full max-w-[200px] rounded-xl font-bold uppercase tracking-tight gap-2"
                 >
                   <Zap className="w-4 h-4" /> Khởi tạo ngay
@@ -430,6 +487,7 @@ export default function LivestreamSettingPage() {
                 {[streamLatency.normal, streamLatency.low, streamLatency.ultra].map((l) => (
                   <button
                     key={l}
+                    type="button"
                     onClick={() => setLatency(l)}
                     className={`flex-1 py-2 text-[10px] font-bold rounded-lg transition-all ${latency === l ? "bg-background text-primary shadow-sm" : "text-secondary hover:text-foreground"}`}
                   >
@@ -445,7 +503,7 @@ export default function LivestreamSettingPage() {
                   <p className={`text-xs font-bold ${dvr ? "text-foreground" : "text-secondary"}`}>Chế độ tua lại (DVR)</p>
                   <p className={`text-[10px] italic ${dvr ? "text-secondary" : "text-secondary opacity-70"}`}>Cho phép người xem tua lại</p>
                 </div>
-                <button onClick={() => setDvr(!dvr)}>
+                <button type="button" onClick={() => setDvr(!dvr)}>
                   {dvr ? <ToggleRight className="w-8 h-8 text-primary" /> : <ToggleLeft className="w-8 h-8 text-secondary" />}
                 </button>
               </div>

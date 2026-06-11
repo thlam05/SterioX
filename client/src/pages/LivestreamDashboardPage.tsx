@@ -95,9 +95,9 @@ export default function LivestreamDashboard() {
 
         if (isMounted) {
           if (response.ok) {
-            setEnableOnStream(true);
+            return true;
           } else {
-            setEnableOnStream(false);
+            return false;
           }
         }
       } catch (error) {
@@ -107,10 +107,19 @@ export default function LivestreamDashboard() {
       }
     };
 
-    checkStreamStatus();
+    const interval = setInterval(async () => {
+      const isOk = await checkStreamStatus();
+      if (isOk) {
+        setEnableOnStream(true);
+      } else {
+        setEnableOnStream(false);
+        streamApi.stopStreamById(stream.id);
+      }
+    }, 10000);
 
     return () => {
       isMounted = false;
+      () => clearInterval(interval);
     };
   }, [stream]);
 
@@ -129,6 +138,13 @@ export default function LivestreamDashboard() {
       setTimeout(() => setCopied(null), 2000);
     }
   };
+
+  const handleOnStream = async () => {
+    if (!stream || !stream.playUrl) return;
+
+    const streamResponse = await streamApi.startStreamById(stream.id);
+    setStream(streamResponse);
+  }
 
   const mockMetrics = {
     viewers: "2,450",
@@ -242,6 +258,7 @@ export default function LivestreamDashboard() {
                   variant="primary"
                   disabled={!enableOnStream}
                   className="text-xs font-bold flex items-center gap-1.5 text-danger border-accent"
+                  onClick={handleOnStream}
                 >
                   <Power className="w-3.5 h-3.5" /> On stream
                 </Button>

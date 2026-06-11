@@ -76,5 +76,13 @@ export const streamApi = {
   async getStreamById(id: string) {
     const response = await api.get<ApiResponse<StreamResponse>>(`/streams/${id}`);
     return response.data.data;
+  },
+  async startStreamById(id: string) {
+    const response = await api.patch<ApiResponse<StreamResponse>>(`/stream/start/${id}`);
+    return response.data.data;
+  },
+  async stopStreamById(id: string) {
+    const response = await api.patch<ApiResponse<StreamResponse>>(`/stream/stop/${id}`);
+    return response.data.data;
   }
 } 
