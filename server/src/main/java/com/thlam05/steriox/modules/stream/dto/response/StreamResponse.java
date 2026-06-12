@@ -1,7 +1,9 @@
 package com.thlam05.steriox.modules.stream.dto.response;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
+
+import com.thlam05.steriox.modules.user.entity.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +21,7 @@ import lombok.AccessLevel;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class StreamResponse {
     String id;
-    String userId;
+    User user;
     String title;
     String description;
     String status;
@@ -35,5 +37,5 @@ public class StreamResponse {
     LocalDateTime startedAt;
     LocalDateTime endedAt;
     LocalDateTime createdAt;
-    List<String> categoryIds;
+    Set<CategoryResponse> categories;
 }

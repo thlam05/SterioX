@@ -29,8 +29,8 @@ import lombok.experimental.FieldDefaults;
 @Table(name = "streams")
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
 @Setter
+@Getter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Stream extends BaseModel {

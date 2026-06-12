@@ -1,12 +1,14 @@
 package com.thlam05.steriox.modules.stream.mapper;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.thlam05.steriox.modules.stream.dto.request.CreateStreamRequest;
+import com.thlam05.steriox.modules.stream.dto.response.CategoryResponse;
 import com.thlam05.steriox.modules.stream.dto.response.StreamResponse;
 import com.thlam05.steriox.modules.stream.entity.Category;
 import com.thlam05.steriox.modules.stream.entity.Stream;
@@ -33,7 +35,7 @@ public interface StreamMapper {
 
         return StreamResponse.builder()
                 .id(stream.getId())
-                .userId(stream.getUser() != null ? stream.getUser().getId() : null)
+                .user(stream.getUser() != null ? stream.getUser() : null)
                 .title(stream.getTitle())
                 .description(stream.getDescription())
                 .status(stream.getStatus())
@@ -47,10 +49,35 @@ public interface StreamMapper {
                 .createdAt(stream.getCreatedAt())
                 .latency(stream.getLatency())
                 .playUrl(stream.getPlayUrl())
-                .categoryIds(stream.getCategories() != null
-                        ? stream.getCategories().stream().map(Category::getId).collect(Collectors.toList())
-                        : null)
+                .categories(toCategoryResponses(stream.getCategories()))
                 .build();
+    }
+
+    default CategoryResponse toCategoryResponse(Category category) {
+        if (category == null) {
+            return null;
+        }
+
+        return CategoryResponse.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .parentId(category.getParentId())
+                .slug(category.getSlug())
+                .level(category.getLevel())
+                .subCategories(null)
+                .createdAt(category.getCreatedAt())
+                .updatedAt(category.getUpdatedAt())
+                .build();
+    }
+
+    default Set<CategoryResponse> toCategoryResponses(Set<Category> categories) {
+        if (categories == null) {
+            return null;
+        }
+
+        return categories.stream()
+                .map(this::toCategoryResponse)
+                .collect(Collectors.toSet());
     }
 
     default List<StreamResponse> toStreamResponses(List<Stream> streams) {

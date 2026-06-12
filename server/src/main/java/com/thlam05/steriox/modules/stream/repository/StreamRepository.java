@@ -1,5 +1,6 @@
 package com.thlam05.steriox.modules.stream.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,6 @@ public interface StreamRepository extends JpaRepository<Stream, String> {
             WHERE s.user.id = :userId AND s.isActive = true
             """)
     Optional<Stream> findStreamOnlineByUserId(@Param("userId") String userId);
+
+    List<Stream> findTop10ByOnStreamTrueOrderByTotalLikesDesc();
 }

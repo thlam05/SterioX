@@ -49,6 +49,11 @@ public class StreamController {
         return new ApiResponse<>(streamService.getById(id));
     }
 
+    @GetMapping("/top")
+    public ApiResponse<List<StreamResponse>> getTopStream() {
+        return new ApiResponse<>(streamService.getTopStream());
+    }
+
     @PutMapping("/{id}")
     public ApiResponse<StreamResponse> update(@PathVariable String id, @RequestBody UpdateStreamRequest request) {
         return new ApiResponse<>(streamService.update(id, request));

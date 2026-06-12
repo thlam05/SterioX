@@ -92,6 +92,11 @@ public class StreamService {
         return streamMapper.toStreamResponses(streamRepository.findAll());
     }
 
+    public List<StreamResponse> getTopStream() {
+        List<Stream> streams = streamRepository.findTop10ByOnStreamTrueOrderByTotalLikesDesc();
+        return streamMapper.toStreamResponses(streams);
+    }
+
     public StreamResponse update(String id, UpdateStreamRequest request) {
         Stream stream = streamRepository.findById(id)
                 .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Stream not found"));
