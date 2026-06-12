@@ -1,4 +1,6 @@
+import { streamApi, type StreamResponse } from "@/api/streamApi";
 import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/stores/authStore";
 import {
   Flame,
   Eye,
@@ -10,25 +12,50 @@ import {
   MonitorPlay,
   MoreVertical
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router";
 
 export default function HomePage() {
+  const { isAuthenticated } = useAuthStore();
+
+  const navigate = useNavigate();
+
+  const [livestreams, setLivestreams] = useState<StreamResponse[]>([]);
+  const [topLivestreams, setTopLivestream] = useState<StreamResponse[]>([]);
+  const [regularLivestream, setRegularLivestream] = useState<StreamResponse[]>([]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+
+    const fetchTopLivestreams = async () => {
+      try {
+        const livestreams = await streamApi.getTopStream();
+        console.log(livestreams);
+        setLivestreams(livestreams);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    fetchTopLivestreams();
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    if (!livestreams) return;
+
+    setTopLivestream(livestreams.slice(0, 2));
+    setRegularLivestream(livestreams.slice(2, 11));
+
+  }, [livestreams]);
+
   const categories = [
     { name: "Công nghệ & Đời sống", count: "12.4k đang xem", icon: Code, bgEmoji: "💻", color: "text-primary" },
     { name: "Giải đấu Trò chơi", count: "45.2k đang xem", icon: Gamepad2, bgEmoji: "🎮", color: "text-info" },
     { name: "Âm nhạc Trực tuyến", count: "8.9k đang xem", icon: Music, bgEmoji: "🎵", color: "text-success" },
     { name: "Học tập & Sáng tạo", count: "5.1k đang xem", icon: MonitorPlay, bgEmoji: "📚", color: "text-warning" },
-  ];
-
-  const highViewStreams = [
-    { title: "Xây dựng AI Agent thông minh từ cơ bản đến nâng cao cùng chuyên gia", streamer: "TechLead VN", viewers: "8.4k", tags: ["Công nghệ", "AI"], avatar: "🤖" },
-    { title: "Chung kết tổng giải đấu SterioX Valorant Championship 2026", streamer: "SterioX Esport", viewers: "24.5k", tags: ["Trò chơi", "Giải đấu"], avatar: "🏆" },
-  ];
-
-  const regularStreams = [
-    { title: "Review chi tiết bàn phím cơ custom công thái học mới nhất", streamer: "Mê Cơ Học", viewers: "1.2k", avatar: "⌨️" },
-    { title: "Lập trình hệ thống phân tán bằng ngôn ngữ Rust", streamer: "Rustacean", viewers: "950", avatar: "🦀" },
-    { title: "Góc thư giãn: Giao lưu và nghe nhạc coding đêm muộn", streamer: "Lofi Chill", viewers: "2.1k", avatar: "🎧" },
-    { title: "Thiết kế giao diện ứng dụng di động chuẩn chỉnh UI/UX", streamer: "Design Studio", viewers: "1.5k", avatar: "🎨" },
   ];
 
   return (
@@ -75,35 +102,43 @@ export default function HomePage() {
         </div>
 
         {/* 1 luồng Stream (video) view cao chiếm 2 ô ngang 1 ô dọc */}
-        {highViewStreams.map((stream, index) => (
-          <div key={index} className="md:col-span-2 md:row-span-1 group flex flex-col bg-background border border-accent rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-200">
+        {topLivestreams.map((stream, index) => (
+          <Link to={`/livestreams/${stream.id}`} key={index} className="md:col-span-2 md:row-span-1 group flex flex-col bg-background border border-accent rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-200">
             <div className="relative aspect-video bg-foreground overflow-hidden">
               <div className="absolute top-3 left-3 bg-danger text-background text-xs font-black px-2 py-0.5 rounded-md tracking-wider z-10">
                 Live
               </div>
               <div className="absolute top-3 right-3 bg-foreground/80 text-background text-xs font-bold px-2 py-0.5 rounded-md flex items-center gap-1 z-10 backdrop-blur-sm">
-                <Eye className="w-3.5 h-3.5 text-danger" /> {stream.viewers}
+                <Eye className="w-3.5 h-3.5 text-danger" /> {stream.totalViews}
               </div>
-              <div className="w-full h-full flex items-center justify-center text-6xl group-hover:scale-105 transition-transform duration-300 select-none">
-                {stream.avatar}
+              <div className="w-full h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-300 select-none overflow-hidden">
+                <img
+                  src={stream.thumbnail}
+                  alt="Stream thumbnail"
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
 
             <div className="p-4 flex gap-3 flex-1 bg-background">
               <div className="w-10 h-10 rounded-full bg-accent text-foreground flex items-center justify-center font-bold shrink-0 border border-primary">
-                {index + 1}
+                <img
+                  src={stream.user?.avatarImageUrl}
+                  alt={stream.user?.username || "Avatar"}
+                  className="w-full h-full rounded-full object-cover"
+                />
               </div>
               <div className="flex-1 space-y-1 min-w-0">
                 <h4 className="text-sm font-bold text-foreground leading-snug truncate group-hover:text-primary transition-colors">
                   {stream.title}
                 </h4>
                 <p className="text-xs font-medium text-secondary">
-                  {stream.streamer}
+                  {stream.user.username}
                 </p>
                 <div className="flex gap-1 pt-1">
-                  {stream.tags.map((tag, tIdx) => (
+                  {stream.categories.map((category, tIdx) => (
                     <span key={tIdx} className="text-[10px] font-bold bg-selection text-primary px-2 py-0.5 rounded-md">
-                      {tag}
+                      {category.name}
                     </span>
                   ))}
                 </div>
@@ -112,7 +147,7 @@ export default function HomePage() {
                 <MoreVertical className="w-4 h-4" />
               </Button>
             </div>
-          </div>
+          </Link>
         ))}
 
         {/* Tiêu đề phần Chuyên mục và Các livestream khác */}
@@ -167,17 +202,17 @@ export default function HomePage() {
         </div>
 
         {/* Các livestream khác xếp theo lưới tiêu chuẩn của hàng nội dung */}
-        {regularStreams.map((stream, index) => (
-          <div key={index} className="md:col-span-1 group flex flex-col bg-background border border-accent rounded-2xl overflow-hidden hover:border-secondary transition-all duration-200">
+        {regularLivestream.map((stream, index) => (
+          <Link to={`/livestreams/${stream.id}`} key={index} className="md:col-span-1 group flex flex-col bg-background border border-accent rounded-2xl overflow-hidden hover:border-secondary transition-all duration-200">
             <div className="relative aspect-video bg-foreground overflow-hidden">
               <div className="absolute top-2 left-2 bg-secondary text-background text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
                 Đang phát
               </div>
               <div className="absolute top-2 right-2 bg-foreground/60 text-background text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1">
-                <Eye className="w-3 h-3 text-info" /> {stream.viewers}
+                <Eye className="w-3 h-3 text-info" /> {stream.totalViews}
               </div>
               <div className="w-full h-full flex items-center justify-center text-4xl group-hover:scale-105 transition-transform duration-300 select-none">
-                {stream.avatar}
+                {stream.thumbnail}
               </div>
             </div>
 
@@ -186,10 +221,10 @@ export default function HomePage() {
                 {stream.title}
               </h4>
               <p className="text-[11px] font-medium text-secondary truncate">
-                {stream.streamer}
+                {stream.user.username}
               </p>
             </div>
-          </div>
+          </Link>
         ))}
 
       </div>

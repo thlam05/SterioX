@@ -113,13 +113,20 @@ export default function LivestreamDashboard() {
         setEnableOnStream(true);
       } else {
         setEnableOnStream(false);
-        streamApi.stopStreamById(stream.id);
+        try {
+          if (stream.onStream) {
+            const streamResponse = await streamApi.stopStreamById(stream.id);
+            setStream(streamResponse);
+          }
+        } catch (error) {
+          console.log(error);
+        }
       }
     }, 10000);
 
     return () => {
       isMounted = false;
-      () => clearInterval(interval);
+      clearInterval(interval);
     };
   }, [stream]);
 
@@ -191,7 +198,7 @@ export default function LivestreamDashboard() {
           </div>
           <div>
             <p className="text-xs text-secondary font-medium">Người xem</p>
-            <span className="text-sm font-black text-foreground">{stream?.currentViewers}</span>
+            <span className="text-sm font-black text-foreground">{stream?.totalViews}</span>
           </div>
         </div>
 

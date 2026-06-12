@@ -1,4 +1,6 @@
 import { api, type ApiResponse } from "@/api/apiClient";
+import type { UserResponse } from "./userApi";
+import type { CategoryResponse } from "./categoryApi";
 
 export type StreamKeyResponse = {
   streamKey: string;
@@ -10,7 +12,7 @@ export type StreamKeyResponse = {
 
 export type StreamResponse = {
   id: string;
-  userId: string;
+  user: UserResponse;
   title: string;
   description: string;
   status: string;
@@ -20,11 +22,11 @@ export type StreamResponse = {
   vod: boolean;
   playUrl: string;
   isActive: boolean;
-  currentViewers: number;
-  maxViewers: number;
+  onStream: boolean;
+  totalViews: number;
   totalLikes: number;
   scheduledAt: Date;
-  categoryIds: string[];
+  categories: CategoryResponse[];
   startedAt: Date;
   endedAt: Date;
   createdAt: Date;
@@ -77,12 +79,16 @@ export const streamApi = {
     const response = await api.get<ApiResponse<StreamResponse>>(`/streams/${id}`);
     return response.data.data;
   },
+  async getTopStream() {
+    const response = await api.get<ApiResponse<StreamResponse[]>>(`/streams/top`);
+    return response.data.data;
+  },
   async startStreamById(id: string) {
-    const response = await api.patch<ApiResponse<StreamResponse>>(`/stream/start/${id}`);
+    const response = await api.patch<ApiResponse<StreamResponse>>(`/streams/start/${id}`);
     return response.data.data;
   },
   async stopStreamById(id: string) {
-    const response = await api.patch<ApiResponse<StreamResponse>>(`/stream/stop/${id}`);
+    const response = await api.patch<ApiResponse<StreamResponse>>(`/streams/stop/${id}`);
     return response.data.data;
   }
 } 
