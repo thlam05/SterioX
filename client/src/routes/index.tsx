@@ -1,4 +1,4 @@
-import { streamApi, type StreamResponse } from "@/api/streamApi";
+import { streamApi } from "@/api/streamApi";
 import MainLayout from "@/layouts/MainLayout";
 import HomePage from "@/pages/HomePage";
 import LivestreamDashboard from "@/pages/LivestreamDashboardPage";
@@ -7,6 +7,7 @@ import LivestreamSetupPage from "@/pages/LivestreamSetupPage";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import SettingPage from "@/pages/SettingPage";
+import type { StreamResponse } from "@/types/streamType";
 import { createBrowserRouter } from "react-router";
 
 export const router = createBrowserRouter([

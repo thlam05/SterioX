@@ -1,19 +1,5 @@
 import { api, type ApiResponse } from "@/api/apiClient";
-
-export type UserResponse = {
-  id: string;
-  username: string;
-  email: string;
-  avatarImageUrl: string;
-  roles: string[];
-};
-
-export type UserRequest = {
-  username: string;
-  email: string;
-  avatarImageUrl?: string;
-  roles?: string[];
-};
+import type { UserRequest, UserResponse } from "@/types/userType";
 
 export const userApi = {
   async getUsers() {

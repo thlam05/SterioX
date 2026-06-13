@@ -1,6 +1,7 @@
-import { streamApi, type StreamResponse } from "@/api/streamApi";
+import { streamApi } from "@/api/streamApi";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/stores/authStore";
+import type { StreamResponse } from "@/types/streamType";
 import {
   Flame,
   Eye,

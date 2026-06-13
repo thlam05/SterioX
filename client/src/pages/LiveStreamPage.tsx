@@ -15,15 +15,18 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate, useLoaderData } from "react-router";
-import type { StreamResponse } from "@/api/streamApi";
+import { useSocket } from "@/context/SocketContext";
+import type { StreamResponse } from "@/types/streamType";
 
 export default function LivestreamPage() {
   const { user, isAuthenticated } = useAuthStore();
+  const { isConnected, sendMessage, subscribeTopic } = useSocket();
   const navigate = useNavigate();
   const loaderData = useLoaderData() as StreamResponse | null;
 
   const [stream, setStream] = useState<StreamResponse | null>(loaderData);
   const [chatMessage, setChatMessage] = useState("");
+  const [currentViews, setCurrentViews] = useState(0);
 
   const [isFollowed, setIsFollowed] = useState(false);
 
@@ -39,6 +42,31 @@ export default function LivestreamPage() {
   useEffect(() => {
     setStream(loaderData);
   }, [loaderData]);
+
+  useEffect(() => {
+    if (!stream || !stream.id) return;
+
+    let unsubscribe: () => void = () => { };
+
+    const setupSocketActions = () => {
+      unsubscribe = subscribeTopic(`/topic/view-livestream/${stream.id}`, (message: any) => {
+        // const { viewers } = a
+      });
+
+      sendMessage(`/app/view-livestream/${stream.id}`, {
+        userId: user?.id,
+        message: "PING"
+      });
+    };
+
+    if (isConnected) {
+      setupSocketActions();
+    }
+
+    return () => {
+      unsubscribe();
+    }
+  }, [stream, isConnected]);
 
   const mockChats = [
     { id: 1, user: "Lâm", text: "Chào mọi người, hôm nay chúng ta sẽ tối ưu hoá kết nối DB nhé.", time: "16:12", isStreamer: true },
@@ -76,7 +104,7 @@ export default function LivestreamPage() {
           </div>
           <div>
             <p className="text-xs text-secondary font-medium">Người xem</p>
-            <span className="text-sm font-black text-foreground">{stream?.currentViewers ?? 0}</span>
+            <span className="text-sm font-black text-foreground">{stream?.totalViews ?? 0}</span>
           </div>
         </div>
 

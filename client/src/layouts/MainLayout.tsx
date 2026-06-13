@@ -19,7 +19,8 @@ import {
 import { useAuthStore } from "@/stores/authStore";
 import { Link } from "react-router";
 import { Outlet } from "react-router";
-import { authApi, type TokenResponse } from "@/api/authApi";
+import { authApi } from "@/api/authApi";
+import type { TokenResponse } from "@/types/authType";
 
 export default function MainLayout() {
   const { user, token, logout, setToken } = useAuthStore();

@@ -24,7 +24,8 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate } from "react-router";
-import { streamApi, streamKeyApi, type StreamResponse } from "@/api/streamApi";
+import { streamApi, streamKeyApi } from "@/api/streamApi";
+import type { StreamResponse } from "@/types/streamType";
 
 export default function LivestreamDashboard() {
   const { user, isAuthenticated } = useAuthStore();

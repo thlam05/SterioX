@@ -23,7 +23,8 @@ import {
 import { streamApi, streamKeyApi } from "@/api/streamApi";
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate } from "react-router";
-import { categoryApi, type CategoryResponse } from "@/api/categoryApi";
+import { categoryApi } from "@/api/categoryApi";
+import type { CategoryResponse } from "@/types/categoryType";
 
 const streamStatus = {
   public: "PUBLIC",
