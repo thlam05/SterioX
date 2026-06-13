@@ -46,6 +46,10 @@ public class Stream extends BaseModel {
     @JoinTable(name = "stream_category", joinColumns = @JoinColumn(name = "stream_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
     Set<Category> categories;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_liked_stream", joinColumns = @JoinColumn(name = "stream_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<User> usersLiked;
+
     @Column(name = "title", nullable = false)
     String title;
 

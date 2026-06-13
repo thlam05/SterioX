@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.thlam05.steriox.common.response.ApiResponse;
 import com.thlam05.steriox.modules.stream.dto.request.CreateStreamRequest;
+import com.thlam05.steriox.modules.stream.dto.request.LikeStreamRequest;
 import com.thlam05.steriox.modules.stream.dto.request.UpdateStreamRequest;
+import com.thlam05.steriox.modules.stream.dto.response.LivestreamLikeResponse;
 import com.thlam05.steriox.modules.stream.dto.response.StreamResponse;
 import com.thlam05.steriox.modules.stream.service.StreamService;
 
@@ -67,6 +69,11 @@ public class StreamController {
     @PatchMapping("/stop/{id}")
     public ApiResponse<StreamResponse> stopStream(@PathVariable String id) {
         return new ApiResponse<>(streamService.stopStream(id));
+    }
+
+    @PatchMapping("/like/{id}")
+    public ApiResponse<LivestreamLikeResponse> likeStream(@PathVariable String id, LikeStreamRequest request) {
+        return new ApiResponse<>(streamService.likeStream(id, request));
     }
 
     @DeleteMapping("/{id}")

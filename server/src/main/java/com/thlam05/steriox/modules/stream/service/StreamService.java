@@ -11,9 +11,12 @@ import org.springframework.stereotype.Service;
 
 import com.thlam05.steriox.common.enums.ResponseStatus;
 import com.thlam05.steriox.common.exception.AppException;
+import com.thlam05.steriox.common.service.RedisService;
 import com.thlam05.steriox.common.service.S3Service;
 import com.thlam05.steriox.modules.stream.dto.request.CreateStreamRequest;
+import com.thlam05.steriox.modules.stream.dto.request.LikeStreamRequest;
 import com.thlam05.steriox.modules.stream.dto.request.UpdateStreamRequest;
+import com.thlam05.steriox.modules.stream.dto.response.LivestreamLikeResponse;
 import com.thlam05.steriox.modules.stream.dto.response.StreamResponse;
 import com.thlam05.steriox.modules.stream.entity.Category;
 import com.thlam05.steriox.modules.stream.entity.Stream;
@@ -38,6 +41,9 @@ public class StreamService {
     private final StreamMapper streamMapper;
     private final UserRepository userRepository;
     private final S3Service s3Service;
+    private final RedisService redisService;
+
+    private String redisLivestreamLikesKey = "livestreams:likes:";
 
     public StreamResponse create(CreateStreamRequest request) throws IOException {
         validateCreateRequest(request);
@@ -147,6 +153,21 @@ public class StreamService {
         return streamMapper.toStreamResponse(stream);
     }
 
+    public LivestreamLikeResponse likeStream(String id, LikeStreamRequest request) {
+        if (!streamRepository.existsById(id)) {
+            throw new AppException(ResponseStatus.NOT_FOUND, "Stream not found");
+        }
+
+        String livestreamLikesKey = getLivestreamLikesKey(id);
+
+        if (!redisService.isMemberOfSet(livestreamLikesKey, request.getUserId())) {
+            redisService.addToSet(livestreamLikesKey, request.getUserId());
+        }
+
+        long currentLikes = redisService.countMember(livestreamLikesKey);
+        return LivestreamLikeResponse.builder().likes(currentLikes).build();
+    }
+
     private void mergeStreamFields(Stream stream, UpdateStreamRequest request) {
         if (request.getTitle() != null) {
             stream.setTitle(request.getTitle());
@@ -189,5 +210,9 @@ public class StreamService {
     private String generatePlayUrl(StreamKey streamKey) {
         String playUrl = "http://localhost:5555/hls/" + streamKey.getStreamKey() + ".m3u8";
         return playUrl;
+    }
+
+    private String getLivestreamLikesKey(String id) {
+        return redisLivestreamLikesKey + id;
     }
 }

@@ -26,6 +26,7 @@ public interface StreamMapper {
     @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "categories", ignore = true)
     @Mapping(target = "onStream", ignore = true)
+    @Mapping(target = "usersLiked", ignore = true)
     Stream toStream(CreateStreamRequest request);
 
     default StreamResponse toStreamResponse(Stream stream) {
