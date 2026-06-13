@@ -47,3 +47,12 @@ export type CreateStreamRequest = {
   vod: boolean;
   categoryIds: string[];
 }
+
+export type HeartBeatMessge = {
+  userId: string;
+  message: string;
+}
+
+export type LivestreamViewResponse = {
+  views: number;
+}

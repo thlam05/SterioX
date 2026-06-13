@@ -16,7 +16,7 @@ import {
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate, useLoaderData } from "react-router";
 import { useSocket } from "@/context/SocketContext";
-import type { StreamResponse } from "@/types/streamType";
+import type { HeartBeatMessge, LivestreamViewResponse, StreamResponse } from "@/types/streamType";
 
 export default function LivestreamPage() {
   const { user, isAuthenticated } = useAuthStore();
@@ -49,14 +49,18 @@ export default function LivestreamPage() {
     let unsubscribe: () => void = () => { };
 
     const setupSocketActions = () => {
-      unsubscribe = subscribeTopic(`/topic/view-livestream/${stream.id}`, (message: any) => {
-        // const { viewers } = a
+      unsubscribe = subscribeTopic(`/topic/view-livestream/${stream.id}`, (message: LivestreamViewResponse) => {
+        const { views } = message;
+        setCurrentViews(views);
       });
 
-      sendMessage(`/app/view-livestream/${stream.id}`, {
-        userId: user?.id,
-        message: "PING"
-      });
+      if (user?.id) {
+        const payload: HeartBeatMessge = {
+          userId: user?.id,
+          message: "PING"
+        }
+        sendMessage(`/app/view-livestream/${stream.id}`, payload);
+      }
     };
 
     if (isConnected) {
@@ -104,7 +108,7 @@ export default function LivestreamPage() {
           </div>
           <div>
             <p className="text-xs text-secondary font-medium">Người xem</p>
-            <span className="text-sm font-black text-foreground">{stream?.totalViews ?? 0}</span>
+            <span className="text-sm font-black text-foreground">{currentViews ?? 0}</span>
           </div>
         </div>
 
