@@ -34,6 +34,7 @@ public class StreamService {
     private final StreamRepository streamRepository;
     private final StreamKeyRepository streamKeyRepository;
     private final CategoryRepository categoryRepository;
+    private final StreamSchedulerService streamSchedulerService;
     private final StreamMapper streamMapper;
     private final UserRepository userRepository;
     private final S3Service s3Service;
@@ -97,6 +98,11 @@ public class StreamService {
         return streamMapper.toStreamResponses(streams);
     }
 
+    public List<StreamResponse> getAllStreamOnline() {
+        List<Stream> streams = streamRepository.findAllStreamOnline();
+        return streamMapper.toStreamResponses(streams);
+    }
+
     public StreamResponse update(String id, UpdateStreamRequest request) {
         Stream stream = streamRepository.findById(id)
                 .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Stream not found"));
@@ -126,6 +132,7 @@ public class StreamService {
         stream.setOnStream(true);
         stream.setStartedAt(LocalDateTime.now());
         stream = streamRepository.save(stream);
+        streamSchedulerService.startHeartbeatTask(id);
         return streamMapper.toStreamResponse(stream);
     }
 

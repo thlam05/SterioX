@@ -19,6 +19,7 @@ public interface CategoryMapper {
     @Mapping(target = "streams", ignore = true)
     Category toCategory(CreateCategoryRequest request);
 
+    @Mapping(target = "subCategories", ignore = true)
     CategoryResponse toCategoryResponse(Category category);
 
     List<CategoryResponse> toCategoryResponses(List<Category> categories);

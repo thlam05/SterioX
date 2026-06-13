@@ -6,7 +6,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import com.thlam05.steriox.common.enums.ResponseStatus;
 import com.thlam05.steriox.common.exception.AppException;
 import com.thlam05.steriox.common.service.RedisService;
-import com.thlam05.steriox.modules.stream.dto.request.HearbeatMessage;
+import com.thlam05.steriox.modules.stream.dto.request.HeartbeatMessage;
 import com.thlam05.steriox.modules.stream.dto.response.LivestreamViewResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class StreamSocketService {
     private final RedisService redisService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public void refreshHearbeat(String livestreamId, HearbeatMessage message) {
+    public void refreshHearbeat(String livestreamId, HeartbeatMessage message) {
         validateHeartbeat(livestreamId, message);
 
         String viewersKey = getViewersKey(livestreamId);
@@ -44,11 +44,11 @@ public class StreamSocketService {
 
         long currentViews = redisService.countZSetSize(heartbeatKey);
 
-        String destination = "/topic/view-livestream" + livestreamId;
-        messagingTemplate.convertAndSend(destination, LivestreamViewResponse.builder().viewers(currentViews).build());
+        String destination = "/topic/view-livestream/" + livestreamId;
+        messagingTemplate.convertAndSend(destination, LivestreamViewResponse.builder().views(currentViews).build());
     }
 
-    private void validateHeartbeat(String livestreamId, HearbeatMessage message) {
+    private void validateHeartbeat(String livestreamId, HeartbeatMessage message) {
         if (livestreamId == null || livestreamId.isBlank()) {
             throw new AppException(ResponseStatus.BAD_REQUEST, "Livestream ID is required");
         }

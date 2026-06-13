@@ -17,4 +17,10 @@ public interface StreamRepository extends JpaRepository<Stream, String> {
     Optional<Stream> findStreamOnlineByUserId(@Param("userId") String userId);
 
     List<Stream> findTop10ByOnStreamTrueOrderByTotalLikesDesc();
+
+    @Query("""
+            SELECT s FROM streams s
+            WHERE s.onStream = true
+            """)
+    List<Stream> findAllStreamOnline();
 }

@@ -14,7 +14,7 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class HearbeatMessage {
+public class HeartbeatMessage {
     String userId;
     String message;
 }
