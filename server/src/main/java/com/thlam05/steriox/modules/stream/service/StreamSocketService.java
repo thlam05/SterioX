@@ -32,6 +32,11 @@ public class StreamSocketService {
 
         long currentTimestamp = System.currentTimeMillis() / 1000;
         redisService.addToZSet(heartbeatKey, message.getUserId(), currentTimestamp);
+
+        long currentViews = redisService.countZSetSize(heartbeatKey);
+
+        String destination = "/topic/view-livestream/" + livestreamId;
+        messagingTemplate.convertAndSend(destination, LivestreamViewResponse.builder().views(currentViews).build());
     }
 
     public void cleanExpiredViews(String livestreamId) {

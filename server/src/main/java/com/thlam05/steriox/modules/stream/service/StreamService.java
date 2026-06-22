@@ -137,18 +137,17 @@ public class StreamService {
     // streamRepository.deleteById(id);
     // }
 
-    // public StreamResponse startStream(String id) {
-    // Stream stream = streamRepository.findById(id)
-    // .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Stream not
-    // found"));
+    public StreamResponse startStream(String id) {
+        Stream stream = streamRepository.findById(id)
+                .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Stream not found"));
 
-    // stream.setIsActive(true);
-    // stream.setOnStream(true);
-    // stream.setStartedAt(LocalDateTime.now());
-    // stream = streamRepository.save(stream);
-    // streamSchedulerService.startHeartbeatTask(id);
-    // return streamMapper.toStreamResponse(stream);
-    // }
+        stream.setIsActive(true);
+        stream.setOnStream(true);
+        stream.setStartedAt(LocalDateTime.now());
+        stream = streamRepository.save(stream);
+        streamSchedulerService.startHeartbeatTask(id);
+        return streamMapper.toStreamResponse(stream);
+    }
 
     // public StreamResponse stopStream(String id) {
     // Stream stream = streamRepository.findById(id)

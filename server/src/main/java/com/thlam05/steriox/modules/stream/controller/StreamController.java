@@ -42,21 +42,20 @@ public class StreamController {
     // return new ApiResponse<>(streamService.getAll());
     // }
 
-    // @GetMapping("/user/{userId}")
-    // public ApiResponse<StreamResponse> getStreamOnlineByUserId(@PathVariable
-    // String userId) {
-    // return new ApiResponse<>(streamService.getStreamOnlineByUserId(userId));
-    // }
+    @GetMapping("/user/{userId}")
+    public ApiResponse<StreamResponse> getStreamOnlineByUserId(@PathVariable String userId) {
+        return new ApiResponse<>(streamService.getStreamOnlineByUserId(userId));
+    }
 
-    // @GetMapping("/{id}")
-    // public ApiResponse<StreamResponse> getById(@PathVariable String id) {
-    // return new ApiResponse<>(streamService.getById(id));
-    // }
+    @GetMapping("/{id}")
+    public ApiResponse<StreamResponse> getById(@PathVariable String id) {
+        return new ApiResponse<>(streamService.getById(id));
+    }
 
-    // @GetMapping("/top")
-    // public ApiResponse<List<StreamResponse>> getTopStream() {
-    // return new ApiResponse<>(streamService.getTopStream());
-    // }
+    @GetMapping("/top")
+    public ApiResponse<List<StreamResponse>> getTopStream() {
+        return new ApiResponse<>(streamService.getTopStream());
+    }
 
     // @GetMapping("/like-status/{id}")
     // public ApiResponse<LivestreamLikeStatusResponse> getSatusLiked(@PathVariable
@@ -70,10 +69,10 @@ public class StreamController {
     // return new ApiResponse<>(streamService.update(id, request));
     // }
 
-    // @PatchMapping("/start/{id}")
-    // public ApiResponse<StreamResponse> startStream(@PathVariable String id) {
-    // return new ApiResponse<>(streamService.startStream(id));
-    // }
+    @PatchMapping("/start/{id}")
+    public ApiResponse<StreamResponse> startStream(@PathVariable String id) {
+        return new ApiResponse<>(streamService.startStream(id));
+    }
 
     // @PatchMapping("/stop/{id}")
     // public ApiResponse<StreamResponse> stopStream(@PathVariable String id) {
