@@ -14,11 +14,7 @@ export type StreamResponse = {
   user: UserResponse;
   title: string;
   description: string;
-  status: string;
   thumbnail: string;
-  latency: string;
-  dvr: boolean;
-  vod: boolean;
   playUrl: string;
   isActive: boolean;
   onStream: boolean;
@@ -40,11 +36,7 @@ export type CreateStreamRequest = {
   userId: string;
   title: string;
   description: string;
-  status: string;
   thumbnail: File | null;
-  latency: string;
-  dvr: boolean;
-  vod: boolean;
   categoryIds: string[];
 }
 
@@ -55,4 +47,16 @@ export type HeartBeatMessge = {
 
 export type LivestreamViewResponse = {
   views: number;
+}
+
+export type LivestreamLikeRequest = {
+  userId: string;
+}
+
+export type LivestreamLikeResponse = {
+  likes: number;
+}
+
+export type LivestreamLikeStatusResponse = {
+  isLiked: boolean;
 }

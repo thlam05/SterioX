@@ -11,12 +11,13 @@ import {
   Sparkles,
   Share2,
   Award,
-  Gift
+  Gift,
 } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate, useLoaderData } from "react-router";
 import { useSocket } from "@/context/SocketContext";
 import type { HeartBeatMessge, LivestreamViewResponse, StreamResponse } from "@/types/streamType";
+import { streamApi } from "@/api/streamApi";
 
 export default function LivestreamPage() {
   const { user, isAuthenticated } = useAuthStore();
@@ -26,9 +27,12 @@ export default function LivestreamPage() {
 
   const [stream, setStream] = useState<StreamResponse | null>(loaderData);
   const [chatMessage, setChatMessage] = useState("");
+
   const [currentViews, setCurrentViews] = useState(0);
+  const [currentLikes, setCurrentLikes] = useState(0);
 
   const [isFollowed, setIsFollowed] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
 
   const tags = ["Java", "SpringBoot", "SystemDesign", "HighPerformance"];
 
@@ -47,6 +51,7 @@ export default function LivestreamPage() {
     if (!stream || !stream.id) return;
 
     let unsubscribe: () => void = () => { };
+    let heartbeatInterval: NodeJS.Timeout | null = null;
 
     const setupSocketActions = () => {
       unsubscribe = subscribeTopic(`/topic/view-livestream/${stream.id}`, (message: LivestreamViewResponse) => {
@@ -54,13 +59,18 @@ export default function LivestreamPage() {
         setCurrentViews(views);
       });
 
-      if (user?.id) {
-        const payload: HeartBeatMessge = {
-          userId: user?.id,
-          message: "PING"
+      const sendHeartbeat = () => {
+        if (user?.id) {
+          const payload: HeartBeatMessge = {
+            userId: user?.id,
+            message: "PING"
+          }
+          sendMessage(`/app/view-livestream/${stream.id}`, payload);
         }
-        sendMessage(`/app/view-livestream/${stream.id}`, payload);
-      }
+      };
+
+      sendHeartbeat();
+      heartbeatInterval = setInterval(sendHeartbeat, 10000);
     };
 
     if (isConnected) {
@@ -69,8 +79,42 @@ export default function LivestreamPage() {
 
     return () => {
       unsubscribe();
+      if (heartbeatInterval != null) {
+        clearInterval(heartbeatInterval);
+      }
     }
   }, [stream, isConnected]);
+
+  useEffect(() => {
+    if (!stream) return;
+
+    const fetchLikeStatus = async () => {
+      try {
+        const { isLiked } = await streamApi.checkStatusLikedStream(stream.id);
+        console.log(isLiked);
+        setIsLiked(isLiked);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    setCurrentLikes(stream.totalLikes);
+    setCurrentViews(stream.totalViews);
+
+    fetchLikeStatus();
+  }, [stream])
+
+  const handleLikeStream = async () => {
+    if (!stream || !user) return null;
+    setIsLiked(!isLiked);
+
+    try {
+      const { likes } = await streamApi.likeStreamById(stream.id, { userId: user.id })
+      setCurrentLikes(likes);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const mockChats = [
     { id: 1, user: "Lâm", text: "Chào mọi người, hôm nay chúng ta sẽ tối ưu hoá kết nối DB nhé.", time: "16:12", isStreamer: true },
@@ -118,7 +162,7 @@ export default function LivestreamPage() {
           </div>
           <div>
             <p className="text-xs text-secondary font-medium">Lượt thích</p>
-            <span className="text-sm font-black text-foreground">{stream?.totalLikes ?? 0}</span>
+            <span className="text-sm font-black text-foreground">{currentLikes ?? 0}</span>
           </div>
         </div>
       </div>
@@ -157,18 +201,38 @@ export default function LivestreamPage() {
 
               {/* Cụm nút tương tác hành động */}
               <div className="flex items-center gap-2 flex-wrap">
+                {/* Nút Theo dõi */}
                 <Button
-                  variant={isFollowed ? "outline" : "primary"} // SỬA LỖI: Thay "primary" thành "default" theo chuẩn shadcn
+                  variant={isFollowed ? "outline" : "primary"}
                   onClick={() => setIsFollowed(!isFollowed)}
                   className="font-bold flex items-center gap-2 px-5"
                 >
-                  <Heart className={`w-4 h-4 ${isFollowed ? "fill-current text-primary" : ""}`} />
                   {isFollowed ? "Đã theo dõi" : "Theo dõi"}
                 </Button>
-                <Button variant="outline" className="font-bold flex items-center gap-2 border-accent">
-                  <Gift className="w-4 h-4 text-warning" /> Tặng quà
+
+                <Button
+                  variant={isLiked ? "outline" : "primary"}
+                  onClick={handleLikeStream}
+                  className="font-bold flex items-center gap-2 px-5"
+                >
+                  <Heart
+                    className={`w-4 h-4`}
+                  />
+                  {isLiked ? "Đã thích" : "Thích"}
                 </Button>
-                <Button variant="outline" className="p-2 border-accent text-secondary hover:text-foreground">
+
+                {/* Nút Tặng quà */}
+                <Button
+                  variant="outline"
+                  className="font-bold flex items-center gap-2 border-accent"
+                >
+                  <Gift className="w-4 h-4 text-warning fill-warning/20" /> Tặng quà
+                </Button>
+                {/* Nút Chia sẻ */}
+                <Button
+                  variant="outline"
+                  className="p-2 border-accent text-secondary hover:text-foreground"
+                >
                   <Share2 className="w-4 h-4" />
                 </Button>
               </div>

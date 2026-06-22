@@ -233,11 +233,7 @@ export default function LivestreamSetupPage() {
         userId: user.id,
         title,
         description,
-        status,
         thumbnail: thumbnailFile,
-        latency,
-        dvr,
-        vod,
         categoryIds
       });
       navigate("/livestreams/dashboard");

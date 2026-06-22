@@ -1,5 +1,5 @@
 import { api, type ApiResponse } from "@/api/apiClient";
-import type { CreateStreamKeyRequest, CreateStreamRequest, StreamKeyResponse, StreamResponse } from "@/types/streamType";
+import type { CreateStreamKeyRequest, CreateStreamRequest, LivestreamLikeRequest, LivestreamLikeResponse, LivestreamLikeStatusResponse, StreamKeyResponse, StreamResponse } from "@/types/streamType";
 
 export const streamKeyApi = {
   async getStreamKey(userId: string) {
@@ -41,6 +41,14 @@ export const streamApi = {
   },
   async stopStreamById(id: string) {
     const response = await api.patch<ApiResponse<StreamResponse>>(`/streams/stop/${id}`);
+    return response.data.data;
+  },
+  async likeStreamById(id: String, payload: LivestreamLikeRequest) {
+    const response = await api.patch<ApiResponse<LivestreamLikeResponse>>(`/streams/like/${id}`, payload);
+    return response.data.data;
+  },
+  async checkStatusLikedStream(id: string) {
+    const response = await api.get<ApiResponse<LivestreamLikeStatusResponse>>(`/streams/like-status/${id}`);
     return response.data.data;
   }
 } 

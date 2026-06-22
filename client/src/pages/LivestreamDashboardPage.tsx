@@ -84,52 +84,52 @@ export default function LivestreamDashboard() {
     loadStreamKey();
   }, [user?.id]);
 
-  useEffect(() => {
-    if (!stream || !stream.playUrl) return;
+  // useEffect(() => {
+  //   if (!stream || !stream.playUrl) return;
 
-    const playUrl = stream.playUrl;
-    let isMounted = true;
+  //   const playUrl = stream.playUrl;
+  //   let isMounted = true;
 
-    const checkStreamStatus = async () => {
-      try {
-        const response = await fetch(playUrl, { method: 'HEAD' });
+  //   const checkStreamStatus = async () => {
+  //     try {
+  //       const response = await fetch(playUrl, { method: 'HEAD' });
 
-        if (isMounted) {
-          if (response.ok) {
-            return true;
-          } else {
-            return false;
-          }
-        }
-      } catch (error) {
-        if (isMounted) {
-          setEnableOnStream(false);
-        }
-      }
-    };
+  //       if (isMounted) {
+  //         if (response.ok) {
+  //           return true;
+  //         } else {
+  //           return false;
+  //         }
+  //       }
+  //     } catch (error) {
+  //       if (isMounted) {
+  //         setEnableOnStream(false);
+  //       }
+  //     }
+  //   };
 
-    const interval = setInterval(async () => {
-      const isOk = await checkStreamStatus();
-      if (isOk) {
-        setEnableOnStream(true);
-      } else {
-        setEnableOnStream(false);
-        try {
-          if (stream.onStream) {
-            const streamResponse = await streamApi.stopStreamById(stream.id);
-            setStream(streamResponse);
-          }
-        } catch (error) {
-          console.log(error);
-        }
-      }
-    }, 10000);
+  //   const interval = setInterval(async () => {
+  //     const isOk = await checkStreamStatus();
+  //     if (isOk) {
+  //       setEnableOnStream(true);
+  //     } else {
+  //       setEnableOnStream(false);
+  //       try {
+  //         if (stream.onStream) {
+  //           const streamResponse = await streamApi.stopStreamById(stream.id);
+  //           setStream(streamResponse);
+  //         }
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     }
+  //   }, 10000);
 
-    return () => {
-      isMounted = false;
-      clearInterval(interval);
-    };
-  }, [stream]);
+  //   return () => {
+  //     isMounted = false;
+  //     clearInterval(interval);
+  //   };
+  // }, [stream]);
 
   const handleCopyStreamKey = () => {
     if (streamKey) {
