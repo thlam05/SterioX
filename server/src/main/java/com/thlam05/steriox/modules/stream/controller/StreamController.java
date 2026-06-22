@@ -20,6 +20,7 @@ import com.thlam05.steriox.modules.stream.dto.request.CreateStreamRequest;
 import com.thlam05.steriox.modules.stream.dto.request.LikeStreamRequest;
 import com.thlam05.steriox.modules.stream.dto.request.UpdateStreamRequest;
 import com.thlam05.steriox.modules.stream.dto.response.LivestreamLikeResponse;
+import com.thlam05.steriox.modules.stream.dto.response.LivestreamLikeStatusResponse;
 import com.thlam05.steriox.modules.stream.dto.response.StreamResponse;
 import com.thlam05.steriox.modules.stream.service.StreamService;
 
@@ -36,49 +37,59 @@ public class StreamController {
         return new ApiResponse<>(streamService.create(request));
     }
 
-    @GetMapping
-    public ApiResponse<List<StreamResponse>> getAll() {
-        return new ApiResponse<>(streamService.getAll());
-    }
+    // @GetMapping
+    // public ApiResponse<List<StreamResponse>> getAll() {
+    // return new ApiResponse<>(streamService.getAll());
+    // }
 
-    @GetMapping("/user/{userId}")
-    public ApiResponse<StreamResponse> getStreamOnlineByUserId(@PathVariable String userId) {
-        return new ApiResponse<>(streamService.getStreamOnlineByUserId(userId));
-    }
+    // @GetMapping("/user/{userId}")
+    // public ApiResponse<StreamResponse> getStreamOnlineByUserId(@PathVariable
+    // String userId) {
+    // return new ApiResponse<>(streamService.getStreamOnlineByUserId(userId));
+    // }
 
-    @GetMapping("/{id}")
-    public ApiResponse<StreamResponse> getById(@PathVariable String id) {
-        return new ApiResponse<>(streamService.getById(id));
-    }
+    // @GetMapping("/{id}")
+    // public ApiResponse<StreamResponse> getById(@PathVariable String id) {
+    // return new ApiResponse<>(streamService.getById(id));
+    // }
 
-    @GetMapping("/top")
-    public ApiResponse<List<StreamResponse>> getTopStream() {
-        return new ApiResponse<>(streamService.getTopStream());
-    }
+    // @GetMapping("/top")
+    // public ApiResponse<List<StreamResponse>> getTopStream() {
+    // return new ApiResponse<>(streamService.getTopStream());
+    // }
 
-    @PutMapping("/{id}")
-    public ApiResponse<StreamResponse> update(@PathVariable String id, @RequestBody UpdateStreamRequest request) {
-        return new ApiResponse<>(streamService.update(id, request));
-    }
+    // @GetMapping("/like-status/{id}")
+    // public ApiResponse<LivestreamLikeStatusResponse> getSatusLiked(@PathVariable
+    // String id) {
+    // return new ApiResponse<>(streamService.checkIsLikedStream(id));
+    // }
 
-    @PatchMapping("/start/{id}")
-    public ApiResponse<StreamResponse> startStream(@PathVariable String id) {
-        return new ApiResponse<>(streamService.startStream(id));
-    }
+    // @PutMapping("/{id}")
+    // public ApiResponse<StreamResponse> update(@PathVariable String id,
+    // @RequestBody UpdateStreamRequest request) {
+    // return new ApiResponse<>(streamService.update(id, request));
+    // }
 
-    @PatchMapping("/stop/{id}")
-    public ApiResponse<StreamResponse> stopStream(@PathVariable String id) {
-        return new ApiResponse<>(streamService.stopStream(id));
-    }
+    // @PatchMapping("/start/{id}")
+    // public ApiResponse<StreamResponse> startStream(@PathVariable String id) {
+    // return new ApiResponse<>(streamService.startStream(id));
+    // }
 
-    @PatchMapping("/like/{id}")
-    public ApiResponse<LivestreamLikeResponse> likeStream(@PathVariable String id, LikeStreamRequest request) {
-        return new ApiResponse<>(streamService.likeStream(id, request));
-    }
+    // @PatchMapping("/stop/{id}")
+    // public ApiResponse<StreamResponse> stopStream(@PathVariable String id) {
+    // return new ApiResponse<>(streamService.stopStream(id));
+    // }
 
-    @DeleteMapping("/{id}")
-    public ApiResponse<?> delete(@PathVariable String id) {
-        streamService.delete(id);
-        return new ApiResponse<>(null);
-    }
+    // @PatchMapping("/like/{id}")
+    // public ApiResponse<LivestreamLikeResponse> likeStream(@PathVariable String
+    // id,
+    // @RequestBody LikeStreamRequest request) {
+    // return new ApiResponse<>(streamService.likeStream(id, request));
+    // }
+
+    // @DeleteMapping("/{id}")
+    // public ApiResponse<?> delete(@PathVariable String id) {
+    // streamService.delete(id);
+    // return new ApiResponse<>(null);
+    // }
 }

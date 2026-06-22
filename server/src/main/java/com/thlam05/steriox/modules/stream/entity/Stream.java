@@ -56,8 +56,8 @@ public class Stream extends BaseModel {
     @Column(name = "description")
     String description;
 
-    @Column(name = "status", length = 20)
-    String status;
+    // @Column(name = "status", length = 20)
+    // String status;
 
     @Column(name = "is_active")
     Boolean isActive;
@@ -71,14 +71,14 @@ public class Stream extends BaseModel {
     @Column(name = "thumbnail")
     String thumbnail;
 
-    @Column(name = "latency")
-    String latency;
+    // @Column(name = "latency")
+    // String latency;
 
-    @Column(name = "dvr")
-    boolean dvr;
+    // @Column(name = "dvr")
+    // boolean dvr;
 
-    @Column(name = "vod")
-    boolean vod;
+    // @Column(name = "vod")
+    // boolean vod;
 
     @Column(name = "total_views")
     Integer totalViews;

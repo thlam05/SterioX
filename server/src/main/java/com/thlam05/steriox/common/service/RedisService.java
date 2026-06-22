@@ -18,6 +18,11 @@ import lombok.RequiredArgsConstructor;
 public class RedisService {
     private final RedisTemplate<String, Object> redisTemplate;
 
+    public boolean isKeyExist(String key) {
+        Boolean hasKey = redisTemplate.hasKey(key);
+        return hasKey != null && hasKey;
+    }
+
     public void set(String key, Object value) {
         valueOps().set(key, value);
     }
