@@ -57,11 +57,10 @@ public class StreamController {
         return new ApiResponse<>(streamService.getTopStream());
     }
 
-    // @GetMapping("/like-status/{id}")
-    // public ApiResponse<LivestreamLikeStatusResponse> getSatusLiked(@PathVariable
-    // String id) {
-    // return new ApiResponse<>(streamService.checkIsLikedStream(id));
-    // }
+    @GetMapping("/like-status/{id}")
+    public ApiResponse<LivestreamLikeStatusResponse> getSatusLiked(@PathVariable String id) {
+        return new ApiResponse<>(streamService.checkIsLikedStream(id));
+    }
 
     // @PutMapping("/{id}")
     // public ApiResponse<StreamResponse> update(@PathVariable String id,
@@ -79,12 +78,10 @@ public class StreamController {
     // return new ApiResponse<>(streamService.stopStream(id));
     // }
 
-    // @PatchMapping("/like/{id}")
-    // public ApiResponse<LivestreamLikeResponse> likeStream(@PathVariable String
-    // id,
-    // @RequestBody LikeStreamRequest request) {
-    // return new ApiResponse<>(streamService.likeStream(id, request));
-    // }
+    @PatchMapping("/like/{id}")
+    public ApiResponse<LivestreamLikeResponse> likeStream(@PathVariable String id) {
+        return new ApiResponse<>(streamService.likeStream(id));
+    }
 
     // @DeleteMapping("/{id}")
     // public ApiResponse<?> delete(@PathVariable String id) {

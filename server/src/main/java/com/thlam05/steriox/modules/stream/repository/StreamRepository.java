@@ -24,7 +24,4 @@ public interface StreamRepository extends JpaRepository<Stream, String> {
                         """)
         List<Stream> findAllStreamOnline();
 
-        @Query("SELECT COUNT(s) > 0 FROM streams s JOIN s.usersLiked u WHERE s.id = :streamId AND u.id = :userId")
-        boolean existsByStreamIdAndUserId(@Param("streamId") String streamId, @Param("userId") String userId);
-
 }

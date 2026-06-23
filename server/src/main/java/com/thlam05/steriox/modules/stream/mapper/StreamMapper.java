@@ -18,7 +18,6 @@ import com.thlam05.steriox.modules.stream.entity.Stream;
 public interface StreamMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "categories", ignore = true)
-    @Mapping(target = "usersLiked", ignore = true)
     @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "onStream", ignore = true)
     @Mapping(target = "thumbnail", ignore = true)
