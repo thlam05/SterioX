@@ -45,8 +45,9 @@ export type HeartBeatMessge = {
   message: string;
 }
 
-export type LivestreamViewResponse = {
+export type LivestreamStatusResponse = {
   views: number;
+  likes: number;
 }
 
 export type LivestreamLikeRequest = {

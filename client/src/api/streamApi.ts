@@ -43,9 +43,13 @@ export const streamApi = {
     const response = await api.patch<ApiResponse<StreamResponse>>(`/streams/stop/${id}`);
     return response.data.data;
   },
-  async likeStreamById(id: String, payload: LivestreamLikeRequest) {
-    const response = await api.patch<ApiResponse<LivestreamLikeResponse>>(`/streams/like/${id}`, payload);
-    return response.data.data;
+  async likeStreamById(id: string) {
+    const response = await api.post<ApiResponse<any>>(`/streams/like/${id}`);
+    return response.data;
+  },
+  async unlikeStreamById(id: String) {
+    const response = await api.post<ApiResponse<any>>(`/streams/unlike/${id}`);
+    return response.data;
   },
   async checkStatusLikedStream(id: string) {
     const response = await api.get<ApiResponse<LivestreamLikeStatusResponse>>(`/streams/like-status/${id}`);

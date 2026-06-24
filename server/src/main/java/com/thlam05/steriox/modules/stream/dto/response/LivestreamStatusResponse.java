@@ -14,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LivestreamViewResponse {
+public class LivestreamStatusResponse {
     long views;
+    long likes;
 }

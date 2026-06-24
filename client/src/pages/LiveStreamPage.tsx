@@ -16,7 +16,7 @@ import {
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate, useLoaderData } from "react-router";
 import { useSocket } from "@/context/SocketContext";
-import type { HeartBeatMessge, LivestreamViewResponse, StreamResponse } from "@/types/streamType";
+import type { HeartBeatMessge, LivestreamStatusResponse, StreamResponse } from "@/types/streamType";
 import { streamApi } from "@/api/streamApi";
 
 export default function LivestreamPage() {
@@ -54,9 +54,10 @@ export default function LivestreamPage() {
     let heartbeatInterval: NodeJS.Timeout | null = null;
 
     const setupSocketActions = () => {
-      unsubscribe = subscribeTopic(`/topic/view-livestream/${stream.id}`, (message: LivestreamViewResponse) => {
-        const { views } = message;
+      unsubscribe = subscribeTopic(`/topic/status-livestream/${stream.id}`, (message: LivestreamStatusResponse) => {
+        const { views, likes } = message;
         setCurrentViews(views);
+        setCurrentLikes(likes);
       });
 
       const sendHeartbeat = () => {
@@ -91,7 +92,6 @@ export default function LivestreamPage() {
     const fetchLikeStatus = async () => {
       try {
         const { isLiked } = await streamApi.checkStatusLikedStream(stream.id);
-        console.log(isLiked);
         setIsLiked(isLiked);
       } catch (error) {
         console.log(error);
@@ -106,11 +106,21 @@ export default function LivestreamPage() {
 
   const handleLikeStream = async () => {
     if (!stream || !user) return null;
-    setIsLiked(!isLiked);
 
     try {
-      const { likes } = await streamApi.likeStreamById(stream.id, { userId: user.id })
-      setCurrentLikes(likes);
+      if (isLiked) {
+        const { success } = await streamApi.unlikeStreamById(stream.id)
+        if (success) {
+          setCurrentLikes(currentLikes - 1 > 0 ? currentLikes - 1 : 0);
+        }
+      }
+      else {
+        const { success } = await streamApi.likeStreamById(stream.id)
+        if (success) {
+          setCurrentLikes(currentLikes + 1);
+        }
+      }
+      setIsLiked(!isLiked);
     } catch (error) {
       console.log(error);
     }

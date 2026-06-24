@@ -7,15 +7,16 @@ import com.thlam05.steriox.common.enums.ResponseStatus;
 import com.thlam05.steriox.common.exception.AppException;
 import com.thlam05.steriox.common.service.RedisService;
 import com.thlam05.steriox.modules.stream.dto.request.HeartbeatMessage;
-import com.thlam05.steriox.modules.stream.dto.response.LivestreamViewResponse;
+import com.thlam05.steriox.modules.stream.dto.response.LivestreamStatusResponse;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class StreamSocketService {
-    private static final String VIEWERS_KEY_PREFIX = "livestream:viewers:";
-    private static final String VIEWER_HEARTBEAT_KEY_PREFIX = "livestream:heartbeat:";
+    private static final String VIEWERS_KEY_PREFIX = "livestreams:viewers:";
+    private static final String LIKES_KEY_PREFIX = "livestreams:likes:";
+    private static final String VIEWER_HEARTBEAT_KEY_PREFIX = "livestreams:heartbeat:";
 
     private final RedisService redisService;
     private final SimpMessagingTemplate messagingTemplate;
@@ -35,12 +36,13 @@ public class StreamSocketService {
 
         long currentViews = redisService.countZSetSize(heartbeatKey);
 
-        String destination = "/topic/view-livestream/" + livestreamId;
-        messagingTemplate.convertAndSend(destination, LivestreamViewResponse.builder().views(currentViews).build());
+        String destination = "/topic/status-livestream/" + livestreamId;
+        messagingTemplate.convertAndSend(destination, LivestreamStatusResponse.builder().views(currentViews).build());
     }
 
     public void cleanExpiredViews(String livestreamId) {
         String heartbeatKey = getHeartbeatKey(livestreamId);
+        String likesKey = getLikesKey(livestreamId);
 
         long currentTimestamp = System.currentTimeMillis() / 1000;
         long expirationTime = currentTimestamp - 30;
@@ -48,9 +50,11 @@ public class StreamSocketService {
         redisService.removeRangeByScore(heartbeatKey, 0, expirationTime);
 
         long currentViews = redisService.countZSetSize(heartbeatKey);
+        long currentLikes = redisService.countMember(likesKey);
 
-        String destination = "/topic/view-livestream/" + livestreamId;
-        messagingTemplate.convertAndSend(destination, LivestreamViewResponse.builder().views(currentViews).build());
+        String destination = "/topic/status-livestream/" + livestreamId;
+        messagingTemplate.convertAndSend(destination,
+                LivestreamStatusResponse.builder().views(currentViews).likes(currentLikes).build());
     }
 
     private void validateHeartbeat(String livestreamId, HeartbeatMessage message) {
@@ -68,5 +72,9 @@ public class StreamSocketService {
 
     private String getHeartbeatKey(String livestreamId) {
         return VIEWER_HEARTBEAT_KEY_PREFIX + livestreamId;
+    }
+
+    private String getLikesKey(String livestreamId) {
+        return LIKES_KEY_PREFIX + livestreamId;
     }
 }

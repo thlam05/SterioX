@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.thlam05.steriox.common.enums.ResponseStatus;
 import com.thlam05.steriox.common.response.ApiResponse;
 import com.thlam05.steriox.modules.stream.dto.request.CreateStreamRequest;
 import com.thlam05.steriox.modules.stream.dto.request.LikeStreamRequest;
@@ -78,9 +79,16 @@ public class StreamController {
     // return new ApiResponse<>(streamService.stopStream(id));
     // }
 
-    @PatchMapping("/like/{id}")
-    public ApiResponse<LivestreamLikeResponse> likeStream(@PathVariable String id) {
-        return new ApiResponse<>(streamService.likeStream(id));
+    @PostMapping("/like/{id}")
+    public ApiResponse<?> likeStream(@PathVariable String id) {
+        streamService.likeStream(id);
+        return new ApiResponse<>(ResponseStatus.SUCCESS);
+    }
+
+    @PostMapping("/unlike/{id}")
+    public ApiResponse<?> unlikeStream(@PathVariable String id) {
+        streamService.unlikeStream(id);
+        return new ApiResponse<>(ResponseStatus.SUCCESS);
     }
 
     // @DeleteMapping("/{id}")
