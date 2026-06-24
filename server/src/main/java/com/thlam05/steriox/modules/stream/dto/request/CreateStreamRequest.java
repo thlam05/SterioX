@@ -23,9 +23,6 @@ public class CreateStreamRequest {
     String title;
     String description;
     String status;
-    String latency;
-    boolean dvr;
-    boolean vod;
     MultipartFile thumbnail;
     List<String> categoryIds;
 }

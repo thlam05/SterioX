@@ -1,51 +1,5 @@
 import { api, type ApiResponse } from "@/api/apiClient";
-
-export type StreamKeyResponse = {
-  streamKey: string;
-  userId: string;
-  streamUrl: string;
-  isActive: boolean;
-  updatedAt: Date;
-};
-
-export type StreamResponse = {
-  id: string;
-  userId: string;
-  title: string;
-  description: string;
-  status: string;
-  thumbnail: string;
-  latency: string;
-  dvr: boolean;
-  vod: boolean;
-  playUrl: string;
-  isActive: boolean;
-  currentViewers: number;
-  maxViewers: number;
-  totalLikes: number;
-  scheduledAt: Date;
-  categoryIds: string[];
-  startedAt: Date;
-  endedAt: Date;
-  createdAt: Date;
-};
-
-export type CreateStreamKeyRequest = {
-  userId: string;
-  isActive: boolean
-};
-
-export type CreateStreamRequest = {
-  userId: string;
-  title: string;
-  description: string;
-  status: string;
-  thumbnail: File | null;
-  latency: string;
-  dvr: boolean;
-  vod: boolean;
-  categoryIds: string[];
-}
+import type { CreateStreamKeyRequest, CreateStreamRequest, LivestreamLikeRequest, LivestreamLikeResponse, LivestreamLikeStatusResponse, StreamKeyResponse, StreamResponse } from "@/types/streamType";
 
 export const streamKeyApi = {
   async getStreamKey(userId: string) {
@@ -75,6 +29,30 @@ export const streamApi = {
   },
   async getStreamById(id: string) {
     const response = await api.get<ApiResponse<StreamResponse>>(`/streams/${id}`);
+    return response.data.data;
+  },
+  async getTopStream() {
+    const response = await api.get<ApiResponse<StreamResponse[]>>(`/streams/top`);
+    return response.data.data;
+  },
+  async startStreamById(id: string) {
+    const response = await api.patch<ApiResponse<StreamResponse>>(`/streams/start/${id}`);
+    return response.data.data;
+  },
+  async stopStreamById(id: string) {
+    const response = await api.patch<ApiResponse<StreamResponse>>(`/streams/stop/${id}`);
+    return response.data.data;
+  },
+  async likeStreamById(id: string) {
+    const response = await api.post<ApiResponse<any>>(`/streams/like/${id}`);
+    return response.data;
+  },
+  async unlikeStreamById(id: String) {
+    const response = await api.post<ApiResponse<any>>(`/streams/unlike/${id}`);
+    return response.data;
+  },
+  async checkStatusLikedStream(id: string) {
+    const response = await api.get<ApiResponse<LivestreamLikeStatusResponse>>(`/streams/like-status/${id}`);
     return response.data.data;
   }
 } 

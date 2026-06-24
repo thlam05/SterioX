@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -14,9 +15,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.thlam05.steriox.common.enums.ResponseStatus;
 import com.thlam05.steriox.common.response.ApiResponse;
 import com.thlam05.steriox.modules.stream.dto.request.CreateStreamRequest;
+import com.thlam05.steriox.modules.stream.dto.request.LikeStreamRequest;
 import com.thlam05.steriox.modules.stream.dto.request.UpdateStreamRequest;
+import com.thlam05.steriox.modules.stream.dto.response.LivestreamLikeResponse;
+import com.thlam05.steriox.modules.stream.dto.response.LivestreamLikeStatusResponse;
 import com.thlam05.steriox.modules.stream.dto.response.StreamResponse;
 import com.thlam05.steriox.modules.stream.service.StreamService;
 
@@ -33,10 +38,10 @@ public class StreamController {
         return new ApiResponse<>(streamService.create(request));
     }
 
-    @GetMapping
-    public ApiResponse<List<StreamResponse>> getAll() {
-        return new ApiResponse<>(streamService.getAll());
-    }
+    // @GetMapping
+    // public ApiResponse<List<StreamResponse>> getAll() {
+    // return new ApiResponse<>(streamService.getAll());
+    // }
 
     @GetMapping("/user/{userId}")
     public ApiResponse<StreamResponse> getStreamOnlineByUserId(@PathVariable String userId) {
@@ -48,14 +53,47 @@ public class StreamController {
         return new ApiResponse<>(streamService.getById(id));
     }
 
-    @PutMapping("/{id}")
-    public ApiResponse<StreamResponse> update(@PathVariable String id, @RequestBody UpdateStreamRequest request) {
-        return new ApiResponse<>(streamService.update(id, request));
+    @GetMapping("/top")
+    public ApiResponse<List<StreamResponse>> getTopStream() {
+        return new ApiResponse<>(streamService.getTopStream());
     }
 
-    @DeleteMapping("/{id}")
-    public ApiResponse<?> delete(@PathVariable String id) {
-        streamService.delete(id);
-        return new ApiResponse<>(null);
+    @GetMapping("/like-status/{id}")
+    public ApiResponse<LivestreamLikeStatusResponse> getSatusLiked(@PathVariable String id) {
+        return new ApiResponse<>(streamService.checkIsLikedStream(id));
     }
+
+    // @PutMapping("/{id}")
+    // public ApiResponse<StreamResponse> update(@PathVariable String id,
+    // @RequestBody UpdateStreamRequest request) {
+    // return new ApiResponse<>(streamService.update(id, request));
+    // }
+
+    @PatchMapping("/start/{id}")
+    public ApiResponse<StreamResponse> startStream(@PathVariable String id) {
+        return new ApiResponse<>(streamService.startStream(id));
+    }
+
+    // @PatchMapping("/stop/{id}")
+    // public ApiResponse<StreamResponse> stopStream(@PathVariable String id) {
+    // return new ApiResponse<>(streamService.stopStream(id));
+    // }
+
+    @PostMapping("/like/{id}")
+    public ApiResponse<?> likeStream(@PathVariable String id) {
+        streamService.likeStream(id);
+        return new ApiResponse<>(ResponseStatus.SUCCESS);
+    }
+
+    @PostMapping("/unlike/{id}")
+    public ApiResponse<?> unlikeStream(@PathVariable String id) {
+        streamService.unlikeStream(id);
+        return new ApiResponse<>(ResponseStatus.SUCCESS);
+    }
+
+    // @DeleteMapping("/{id}")
+    // public ApiResponse<?> delete(@PathVariable String id) {
+    // streamService.delete(id);
+    // return new ApiResponse<>(null);
+    // }
 }

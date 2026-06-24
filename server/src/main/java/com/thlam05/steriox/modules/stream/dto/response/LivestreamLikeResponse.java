@@ -1,15 +1,12 @@
 package com.thlam05.steriox.modules.stream.dto.response;
 
-import java.time.LocalDateTime;
-import java.util.Set;
-
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import lombok.AccessLevel;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,13 +14,6 @@ import lombok.AccessLevel;
 @Setter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CategoryResponse {
-    String id;
-    String name;
-    String parentId;
-    String slug;
-    Integer level;
-    Set<CategoryResponse> subCategories;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
+public class LivestreamLikeResponse {
+    long likes;
 }

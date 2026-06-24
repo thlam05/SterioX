@@ -1,31 +1,6 @@
 import { api, type ApiResponse } from "@/api/apiClient";
+import type { InstrspecResponse, LoginRequest, LoginResponse, RegisterRequest, TokenResponse } from "@/types/authType";
 import axios from 'axios';
-import type { UserResponse } from "./userApi";
-
-export type LoginRequest = {
-  email: string;
-  password: string;
-};
-
-export type RegisterRequest = {
-  email: string;
-  username: string;
-  password: string;
-};
-
-export type TokenResponse = {
-  accessToken: string;
-  tokenType: string;
-};
-
-export type LoginResponse = {
-  token: string;
-  user: UserResponse
-};
-
-export type InstrspecResponse = {
-  valid: boolean;
-}
 
 export const authApi = {
   async login(payload: LoginRequest) {

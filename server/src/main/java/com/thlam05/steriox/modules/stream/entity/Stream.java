@@ -29,8 +29,8 @@ import lombok.experimental.FieldDefaults;
 @Table(name = "streams")
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
 @Setter
+@Getter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Stream extends BaseModel {
@@ -52,11 +52,14 @@ public class Stream extends BaseModel {
     @Column(name = "description")
     String description;
 
-    @Column(name = "status", length = 20)
-    String status;
+    // @Column(name = "status", length = 20)
+    // String status;
 
     @Column(name = "is_active")
     Boolean isActive;
+
+    @Column(name = "on_stream")
+    Boolean onStream;
 
     @Column(name = "play_url")
     String playUrl;
@@ -64,20 +67,17 @@ public class Stream extends BaseModel {
     @Column(name = "thumbnail")
     String thumbnail;
 
-    @Column(name = "latency")
-    String latency;
+    // @Column(name = "latency")
+    // String latency;
 
-    @Column(name = "dvr")
-    boolean dvr;
+    // @Column(name = "dvr")
+    // boolean dvr;
 
-    @Column(name = "vod")
-    boolean vod;
+    // @Column(name = "vod")
+    // boolean vod;
 
-    @Column(name = "current_viewers")
-    Integer currentViewers;
-
-    @Column(name = "max_viewers")
-    Integer maxViewers;
+    @Column(name = "total_views")
+    Integer totalViews;
 
     @Column(name = "total_likes")
     Integer totalLikes;

@@ -19,11 +19,13 @@ import {
   Copy,
   Check,
   Eye,
-  EyeOff
+  EyeOff,
+  Power
 } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate } from "react-router";
-import { streamApi, streamKeyApi, type StreamResponse } from "@/api/streamApi";
+import { streamApi, streamKeyApi } from "@/api/streamApi";
+import type { StreamResponse } from "@/types/streamType";
 
 export default function LivestreamDashboard() {
   const { user, isAuthenticated } = useAuthStore();
@@ -40,6 +42,8 @@ export default function LivestreamDashboard() {
   const [streamTitle, setStreamTitle] = useState("Lập trình hệ thống phân tán hiệu năng cao với Java và Spring Boot");
   const [category, setCategory] = useState("Công nghệ & Lập trình");
   const [chatMessage, setChatMessage] = useState("");
+
+  const [enableOnStream, setEnableOnStream] = useState<boolean>(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -80,6 +84,53 @@ export default function LivestreamDashboard() {
     loadStreamKey();
   }, [user?.id]);
 
+  // useEffect(() => {
+  //   if (!stream || !stream.playUrl) return;
+
+  //   const playUrl = stream.playUrl;
+  //   let isMounted = true;
+
+  //   const checkStreamStatus = async () => {
+  //     try {
+  //       const response = await fetch(playUrl, { method: 'HEAD' });
+
+  //       if (isMounted) {
+  //         if (response.ok) {
+  //           return true;
+  //         } else {
+  //           return false;
+  //         }
+  //       }
+  //     } catch (error) {
+  //       if (isMounted) {
+  //         setEnableOnStream(false);
+  //       }
+  //     }
+  //   };
+
+  //   const interval = setInterval(async () => {
+  //     const isOk = await checkStreamStatus();
+  //     if (isOk) {
+  //       setEnableOnStream(true);
+  //     } else {
+  //       setEnableOnStream(false);
+  //       try {
+  //         if (stream.onStream) {
+  //           const streamResponse = await streamApi.stopStreamById(stream.id);
+  //           setStream(streamResponse);
+  //         }
+  //       } catch (error) {
+  //         console.log(error);
+  //       }
+  //     }
+  //   }, 10000);
+
+  //   return () => {
+  //     isMounted = false;
+  //     clearInterval(interval);
+  //   };
+  // }, [stream]);
+
   const handleCopyStreamKey = () => {
     if (streamKey) {
       navigator.clipboard.writeText(streamKey);
@@ -95,6 +146,13 @@ export default function LivestreamDashboard() {
       setTimeout(() => setCopied(null), 2000);
     }
   };
+
+  const handleOnStream = async () => {
+    if (!stream || !stream.playUrl) return;
+
+    const streamResponse = await streamApi.startStreamById(stream.id);
+    setStream(streamResponse);
+  }
 
   const mockMetrics = {
     viewers: "2,450",
@@ -141,7 +199,7 @@ export default function LivestreamDashboard() {
           </div>
           <div>
             <p className="text-xs text-secondary font-medium">Người xem</p>
-            <span className="text-sm font-black text-foreground">{stream?.currentViewers}</span>
+            <span className="text-sm font-black text-foreground">{stream?.totalViews}</span>
           </div>
         </div>
 
@@ -204,6 +262,14 @@ export default function LivestreamDashboard() {
                 <Sliders className="w-5 h-5 text-primary" /> Công cụ thao tác nhanh
               </h3>
               <div className="flex gap-2">
+                <Button
+                  variant="primary"
+                  disabled={!enableOnStream}
+                  className="text-xs font-bold flex items-center gap-1.5 text-danger border-accent"
+                  onClick={handleOnStream}
+                >
+                  <Power className="w-3.5 h-3.5" /> On stream
+                </Button>
                 <Button variant="outline" className="text-xs font-bold flex items-center gap-1.5 text-danger border-accent">
                   <AlertTriangle className="w-3.5 h-3.5" /> Báo cáo sự cố
                 </Button>

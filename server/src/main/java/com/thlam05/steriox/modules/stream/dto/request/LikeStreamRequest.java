@@ -1,14 +1,12 @@
 package com.thlam05.steriox.modules.stream.dto.request;
 
-import java.time.LocalDateTime;
-
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import lombok.AccessLevel;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,17 +14,6 @@ import lombok.AccessLevel;
 @Setter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpdateStreamRequest {
+public class LikeStreamRequest {
     String userId;
-    String title;
-    String description;
-    String status;
-    Boolean isActive;
-    String thumbnail;
-    Integer currentViewers;
-    Integer totalViews;
-    Integer totalLikes;
-    LocalDateTime scheduledAt;
-    LocalDateTime startedAt;
-    LocalDateTime endedAt;
 }

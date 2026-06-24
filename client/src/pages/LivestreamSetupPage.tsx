@@ -17,11 +17,14 @@ import {
   Lock,
   Link2,
   KeyRound,
-  Zap
+  Zap,
+  ChevronRight
 } from "lucide-react";
 import { streamApi, streamKeyApi } from "@/api/streamApi";
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate } from "react-router";
+import { categoryApi } from "@/api/categoryApi";
+import type { CategoryResponse } from "@/types/categoryType";
 
 const streamStatus = {
   public: "PUBLIC",
@@ -35,7 +38,7 @@ const streamLatency = {
   ultra: "ULTRA"
 }
 
-export default function LivestreamSettingPage() {
+export default function LivestreamSetupPage() {
   const { isAuthenticated, user } = useAuthStore();
 
   const navigate = useNavigate();
@@ -53,6 +56,7 @@ export default function LivestreamSettingPage() {
   const [titleError, setTitleError] = useState("");
   const [descriptionError, setDescriptionError] = useState("");
   const [thumbnailError, setThumbnailError] = useState("");
+  const [categoryError, setCategoryError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -60,11 +64,22 @@ export default function LivestreamSettingPage() {
   const [dvr, setDvr] = useState(true);
   const [vod, setVod] = useState(true);
 
+  const [parentCategory, setParentCategory] = useState<string>('');
+  const [subCategory, setSubCategory] = useState<string>('');
+  const [categoriesData, setCategoriesData] = useState<CategoryResponse[]>([]);
+
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/login");
       return;
     }
+
+    const fetchCategories = async () => {
+      const categories = await categoryApi.getCategories();
+      if (categories) setCategoriesData(categories);
+    }
+
+    fetchCategories();
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
@@ -153,6 +168,7 @@ export default function LivestreamSettingPage() {
 
     const trimmedTitle = title.trim();
     const trimmedDescription = description.trim();
+    const selectedParentCategory = parentCategory.trim();
 
     if (!trimmedTitle) {
       setTitleError("Tiêu đề không được để trống.");
@@ -184,6 +200,13 @@ export default function LivestreamSettingPage() {
       setThumbnailError("");
     }
 
+    if (!selectedParentCategory) {
+      setCategoryError("Vui lòng chọn chuyên mục cấp 1 và cấp 2.");
+      isValid = false;
+    } else {
+      setCategoryError("");
+    }
+
     return isValid;
   };
 
@@ -203,17 +226,17 @@ export default function LivestreamSettingPage() {
     setIsSubmitting(true);
 
     try {
+      const categoryIds = [];
+      if (parentCategory) categoryIds.push(parentCategory);
+      if (subCategory) categoryIds.push(subCategory);
       await streamApi.createStream({
         userId: user.id,
         title,
         description,
-        status,
         thumbnail: thumbnailFile,
-        latency,
-        dvr,
-        vod
+        categoryIds
       });
-      navigate("/stream/dashboard");
+      navigate("/livestreams/dashboard");
       return;
     } catch (error) {
       console.error("Failed to save livestream settings", error);
@@ -221,6 +244,14 @@ export default function LivestreamSettingPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const activeParent = categoriesData.find(cat => cat.id === parentCategory);
+
+  const handleParentSelect = (id: string) => {
+    setParentCategory(id);
+    setSubCategory('');
+    setCategoryError('');
   };
 
   return (
@@ -268,6 +299,90 @@ export default function LivestreamSettingPage() {
                 {descriptionError && <p className="text-danger text-xs mt-1">{descriptionError}</p>}
               </div>
 
+              {/* UI phần chuyên mục phân cấp: Chọn cấp 1 xong rồi chọn cấp 2 */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <label className="text-xs font-bold tracking-widest opacity-60 uppercase">Chuyên mục phân cấp</label>
+                </div>
+
+                <div className="space-y-4">
+                  {/* Cấp 1: Chọn chuyên mục chính */}
+                  <div className="space-y-2">
+                    <span className="text-[11px] font-bold text-secondary">Bước 1: Chọn chuyên mục chính</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {categoriesData.map((cat) => {
+                        const isSelected = parentCategory === cat.id;
+                        return (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            onClick={() => handleParentSelect(cat.id)}
+                            className={`flex items-center justify-between p-4 rounded-2xl border text-left transition-all ${isSelected
+                              ? "border-primary bg-selection text-foreground"
+                              : "border-accent bg-background text-secondary hover:border-primary/50 hover:text-foreground"
+                              }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="text-sm font-bold">{cat.name}</span>
+                            </div>
+                            <ChevronRight className={`w-4 h-4 transition-transform ${isSelected ? "text-primary rotate-90" : "text-accent"}`} />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Cấp 2: Chọn chuyên mục phụ (Chỉ hiển thị khi đã chọn cấp 1) */}
+                  {parentCategory && activeParent && (
+                    <div className="space-y-2 pt-2 border-t border-accent border-dashed animate-in fade-in slide-in-from-top-2 duration-200">
+                      <span className="text-[11px] font-bold text-secondary">Bước 2: Chọn danh mục chi tiết thuộc {activeParent.name}</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {activeParent.subCategories && activeParent.subCategories.map((sub) => {
+                          const isSubSelected = subCategory === sub.id;
+                          return (
+                            <button
+                              key={sub.id}
+                              type="button"
+                              onClick={() => setSubCategory(sub.id)}
+                              className={`flex items-center justify-between p-4 rounded-2xl border text-left transition-all ${isSubSelected
+                                ? "border-primary bg-selection text-foreground"
+                                : "border-accent bg-background text-secondary hover:border-primary/50 hover:text-foreground"
+                                }`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="text-sm font-bold">{sub.name}</span>
+                              </div>
+                              <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${isSubSelected ? "border-primary" : "border-accent"}`}>
+                                {isSubSelected && <div className="w-2 h-2 rounded-full bg-primary" />}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Trạng thái hiển thị lựa chọn hiện tại */}
+                <div className="p-3 bg-accent/30 rounded-xl flex items-center gap-2 text-xs">
+                  <span className="font-bold text-secondary">Đã chọn:</span>
+                  {parentCategory ? (
+                    <div className="flex items-center gap-1.5 font-bold text-foreground">
+                      <span>{activeParent?.name}</span>
+                      {subCategory && (
+                        <>
+                          <ChevronRight className="w-3 h-3 text-secondary" />
+                          <span className="text-primary">{activeParent?.subCategories && activeParent?.subCategories.find(s => s.id === subCategory)?.name}</span>
+                        </>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="italic text-secondary">Vui lòng chọn đầy đủ chuyên mục 2 cấp</span>
+                  )}
+                </div>
+                {categoryError && <p className="text-danger text-xs mt-1">{categoryError}</p>}
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <label className="text-xs font-bold tracking-widest opacity-60 uppercase">Quyền riêng tư</label>
@@ -281,7 +396,7 @@ export default function LivestreamSettingPage() {
                         key={item.id}
                         className={`flex items-center gap-4 p-4 rounded-2xl border cursor-pointer transition-all hover:border-primary/50 ${status === item.id ? "border-primary bg-selection" : "border-accent"}`}
                       >
-                        <input type="radio" name="status" className="hidden" onChange={() => setStatus(item.id)} />
+                        <input type="radio" name="status" className="hidden" checked={status === item.id} onChange={() => setStatus(item.id)} />
                         <item.icon className={`w-5 h-5 ${status === item.id ? "text-primary" : "text-secondary"}`} />
                         <div className="flex-grow">
                           <p className="text-sm font-bold">{item.label}</p>
@@ -340,7 +455,7 @@ export default function LivestreamSettingPage() {
                 {submitError && <p className="text-danger text-xs">{submitError}</p>}
                 <div className="flex items-center justify-end gap-3">
                   {/* <Button variant="outline" type="button">Hủy thay đổi</Button> */}
-                  <Button variant="primary" type="submit" disabled={!streamKey || isSubmitting}>
+                  <Button variant="primary" type="submit" disabled={!streamKey || isSubmitting || !parentCategory}>
                     {isSubmitting ? "Đang lưu..." : "Lưu thiết lập phát sóng"}
                   </Button>
                 </div>
@@ -387,7 +502,7 @@ export default function LivestreamSettingPage() {
                         className="bg-accent font-mono text-[11px] pr-20 tracking-widest border-accent"
                       />
                       <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-                        <button onClick={() => setShowStreamKey(!showStreamKey)} className="p-1.5 text-secondary hover:text-foreground">
+                        <button type="button" onClick={() => setShowStreamKey(!showStreamKey)} className="p-1.5 text-secondary hover:text-foreground">
                           {showStreamKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                         <button type="button" onClick={handleCopyStreamKey} className="p-1.5 text-secondary hover:text-foreground">
@@ -411,7 +526,6 @@ export default function LivestreamSettingPage() {
                 <Button
                   onClick={handleCreateStreamKey}
                   variant="primary"
-                  // size="sm"
                   className="w-full max-w-[200px] rounded-xl font-bold uppercase tracking-tight gap-2"
                 >
                   <Zap className="w-4 h-4" /> Khởi tạo ngay
@@ -430,6 +544,7 @@ export default function LivestreamSettingPage() {
                 {[streamLatency.normal, streamLatency.low, streamLatency.ultra].map((l) => (
                   <button
                     key={l}
+                    type="button"
                     onClick={() => setLatency(l)}
                     className={`flex-1 py-2 text-[10px] font-bold rounded-lg transition-all ${latency === l ? "bg-background text-primary shadow-sm" : "text-secondary hover:text-foreground"}`}
                   >
@@ -445,7 +560,7 @@ export default function LivestreamSettingPage() {
                   <p className={`text-xs font-bold ${dvr ? "text-foreground" : "text-secondary"}`}>Chế độ tua lại (DVR)</p>
                   <p className={`text-[10px] italic ${dvr ? "text-secondary" : "text-secondary opacity-70"}`}>Cho phép người xem tua lại</p>
                 </div>
-                <button onClick={() => setDvr(!dvr)}>
+                <button type="button" onClick={() => setDvr(!dvr)}>
                   {dvr ? <ToggleRight className="w-8 h-8 text-primary" /> : <ToggleLeft className="w-8 h-8 text-secondary" />}
                 </button>
               </div>

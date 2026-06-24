@@ -1,4 +1,4 @@
-import type { UserResponse } from "@/api/userApi";
+import type { UserResponse } from "@/types/userType";
 import { create } from "zustand";
 
 type AuthState = {
