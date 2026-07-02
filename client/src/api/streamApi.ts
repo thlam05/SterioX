@@ -1,5 +1,5 @@
 import { api, type ApiResponse } from "@/api/apiClient";
-import type { CreateStreamKeyRequest, CreateStreamRequest, LivestreamLikeRequest, LivestreamLikeResponse, LivestreamLikeStatusResponse, StreamKeyResponse, StreamResponse } from "@/types/streamType";
+import type { CreateStreamKeyRequest, CreateStreamRequest, LivestreamLikeStatusResponse, StreamKeyResponse, StreamResponse } from "@/types/streamType";
 
 export const streamKeyApi = {
   async getStreamKey(userId: string) {

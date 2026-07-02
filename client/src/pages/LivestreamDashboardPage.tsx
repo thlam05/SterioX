@@ -43,7 +43,12 @@ export default function LivestreamDashboard() {
   const [category, setCategory] = useState("Công nghệ & Lập trình");
   const [chatMessage, setChatMessage] = useState("");
 
+
   const [enableOnStream, setEnableOnStream] = useState<boolean>(false);
+
+  useEffect(() => {
+    setEnableOnStream(!!stream);
+  }, [stream]);
 
   useEffect(() => {
     if (!isAuthenticated) {

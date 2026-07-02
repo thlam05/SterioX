@@ -16,7 +16,7 @@ import {
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate, useLoaderData } from "react-router";
 import { useSocket } from "@/context/SocketContext";
-import type { HeartBeatMessge, LivestreamStatusResponse, StreamResponse } from "@/types/streamType";
+import type { HeartBeatMessge, LivestreamLikeResponse, LivestreamStatusResponse, StreamResponse } from "@/types/streamType";
 import { streamApi } from "@/api/streamApi";
 
 export default function LivestreamPage() {
@@ -51,6 +51,7 @@ export default function LivestreamPage() {
     if (!stream || !stream.id) return;
 
     let unsubscribe: () => void = () => { };
+    let unsubscribeLikes: () => void = () => { };
     let heartbeatInterval: NodeJS.Timeout | null = null;
 
     const setupSocketActions = () => {
@@ -58,6 +59,10 @@ export default function LivestreamPage() {
         const { views, likes } = message;
         setCurrentViews(views);
         setCurrentLikes(likes);
+      });
+
+      unsubscribeLikes = subscribeTopic(`/topic/likes-livestreams/${stream.id}`, (message: LivestreamLikeResponse) => {
+        setCurrentLikes(message.likes);
       });
 
       const sendHeartbeat = () => {
@@ -80,6 +85,7 @@ export default function LivestreamPage() {
 
     return () => {
       unsubscribe();
+      unsubscribeLikes();
       if (heartbeatInterval != null) {
         clearInterval(heartbeatInterval);
       }
@@ -105,20 +111,13 @@ export default function LivestreamPage() {
   }, [stream])
 
   const handleLikeStream = async () => {
-    if (!stream || !user) return null;
+    if (!stream || !user) return;
 
     try {
       if (isLiked) {
-        const { success } = await streamApi.unlikeStreamById(stream.id)
-        if (success) {
-          setCurrentLikes(currentLikes - 1 > 0 ? currentLikes - 1 : 0);
-        }
-      }
-      else {
-        const { success } = await streamApi.likeStreamById(stream.id)
-        if (success) {
-          setCurrentLikes(currentLikes + 1);
-        }
+        await streamApi.unlikeStreamById(stream.id);
+      } else {
+        await streamApi.likeStreamById(stream.id);
       }
       setIsLiked(!isLiked);
     } catch (error) {
