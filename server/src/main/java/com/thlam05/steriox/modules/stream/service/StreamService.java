@@ -8,14 +8,18 @@ import java.util.Set;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.thlam05.steriox.common.enums.ResponseStatus;
 import com.thlam05.steriox.common.exception.AppException;
+import com.thlam05.steriox.modules.stream.dto.response.LivestreamStatusResponse;
 import com.thlam05.steriox.common.service.RedisService;
 import com.thlam05.steriox.common.service.S3Service;
 import com.thlam05.steriox.modules.stream.dto.request.CreateStreamRequest;
+import com.thlam05.steriox.modules.stream.dto.response.LivestreamLikeResponse;
 import com.thlam05.steriox.modules.stream.dto.response.LivestreamLikeStatusResponse;
 import com.thlam05.steriox.modules.stream.dto.response.StreamResponse;
 import com.thlam05.steriox.modules.stream.entity.Category;
@@ -44,6 +48,7 @@ public class StreamService {
     private final UserRepository userRepository;
     private final S3Service s3Service;
     private final RedisService redisService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     private String redisLivestreamLikesKey = "livestreams:likes:";
 
@@ -126,32 +131,25 @@ public class StreamService {
         stream.setOnStream(false);
         stream.setEndedAt(LocalDateTime.now());
         stream = streamRepository.save(stream);
+
+        redisService.deleteKey("livestreams:views:" + id);
+        redisService.deleteKey("livestreams:unique-views:" + id);
+
         return streamMapper.toStreamResponse(stream);
     }
 
     @Transactional
-    public void likeStream(String id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || "anonymousUser".equals(authentication.getPrincipal())) {
-            throw new AppException(ResponseStatus.UNAUTHORIZED, "User must be logged in");
-        }
-        String userId = authentication.getName();
+    public void likeStream(String streamId) {
+        String userId = getAuthenticatedUserId();
+        Stream stream = findStreamById(streamId);
 
-        if (!streamRepository.existsById(id)) {
-            throw new AppException(ResponseStatus.NOT_FOUND, "Stream not found");
-        }
+        String likesKey = getLivestreamLikesKey(streamId);
+        if (!redisService.setIsMember(likesKey, userId)) {
+            redisService.setAdd(likesKey, userId);
 
-        // key redis
-        String LivestreamLikesKey = getLivestreamLikesKey(id);
-        if (redisService.setIsMember(LivestreamLikesKey, userId) == false) {
-            redisService.setAdd(LivestreamLikesKey, userId);
-
-            // Persist to database
-            Stream stream = streamRepository.getReferenceById(id);
             User user = userRepository.getReferenceById(userId);
-
             StreamLikeId likeId = StreamLikeId.builder()
-                    .streamId(id)
+                    .streamId(streamId)
                     .userId(userId)
                     .build();
 
@@ -162,38 +160,43 @@ public class StreamService {
                     .build();
 
             streamLikeRepository.save(streamLike);
-
-            long likes = redisService.setSize(LivestreamLikesKey);
-            stream.setTotalLikes((int) likes);
-            streamRepository.save(stream);
+            syncLikeCount(stream, likesKey);
         }
     }
 
     @Transactional
-    public void unlikeStream(String id) {
+    public void unlikeStream(String streamId) {
+        String userId = getAuthenticatedUserId();
+        Stream stream = findStreamById(streamId);
+
+        String likesKey = getLivestreamLikesKey(streamId);
+        if (redisService.setIsMember(likesKey, userId)) {
+            redisService.setRemove(likesKey, userId);
+            streamLikeRepository.deleteByStreamIdAndUserId(streamId, userId);
+            syncLikeCount(stream, likesKey);
+        }
+    }
+
+    private String getAuthenticatedUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || "anonymousUser".equals(authentication.getPrincipal())) {
             throw new AppException(ResponseStatus.UNAUTHORIZED, "User must be logged in");
         }
-        String userId = authentication.getName();
+        return authentication.getName();
+    }
 
-        if (!streamRepository.existsById(id)) {
-            throw new AppException(ResponseStatus.NOT_FOUND, "Stream not found");
-        }
+    private Stream findStreamById(String streamId) {
+        return streamRepository.findById(streamId)
+                .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Stream not found"));
+    }
 
-        // key redis
-        String LivestreamLikesKey = getLivestreamLikesKey(id);
-        if (redisService.setIsMember(LivestreamLikesKey, userId) == true) {
-            redisService.setRemove(LivestreamLikesKey, userId);
+    private void syncLikeCount(Stream stream, String likesKey) {
+        long likes = redisService.setSize(likesKey);
+        stream.setTotalLikes((int) likes);
+        streamRepository.save(stream);
 
-            // Remove from database
-            streamLikeRepository.deleteByStreamIdAndUserId(id, userId);
-
-            Stream stream = streamRepository.getReferenceById(id);
-            long likes = redisService.setSize(LivestreamLikesKey);
-            stream.setTotalLikes((int) likes);
-            streamRepository.save(stream);
-        }
+        String destination = "/topic/likes-livestreams/" + stream.getId();
+        messagingTemplate.convertAndSend(destination, LivestreamLikeResponse.builder().likes(likes).build());
     }
 
     public LivestreamLikeStatusResponse checkIsLikedStream(String livestreamId) {
@@ -237,5 +240,54 @@ public class StreamService {
 
     private String getLivestreamLikesKey(String id) {
         return redisLivestreamLikesKey + id;
+    }
+
+    @Transactional
+    public void handleViewHeartbeat(String streamId, String userId) {
+        String viewsKey = "livestreams:views:" + streamId;
+        double currentTimestamp = System.currentTimeMillis() / 1000.0;
+
+        redisService.zSetAdd(viewsKey, userId, currentTimestamp);
+
+        String uniqueViewsKey = "livestreams:unique-views:" + streamId;
+        if (!redisService.setIsMember(uniqueViewsKey, userId)) {
+            redisService.setAdd(uniqueViewsKey, userId);
+
+            Stream stream = findStreamById(streamId);
+            stream.setTotalViews((stream.getTotalViews() != null ? stream.getTotalViews() : 0) + 1);
+            streamRepository.save(stream);
+        }
+    }
+
+    @Scheduled(fixedRate = 3000)
+    public void broadcastActiveViewsAndLikes() {
+        List<Stream> onlineStreams = streamRepository.findAllStreamOnline();
+        if (onlineStreams == null || onlineStreams.isEmpty()) {
+            return;
+        }
+
+        double currentTimestamp = System.currentTimeMillis() / 1000.0;
+
+        for (Stream stream : onlineStreams) {
+            String streamId = stream.getId();
+            String viewsKey = "livestreams:views:" + streamId;
+
+            // Clean up viewers inactive for more than 15 seconds
+            redisService.zSetRemoveRangeByScore(viewsKey, 0, currentTimestamp - 15);
+
+            // Count active viewers
+            long activeViews = redisService.zSetSize(viewsKey);
+
+            // Get total likes
+            String likesKey = getLivestreamLikesKey(streamId);
+            long totalLikes = redisService.setSize(likesKey);
+
+            // Broadcast to STOMP topic
+            String destination = "/topic/status-livestream/" + streamId;
+            messagingTemplate.convertAndSend(destination, LivestreamStatusResponse.builder()
+                    .views(activeViews)
+                    .likes(totalLikes)
+                    .build());
+        }
     }
 }
