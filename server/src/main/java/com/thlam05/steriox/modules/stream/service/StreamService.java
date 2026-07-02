@@ -115,16 +115,12 @@ public class StreamService {
         stream.setOnStream(true);
         stream.setStartedAt(LocalDateTime.now());
         stream = streamRepository.save(stream);
-        // streamSchedulerService.startHeartbeatTask(id);
         return streamMapper.toStreamResponse(stream);
     }
 
     public StreamResponse stopStream(String id) {
         Stream stream = streamRepository.findById(id)
                 .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Stream not found"));
-
-        // streamSchedulerService.stopHeartbeatTask(id);
-        // streamSocketService.clearStreamData(id);
 
         stream.setIsActive(false);
         stream.setOnStream(false);
@@ -147,8 +143,8 @@ public class StreamService {
 
         // key redis
         String LivestreamLikesKey = getLivestreamLikesKey(id);
-        if (redisService.isMemberOfSet(LivestreamLikesKey, userId) == false) {
-            redisService.addToSet(LivestreamLikesKey, userId);
+        if (redisService.setIsMember(LivestreamLikesKey, userId) == false) {
+            redisService.setAdd(LivestreamLikesKey, userId);
 
             // Persist to database
             Stream stream = streamRepository.getReferenceById(id);
@@ -167,8 +163,8 @@ public class StreamService {
 
             streamLikeRepository.save(streamLike);
 
-            Long likes = redisService.countMember(LivestreamLikesKey);
-            stream.setTotalLikes(likes.intValue());
+            long likes = redisService.setSize(LivestreamLikesKey);
+            stream.setTotalLikes((int) likes);
             streamRepository.save(stream);
         }
     }
@@ -187,15 +183,15 @@ public class StreamService {
 
         // key redis
         String LivestreamLikesKey = getLivestreamLikesKey(id);
-        if (redisService.isMemberOfSet(LivestreamLikesKey, userId) == true) {
-            redisService.removeFromSet(LivestreamLikesKey, userId);
+        if (redisService.setIsMember(LivestreamLikesKey, userId) == true) {
+            redisService.setRemove(LivestreamLikesKey, userId);
 
             // Remove from database
             streamLikeRepository.deleteByStreamIdAndUserId(id, userId);
 
             Stream stream = streamRepository.getReferenceById(id);
-            Long likes = redisService.countMember(LivestreamLikesKey);
-            stream.setTotalLikes(likes.intValue());
+            long likes = redisService.setSize(LivestreamLikesKey);
+            stream.setTotalLikes((int) likes);
             streamRepository.save(stream);
         }
     }
@@ -212,12 +208,12 @@ public class StreamService {
         String livestreamLikesKey = getLivestreamLikesKey(livestreamId);
         boolean isLiked = false;
 
-        if (redisService.isKeyExist(livestreamLikesKey)) {
-            isLiked = redisService.isMemberOfSet(livestreamLikesKey, userId);
+        if (redisService.existsKey(livestreamLikesKey)) {
+            isLiked = redisService.setIsMember(livestreamLikesKey, userId);
         } else {
             isLiked = streamLikeRepository.existsByStreamIdAndUserId(livestreamId, userId);
             if (isLiked) {
-                redisService.addToSet(livestreamLikesKey, userId);
+                redisService.setAdd(livestreamLikesKey, userId);
             }
         }
 
