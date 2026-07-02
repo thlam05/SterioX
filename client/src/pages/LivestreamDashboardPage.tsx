@@ -24,14 +24,14 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate } from "react-router";
-import { streamApi, streamKeyApi } from "@/api/streamApi";
-import type { StreamResponse } from "@/types/streamType";
+import { useSocket } from "@/context/SocketContext";
+import { streamApi, streamKeyApi, streamChatApi } from "@/api/streamApi";
+import type { StreamResponse, HeartBeatMessge, LivestreamLikeResponse, LivestreamStatusResponse, StreamChatResponse } from "@/types/streamType";
 
 export default function LivestreamDashboard() {
   const { user, isAuthenticated } = useAuthStore();
-
   const navigate = useNavigate();
-
+  const { isConnected, sendMessage, subscribeTopic } = useSocket();
 
   const [streamKey, setStreamKey] = useState<string | null>(null);
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
@@ -42,8 +42,10 @@ export default function LivestreamDashboard() {
   const [streamTitle, setStreamTitle] = useState("Lập trình hệ thống phân tán hiệu năng cao với Java và Spring Boot");
   const [category, setCategory] = useState("Công nghệ & Lập trình");
   const [chatMessage, setChatMessage] = useState("");
+  const [chats, setChats] = useState<StreamChatResponse[]>([]);
 
-
+  const [currentViews, setCurrentViews] = useState(0);
+  const [currentLikes, setCurrentLikes] = useState(0);
   const [enableOnStream, setEnableOnStream] = useState<boolean>(false);
 
   useEffect(() => {
@@ -64,6 +66,12 @@ export default function LivestreamDashboard() {
       try {
         const streamResponse = await streamApi.getStreamOnlineOfUSer(user.id);
         setStream(streamResponse);
+        if (streamResponse) {
+          setCurrentViews(streamResponse.totalViews);
+          setCurrentLikes(streamResponse.totalLikes);
+          const history = await streamChatApi.getChats(streamResponse.id);
+          setChats(history);
+        }
       } catch (error) {
         console.log(error);
       }
@@ -72,6 +80,57 @@ export default function LivestreamDashboard() {
     fetchStreaming();
 
   }, [user, isAuthenticated]);
+
+  useEffect(() => {
+    if (!stream || !stream.id) return;
+
+    let unsubscribe: () => void = () => { };
+    let unsubscribeLikes: () => void = () => { };
+    let unsubscribeChat: () => void = () => { };
+    let heartbeatInterval: NodeJS.Timeout | null = null;
+
+    const setupSocketActions = () => {
+      unsubscribe = subscribeTopic(`/topic/status-livestream/${stream.id}`, (message: LivestreamStatusResponse) => {
+        const { views, likes } = message;
+        setCurrentViews(views);
+        setCurrentLikes(likes);
+      });
+
+      unsubscribeLikes = subscribeTopic(`/topic/likes-livestreams/${stream.id}`, (message: LivestreamLikeResponse) => {
+        setCurrentLikes(message.likes);
+      });
+
+      unsubscribeChat = subscribeTopic(`/topic/chat/${stream.id}`, (message: StreamChatResponse) => {
+        setChats((prev) => [...prev, message]);
+      });
+
+      const sendHeartbeat = () => {
+        if (user?.id) {
+          const payload: HeartBeatMessge = {
+            userId: user?.id,
+            message: "PING"
+          }
+          sendMessage(`/app/view-livestream/${stream.id}`, payload);
+        }
+      };
+
+      sendHeartbeat();
+      heartbeatInterval = setInterval(sendHeartbeat, 10000);
+    };
+
+    if (isConnected) {
+      setupSocketActions();
+    }
+
+    return () => {
+      unsubscribe();
+      unsubscribeLikes();
+      unsubscribeChat();
+      if (heartbeatInterval != null) {
+        clearInterval(heartbeatInterval);
+      }
+    }
+  }, [stream, isConnected]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -168,13 +227,17 @@ export default function LivestreamDashboard() {
     resolution: "1080p"
   };
 
-  const mockChats = [
-    { id: 1, user: "Lâm", text: "Chào mọi người, hôm nay chúng ta sẽ tối ưu hoá kết nối DB nhé.", time: "16:12", isStreamer: true },
-    { id: 2, user: "Hoàng Nam", text: "Dự án này có sử dụng mô hình Master-Slave không anh?", time: "16:13", isStreamer: false },
-    { id: 3, user: "Minh Thư", text: "Luồng mượt quá, cấu hình OBS thế nào vậy ạ?", time: "16:14", isStreamer: false },
-    { id: 4, user: "Quốc Anh", text: "Chào sếp Lâm, hướng dẫn phần Nginx load balancing kỹ hơn chút nhé.", time: "16:15", isStreamer: false },
-    { id: 5, user: "Thanh Sơn", text: "Bên MoMo Sandbox kết nối trực tiếp với Worker luôn hả anh?", time: "16:16", isStreamer: false }
-  ];
+  const handleSendChat = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stream || !user || !chatMessage.trim()) return;
+
+    try {
+      await streamChatApi.sendChat(stream.id, user.id, chatMessage.trim());
+      setChatMessage("");
+    } catch (error) {
+      console.error("Failed to send chat message", error);
+    }
+  };
 
   const mockDonations = [
     { id: 1, user: "Duy Mạnh", amount: "50,000 VND", message: "Ủng hộ anh Lâm chia sẻ kiến thức hay!" },
@@ -204,7 +267,7 @@ export default function LivestreamDashboard() {
           </div>
           <div>
             <p className="text-xs text-secondary font-medium">Người xem</p>
-            <span className="text-sm font-black text-foreground">{stream?.totalViews}</span>
+            <span className="text-sm font-black text-foreground">{currentViews}</span>
           </div>
         </div>
 
@@ -214,7 +277,7 @@ export default function LivestreamDashboard() {
           </div>
           <div>
             <p className="text-xs text-secondary font-medium">Lượt thích</p>
-            <span className="text-sm font-black text-foreground">{stream?.totalLikes}</span>
+            <span className="text-sm font-black text-foreground">{currentLikes}</span>
           </div>
         </div>
 
@@ -367,21 +430,25 @@ export default function LivestreamDashboard() {
 
             {/* Danh sách các tin nhắn */}
             <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-background">
-              {mockChats.map((chat) => (
-                <div key={chat.id} className="text-xs leading-relaxed flex items-start gap-2">
-                  <span className="text-secondary font-medium tracking-tighter shrink-0 pt-0.5">{chat.time}</span>
-                  <div>
-                    <span className={`font-black mr-2 ${chat.isStreamer ? 'text-primary bg-selection px-1.5 py-0.5 rounded-md text-[10px]' : 'text-foreground'}`}>
-                      {chat.user}
-                    </span>
-                    <span className="text-secondary">{chat.text}</span>
+              {chats.map((chat) => {
+                const isStreamer = chat.user.id === stream?.user?.id;
+                const timeStr = new Date(chat.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                return (
+                  <div key={chat.id} className="text-xs leading-relaxed flex items-start gap-2">
+                    <span className="text-secondary font-medium tracking-tighter shrink-0 pt-0.5">{timeStr}</span>
+                    <div>
+                      <span className={`font-black mr-2 ${isStreamer ? 'text-primary bg-selection px-1.5 py-0.5 rounded-md text-[10px]' : 'text-foreground'}`}>
+                        {chat.user.username}
+                      </span>
+                      <span className="text-secondary">{chat.content}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Khu vực gửi tin nhắn */}
-            <form onSubmit={(e) => e.preventDefault()} className="p-3 border-t border-accent bg-background flex gap-2">
+            <form onSubmit={handleSendChat} className="p-3 border-t border-accent bg-background flex gap-2">
               <div className="flex-1">
                 <Input
                   type="text"
@@ -390,7 +457,7 @@ export default function LivestreamDashboard() {
                   onChange={(e) => setChatMessage(e.target.value)}
                 />
               </div>
-              <Button variant="primary" className="px-4 py-2 rounded-xl flex items-center justify-center">
+              <Button type="submit" variant="primary" className="px-4 py-2 rounded-xl flex items-center justify-center">
                 <Send className="w-4 h-4" />
               </Button>
             </form>
