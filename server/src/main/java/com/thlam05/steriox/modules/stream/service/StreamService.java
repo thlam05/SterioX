@@ -5,9 +5,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -18,16 +16,12 @@ import com.thlam05.steriox.common.exception.AppException;
 import com.thlam05.steriox.common.service.RedisService;
 import com.thlam05.steriox.common.service.S3Service;
 import com.thlam05.steriox.modules.stream.dto.request.CreateStreamRequest;
-import com.thlam05.steriox.modules.stream.dto.request.LikeStreamRequest;
-import com.thlam05.steriox.modules.stream.dto.request.UpdateStreamRequest;
-import com.thlam05.steriox.modules.stream.dto.response.LivestreamLikeResponse;
 import com.thlam05.steriox.modules.stream.dto.response.LivestreamLikeStatusResponse;
 import com.thlam05.steriox.modules.stream.dto.response.StreamResponse;
 import com.thlam05.steriox.modules.stream.entity.Category;
 import com.thlam05.steriox.modules.stream.entity.Stream;
 import com.thlam05.steriox.modules.stream.entity.StreamKey;
 import com.thlam05.steriox.modules.stream.entity.StreamLike;
-import com.thlam05.steriox.modules.stream.enums.StreamStatus;
 import com.thlam05.steriox.modules.stream.types.StreamLikeId;
 import com.thlam05.steriox.modules.stream.mapper.StreamMapper;
 import com.thlam05.steriox.modules.stream.repository.CategoryRepository;
@@ -42,12 +36,10 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class StreamService {
-    private final RedisTemplate<String, Object> redisTemplate;
     private final StreamRepository streamRepository;
     private final StreamLikeRepository streamLikeRepository;
     private final StreamKeyRepository streamKeyRepository;
     private final CategoryRepository categoryRepository;
-    private final StreamSchedulerService streamSchedulerService;
     private final StreamMapper streamMapper;
     private final UserRepository userRepository;
     private final S3Service s3Service;
@@ -115,35 +107,6 @@ public class StreamService {
         return streamMapper.toStreamResponses(streams);
     }
 
-    // public List<StreamResponse> getAllStreamOnline() {
-    // List<Stream> streams = streamRepository.findAllStreamOnline();
-    // return streamMapper.toStreamResponses(streams);
-    // }
-
-    // public StreamResponse update(String id, UpdateStreamRequest request) {
-    // Stream stream = streamRepository.findById(id)
-    // .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Stream not
-    // found"));
-
-    // if (request.getUserId() != null &&
-    // !request.getUserId().equals(stream.getUser().getId())) {
-    // User user = userRepository.findById(request.getUserId())
-    // .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "User not
-    // found"));
-    // stream.setUser(user);
-    // }
-
-    // mergeStreamFields(stream, request);
-    // return streamMapper.toStreamResponse(streamRepository.save(stream));
-    // }
-
-    // public void delete(String id) {
-    // if (!streamRepository.existsById(id)) {
-    // throw new AppException(ResponseStatus.NOT_FOUND, "Stream not found");
-    // }
-    // streamRepository.deleteById(id);
-    // }
-
     public StreamResponse startStream(String id) {
         Stream stream = streamRepository.findById(id)
                 .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Stream not found"));
@@ -152,21 +115,23 @@ public class StreamService {
         stream.setOnStream(true);
         stream.setStartedAt(LocalDateTime.now());
         stream = streamRepository.save(stream);
-        streamSchedulerService.startHeartbeatTask(id);
+        // streamSchedulerService.startHeartbeatTask(id);
         return streamMapper.toStreamResponse(stream);
     }
 
-    // public StreamResponse stopStream(String id) {
-    // Stream stream = streamRepository.findById(id)
-    // .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Stream not
-    // found"));
+    public StreamResponse stopStream(String id) {
+        Stream stream = streamRepository.findById(id)
+                .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Stream not found"));
 
-    // stream.setIsActive(false);
-    // stream.setOnStream(false);
-    // stream.setEndedAt(LocalDateTime.now());
-    // stream = streamRepository.save(stream);
-    // return streamMapper.toStreamResponse(stream);
-    // }
+        // streamSchedulerService.stopHeartbeatTask(id);
+        // streamSocketService.clearStreamData(id);
+
+        stream.setIsActive(false);
+        stream.setOnStream(false);
+        stream.setEndedAt(LocalDateTime.now());
+        stream = streamRepository.save(stream);
+        return streamMapper.toStreamResponse(stream);
+    }
 
     @Transactional
     public void likeStream(String id) {

@@ -103,6 +103,13 @@ public class RedisService {
         return size != null ? size : 0L;
     }
 
+    public void deleteByPattern(String pattern) {
+        Set<String> keys = redisTemplate.keys(pattern);
+        if (keys != null && !keys.isEmpty()) {
+            redisTemplate.delete(keys);
+        }
+    }
+
     private ValueOperations<String, Object> valueOps() {
         return redisTemplate.opsForValue();
     }

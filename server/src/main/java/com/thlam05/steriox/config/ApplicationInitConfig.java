@@ -1,6 +1,5 @@
 package com.thlam05.steriox.config;
 
-import java.util.List;
 import java.util.Set;
 
 import org.springframework.boot.ApplicationRunner;
@@ -13,9 +12,6 @@ import com.thlam05.steriox.common.enums.RoleType;
 import com.thlam05.steriox.common.exception.AppException;
 import com.thlam05.steriox.modules.rbac.entity.Role;
 import com.thlam05.steriox.modules.rbac.repository.RoleRepository;
-import com.thlam05.steriox.modules.stream.entity.Stream;
-import com.thlam05.steriox.modules.stream.repository.StreamRepository;
-import com.thlam05.steriox.modules.stream.service.StreamSchedulerService;
 import com.thlam05.steriox.modules.user.entity.User;
 import com.thlam05.steriox.modules.user.repository.UserRepository;
 
@@ -28,8 +24,6 @@ public class ApplicationInitConfig {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final StreamSchedulerService streamSchedulerService;
-    private final StreamRepository streamRepository;
 
     @Bean
     ApplicationRunner applicationRunner() {
@@ -71,15 +65,6 @@ public class ApplicationInitConfig {
 
                 userRepository.save(user);
             }
-
-            startStreamSchedular();
         };
-    }
-
-    private void startStreamSchedular() {
-        List<Stream> streams = streamRepository.findAllStreamOnline();
-        for (var stream : streams) {
-            streamSchedulerService.startHeartbeatTask(stream.getId());
-        }
     }
 }
