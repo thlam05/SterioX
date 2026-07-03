@@ -61,3 +61,13 @@ export type LivestreamLikeResponse = {
 export type LivestreamLikeStatusResponse = {
   isLiked: boolean;
 }
+
+export type StreamChatResponse = {
+  id: string;
+  streamId: string;
+  user: UserResponse;
+  content: string;
+  isPinned: boolean;
+  isToxic: boolean;
+  createdAt: string;
+}

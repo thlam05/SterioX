@@ -18,89 +18,93 @@ import lombok.RequiredArgsConstructor;
 public class RedisService {
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public boolean isKeyExist(String key) {
-        Boolean hasKey = redisTemplate.hasKey(key);
-        return hasKey != null && hasKey;
-    }
-
-    public void set(String key, Object value) {
-        valueOps().set(key, value);
-    }
-
-    public void setWithTTL(String key, Object value, long timeoutInSeconds) {
-        valueOps().set(key, value, timeoutInSeconds, TimeUnit.SECONDS);
-    }
-
-    public Object get(String key) {
-        return valueOps().get(key);
-    }
-
-    public void delete(String key) {
-        redisTemplate.delete(key);
-    }
-
-    public boolean hasKey(String key) {
+    public boolean existsKey(String key) {
         return Boolean.TRUE.equals(redisTemplate.hasKey(key));
     }
 
-    public void putHash(String key, String hashKey, Object value) {
-        hashOps().put(key, hashKey, value);
+    public void setValue(String key, Object value) {
+        valueOps().set(key, value);
     }
 
-    public Object getHash(String key, String hashKey) {
-        return hashOps().get(key, hashKey);
+    public void setValueWithTTL(String key, Object value, long ttlSeconds) {
+        valueOps().set(key, value, ttlSeconds, TimeUnit.SECONDS);
     }
 
-    public void pushToList(String key, Object value) {
+    public Object getValue(String key) {
+        return valueOps().get(key);
+    }
+
+    public void deleteKey(String key) {
+        redisTemplate.delete(key);
+    }
+
+    public void setHash(String key, String field, Object value) {
+        hashOps().put(key, field, value);
+    }
+
+    public Object getHash(String key, String field) {
+        return hashOps().get(key, field);
+    }
+
+    public void listRightPush(String key, Object value) {
         listOps().rightPush(key, value);
     }
 
-    public Object popFromList(String key) {
+    public Object listLeftPop(String key) {
         return listOps().leftPop(key);
     }
 
-    public void addToSet(String key, Object... values) {
+    public void setAdd(String key, Object... values) {
         setOps().add(key, values);
     }
 
-    public void removeFromSet(String key, Object... values) {
+    public void setRemove(String key, Object... values) {
         setOps().remove(key, values);
     }
 
-    public boolean isMemberOfSet(String key, Object value) {
+    public boolean setIsMember(String key, Object value) {
         return Boolean.TRUE.equals(setOps().isMember(key, value));
     }
 
-    public Set<Object> getSetMembers(String key) {
+    public Set<Object> setMembers(String key) {
         Set<Object> members = setOps().members(key);
         return members != null ? members : Set.of();
     }
 
-    public Long countMember(String key) {
+    public long setSize(String key) {
         Long size = setOps().size(key);
         return size != null ? size : 0L;
     }
 
-    public boolean addToZSet(String key, Object value, double score) {
+    public boolean zSetAdd(String key, Object value, double score) {
         return Boolean.TRUE.equals(zSetOps().add(key, value, score));
     }
 
-    public Long removeFromZSet(String key, Object... values) {
-        return zSetOps().remove(key, values);
+    public long zSetRemove(String key, Object... values) {
+        Long removed = zSetOps().remove(key, values);
+        return removed != null ? removed : 0L;
     }
 
-    public Long removeRangeByScore(String key, double minScore, double maxScore) {
-        return zSetOps().removeRangeByScore(key, minScore, maxScore);
+    public long zSetRemoveRangeByScore(String key, double minScore, double maxScore) {
+        Long removed = zSetOps().removeRangeByScore(key, minScore, maxScore);
+        return removed != null ? removed : 0L;
     }
 
-    public Set<Object> getZSetMembers(String key) {
+    public Set<Object> zSetMembers(String key) {
         Set<Object> members = zSetOps().range(key, 0, -1);
         return members != null ? members : Set.of();
     }
 
-    public Long countZSetSize(String key) {
+    public long zSetSize(String key) {
         Long size = zSetOps().size(key);
         return size != null ? size : 0L;
+    }
+
+    public void deleteKeysByPattern(String pattern) {
+        Set<String> keys = redisTemplate.keys(pattern);
+        if (keys != null && !keys.isEmpty()) {
+            redisTemplate.delete(keys);
+        }
     }
 
     private ValueOperations<String, Object> valueOps() {

@@ -1,5 +1,5 @@
 import { api, type ApiResponse } from "@/api/apiClient";
-import type { CreateStreamKeyRequest, CreateStreamRequest, LivestreamLikeRequest, LivestreamLikeResponse, LivestreamLikeStatusResponse, StreamKeyResponse, StreamResponse } from "@/types/streamType";
+import type { CreateStreamKeyRequest, CreateStreamRequest, LivestreamLikeStatusResponse, StreamKeyResponse, StreamResponse, StreamChatResponse } from "@/types/streamType";
 
 export const streamKeyApi = {
   async getStreamKey(userId: string) {
@@ -56,3 +56,18 @@ export const streamApi = {
     return response.data.data;
   }
 } 
+
+export const streamChatApi = {
+  async getChats(streamId: string) {
+    const response = await api.get<ApiResponse<StreamChatResponse[]>>(`/stream-chats/stream/${streamId}`);
+    return response.data.data;
+  },
+  async sendChat(streamId: string, userId: string, content: string) {
+    const response = await api.post<ApiResponse<StreamChatResponse>>(`/stream-chats`, {
+      streamId,
+      userId,
+      content
+    });
+    return response.data.data;
+  }
+};
