@@ -1,0 +1,47 @@
+INSERT INTO permissions (name) VALUES
+    ('CREATE:USER'),
+    ('READ:USER'),
+    ('UPDATE:USER'),
+    ('DELETE:USER'),
+    ('CREATE:ROLE'),
+    ('READ:ROLE'),
+    ('UPDATE:ROLE'),
+    ('DELETE:ROLE'),
+    ('CREATE:PERMISSION'),
+    ('READ:PERMISSION'),
+    ('UPDATE:PERMISSION'),
+    ('DELETE:PERMISSION'),
+    ('CREATE:STREAM'),
+    ('READ:STREAM'),
+    ('UPDATE:STREAM'),
+    ('DELETE:STREAM')
+ON CONFLICT (name) DO NOTHING;
+
+INSERT INTO roles (name) VALUES
+    ('ADMIN'),
+    ('VIEWER'),
+    ('STREAMER')
+ON CONFLICT (name) DO NOTHING;
+
+INSERT INTO role_permission (role_name, permission_name) VALUES
+    ('ADMIN', 'CREATE:USER'),
+    ('ADMIN', 'READ:USER'),
+    ('ADMIN', 'UPDATE:USER'),
+    ('ADMIN', 'DELETE:USER'),
+    ('ADMIN', 'CREATE:ROLE'),
+    ('ADMIN', 'READ:ROLE'),
+    ('ADMIN', 'UPDATE:ROLE'),
+    ('ADMIN', 'DELETE:ROLE'),
+    ('ADMIN', 'CREATE:PERMISSION'),
+    ('ADMIN', 'READ:PERMISSION'),
+    ('ADMIN', 'UPDATE:PERMISSION'),
+    ('ADMIN', 'DELETE:PERMISSION'),
+    ('ADMIN', 'CREATE:STREAM'),
+    ('ADMIN', 'READ:STREAM'),
+    ('ADMIN', 'UPDATE:STREAM'),
+    ('ADMIN', 'DELETE:STREAM'),
+    ('STREAMER', 'CREATE:STREAM'),
+    ('STREAMER', 'READ:STREAM'),
+    ('STREAMER', 'UPDATE:STREAM'),
+    ('STREAMER', 'DELETE:STREAM')
+ON CONFLICT DO NOTHING;
