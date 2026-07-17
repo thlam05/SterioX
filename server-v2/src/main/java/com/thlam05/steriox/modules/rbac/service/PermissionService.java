@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.thlam05.steriox.common.constant.ResponseCode;
 import com.thlam05.steriox.common.exception.AppException;
+import com.thlam05.steriox.modules.rbac.constant.PermissionMessage;
 import com.thlam05.steriox.modules.rbac.dto.request.PermissionRequest;
 import com.thlam05.steriox.modules.rbac.dto.response.PermissionResponse;
 import com.thlam05.steriox.modules.rbac.entity.Permission;
@@ -46,11 +47,11 @@ public class PermissionService {
                 .toUpperCase();
 
         if (!validateFormatPermission(permissionName)) {
-            throw new AppException(ResponseCode.BAD_REQUEST, "Invalid permission format");
+            throw new AppException(ResponseCode.BAD_REQUEST, PermissionMessage.INVALID_PERMISSION_FORMAT);
         }
 
         if (permissionRepository.existsById(permissionName)) {
-            throw new AppException(ResponseCode.BAD_REQUEST, "Permission already exists");
+            throw new AppException(ResponseCode.BAD_REQUEST, PermissionMessage.PERMISSION_ALREADY_EXISTS);
         }
 
         Permission permission = permissionMapper.toPermission(request);
@@ -62,7 +63,7 @@ public class PermissionService {
     @PreAuthorize("hasAuthority('DELETE:PERMISSION')")
     public void delete(String name) {
         if (!permissionRepository.existsById(name)) {
-            throw new AppException(ResponseCode.NOT_FOUND, "Permission not found");
+            throw new AppException(ResponseCode.NOT_FOUND, PermissionMessage.PERMISSION_NOT_FOUND);
         }
 
         permissionRepository.deleteById(name);

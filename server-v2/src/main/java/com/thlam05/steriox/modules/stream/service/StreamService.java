@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.thlam05.steriox.common.constant.ResponseCode;
 import com.thlam05.steriox.common.exception.AppException;
+import com.thlam05.steriox.modules.stream.constant.StreamMessage;
 import com.thlam05.steriox.modules.stream.dto.request.CreateStreamRequest;
 import com.thlam05.steriox.modules.stream.dto.request.UpdateStreamRequest;
 import com.thlam05.steriox.modules.stream.dto.response.StreamResponse;
@@ -32,7 +33,7 @@ public class StreamService {
 
     public StreamResponse create(CreateStreamRequest request, String userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND, StreamMessage.USER_NOT_FOUND));
 
         Stream stream = streamMapper.toStream(request);
         stream.setUser(user);
@@ -56,7 +57,7 @@ public class StreamService {
 
     public StreamResponse getById(String id) {
         Stream stream = streamRepository.findById(id)
-                .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND, "Stream not found"));
+                .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND, StreamMessage.STREAM_NOT_FOUND));
         return streamMapper.toStreamResponse(stream);
     }
 
@@ -72,10 +73,10 @@ public class StreamService {
 
     public StreamResponse update(String id, UpdateStreamRequest request, String userId) {
         Stream stream = streamRepository.findById(id)
-                .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND, "Stream not found"));
+                .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND, StreamMessage.STREAM_NOT_FOUND));
 
         if (!stream.getUser().getId().equals(userId)) {
-            throw new AppException(ResponseCode.FORBIDDEN, "You can only update your own streams");
+            throw new AppException(ResponseCode.FORBIDDEN, StreamMessage.CAN_ONLY_UPDATE_OWN_STREAMS);
         }
 
         if (request.getTitle() != null) {
@@ -102,10 +103,10 @@ public class StreamService {
 
     public void delete(String id, String userId) {
         Stream stream = streamRepository.findById(id)
-                .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND, "Stream not found"));
+                .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND, StreamMessage.STREAM_NOT_FOUND));
 
         if (!stream.getUser().getId().equals(userId)) {
-            throw new AppException(ResponseCode.FORBIDDEN, "You can only delete your own streams");
+            throw new AppException(ResponseCode.FORBIDDEN, StreamMessage.CAN_ONLY_DELETE_OWN_STREAMS);
         }
 
         streamRepository.delete(stream);

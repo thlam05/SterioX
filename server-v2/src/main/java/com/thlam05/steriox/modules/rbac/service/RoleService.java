@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.thlam05.steriox.common.constant.ResponseCode;
 import com.thlam05.steriox.common.exception.AppException;
+import com.thlam05.steriox.modules.rbac.constant.RoleMessage;
 import com.thlam05.steriox.modules.rbac.dto.request.RoleRequest;
 import com.thlam05.steriox.modules.rbac.dto.request.UpdateRoleRequest;
 import com.thlam05.steriox.modules.rbac.dto.response.RoleResponse;
@@ -33,20 +34,20 @@ public class RoleService {
                 .trim();
 
         if (!isValidRoleName(roleName)) {
-            throw new AppException(ResponseCode.BAD_REQUEST, "Invalid role name");
+            throw new AppException(ResponseCode.BAD_REQUEST, RoleMessage.INVALID_ROLE_NAME);
         }
 
         if (roleRepository.existsById(roleName)) {
-            throw new AppException(ResponseCode.BAD_REQUEST, "Role already exists");
+            throw new AppException(ResponseCode.BAD_REQUEST, RoleMessage.ROLE_ALREADY_EXISTS);
         }
 
         if (request.getPermissions() == null || request.getPermissions().isEmpty()) {
-            throw new AppException(ResponseCode.BAD_REQUEST, "Role must have at least one permission");
+            throw new AppException(ResponseCode.BAD_REQUEST, RoleMessage.ROLE_MUST_HAVE_PERMISSION);
         }
 
         Set<Permission> permissions = new HashSet<>(permissionRepository.findAllById(request.getPermissions()));
         if (permissions.size() != request.getPermissions().size()) {
-            throw new AppException(ResponseCode.BAD_REQUEST, "Some permissions not found");
+            throw new AppException(ResponseCode.BAD_REQUEST, RoleMessage.SOME_PERMISSIONS_NOT_FOUND);
         }
 
         Role role = roleMapper.toRole(request);
@@ -66,7 +67,7 @@ public class RoleService {
     @PreAuthorize("hasAuthority('DELETE:ROLE')")
     public void delete(String roleName) {
         if (!roleRepository.existsById(roleName)) {
-            throw new AppException(ResponseCode.NOT_FOUND, "Role not found");
+            throw new AppException(ResponseCode.NOT_FOUND, RoleMessage.ROLE_NOT_FOUND);
         }
 
         roleRepository.deleteById(roleName);
@@ -75,15 +76,15 @@ public class RoleService {
     @PreAuthorize("hasAuthority('UPDATE:ROLE')")
     public RoleResponse update(String roleName, UpdateRoleRequest request) {
         Role role = roleRepository.findById(roleName)
-                .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND, "Role not found"));
+                .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND, RoleMessage.ROLE_NOT_FOUND));
 
         if (request.getPermissions() == null || request.getPermissions().isEmpty()) {
-            throw new AppException(ResponseCode.BAD_REQUEST, "Role must have at least one permission");
+            throw new AppException(ResponseCode.BAD_REQUEST, RoleMessage.ROLE_MUST_HAVE_PERMISSION);
         }
 
         Set<Permission> permissions = new HashSet<>(permissionRepository.findAllById(request.getPermissions()));
         if (permissions.size() != request.getPermissions().size()) {
-            throw new AppException(ResponseCode.BAD_REQUEST, "Some permissions not found");
+            throw new AppException(ResponseCode.BAD_REQUEST, RoleMessage.SOME_PERMISSIONS_NOT_FOUND);
         }
 
         role.setPermissions(permissions);

@@ -37,11 +37,6 @@ public enum ResponseCode {
             HttpStatus.NOT_FOUND),
 
     // ===== AUTH ERRORS =====
-    INVALID_USERNAME_OR_PASSWORD(
-            2000,
-            "Invalid username or password",
-            HttpStatus.BAD_REQUEST),
-
     USER_ALREADY_EXISTS(
             2001,
             "User already exists",
