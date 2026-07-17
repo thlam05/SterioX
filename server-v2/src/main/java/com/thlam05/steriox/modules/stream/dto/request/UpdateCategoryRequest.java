@@ -1,7 +1,4 @@
-package com.thlam05.steriox.modules.stream.dto.response;
-
-import java.time.LocalDateTime;
-import java.util.Set;
+package com.thlam05.steriox.modules.stream.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,13 +14,9 @@ import lombok.AccessLevel;
 @Setter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CategoryResponse {
-    String id;
+public class UpdateCategoryRequest {
     String name;
     String parentId;
     String slug;
     Integer level;
-    Set<CategoryResponse> subCategories;
-    LocalDateTime createdAt;
-    LocalDateTime updatedAt;
 }

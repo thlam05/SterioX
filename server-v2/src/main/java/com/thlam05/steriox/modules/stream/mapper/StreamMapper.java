@@ -67,7 +67,11 @@ public interface StreamMapper {
             return Collections.emptyList();
         }
         return categories.stream()
-                .map(c -> new CategoryResponse(c.getId(), c.getName(), c.getSlug()))
+                .map(c -> CategoryResponse.builder()
+                        .id(c.getId())
+                        .name(c.getName())
+                        .slug(c.getSlug())
+                        .build())
                 .collect(Collectors.toList());
     }
 }
