@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -15,18 +16,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.thlam05.steriox.common.enums.ResponseStatus;
 import com.thlam05.steriox.common.exception.AppException;
+import com.thlam05.steriox.common.message.LikeEvent;
 import com.thlam05.steriox.modules.stream.dto.response.LivestreamStatusResponse;
 import com.thlam05.steriox.common.service.RedisService;
 import com.thlam05.steriox.common.service.S3Service;
 import com.thlam05.steriox.modules.stream.dto.request.CreateStreamRequest;
-import com.thlam05.steriox.modules.stream.dto.response.LivestreamLikeResponse;
 import com.thlam05.steriox.modules.stream.dto.response.LivestreamLikeStatusResponse;
 import com.thlam05.steriox.modules.stream.dto.response.StreamResponse;
 import com.thlam05.steriox.modules.stream.entity.Category;
 import com.thlam05.steriox.modules.stream.entity.Stream;
 import com.thlam05.steriox.modules.stream.entity.StreamKey;
-import com.thlam05.steriox.modules.stream.entity.StreamLike;
-import com.thlam05.steriox.modules.stream.types.StreamLikeId;
 import com.thlam05.steriox.modules.stream.mapper.StreamMapper;
 import com.thlam05.steriox.modules.stream.repository.CategoryRepository;
 import com.thlam05.steriox.modules.stream.repository.StreamKeyRepository;
@@ -49,6 +48,7 @@ public class StreamService {
     private final S3Service s3Service;
     private final RedisService redisService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
     private String redisLivestreamLikesKey = "livestreams:likes:";
 
@@ -138,43 +138,26 @@ public class StreamService {
         return streamMapper.toStreamResponse(stream);
     }
 
-    @Transactional
     public void likeStream(String streamId) {
         String userId = getAuthenticatedUserId();
-        Stream stream = findStreamById(streamId);
 
-        String likesKey = getLivestreamLikesKey(streamId);
-        if (!redisService.setIsMember(likesKey, userId)) {
-            redisService.setAdd(likesKey, userId);
-
-            User user = userRepository.getReferenceById(userId);
-            StreamLikeId likeId = StreamLikeId.builder()
-                    .streamId(streamId)
-                    .userId(userId)
-                    .build();
-
-            StreamLike streamLike = StreamLike.builder()
-                    .id(likeId)
-                    .stream(stream)
-                    .user(user)
-                    .build();
-
-            streamLikeRepository.save(streamLike);
-            syncLikeCount(stream, likesKey);
-        }
+        rabbitTemplate.convertAndSend("steriox.direct", "stream.like." + streamId,
+                LikeEvent.builder()
+                        .streamId(streamId)
+                        .userId(userId)
+                        .action("LIKE")
+                        .build());
     }
 
-    @Transactional
     public void unlikeStream(String streamId) {
         String userId = getAuthenticatedUserId();
-        Stream stream = findStreamById(streamId);
 
-        String likesKey = getLivestreamLikesKey(streamId);
-        if (redisService.setIsMember(likesKey, userId)) {
-            redisService.setRemove(likesKey, userId);
-            streamLikeRepository.deleteByStreamIdAndUserId(streamId, userId);
-            syncLikeCount(stream, likesKey);
-        }
+        rabbitTemplate.convertAndSend("steriox.direct", "stream.like." + streamId,
+                LikeEvent.builder()
+                        .streamId(streamId)
+                        .userId(userId)
+                        .action("UNLIKE")
+                        .build());
     }
 
     private String getAuthenticatedUserId() {
@@ -188,15 +171,6 @@ public class StreamService {
     private Stream findStreamById(String streamId) {
         return streamRepository.findById(streamId)
                 .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Stream not found"));
-    }
-
-    private void syncLikeCount(Stream stream, String likesKey) {
-        long likes = redisService.setSize(likesKey);
-        stream.setTotalLikes((int) likes);
-        streamRepository.save(stream);
-
-        String destination = "/topic/likes-livestreams/" + stream.getId();
-        messagingTemplate.convertAndSend(destination, LivestreamLikeResponse.builder().likes(likes).build());
     }
 
     public LivestreamLikeStatusResponse checkIsLikedStream(String livestreamId) {

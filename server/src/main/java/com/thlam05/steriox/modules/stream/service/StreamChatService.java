@@ -1,13 +1,15 @@
 package com.thlam05.steriox.modules.stream.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.thlam05.steriox.common.enums.ResponseStatus;
 import com.thlam05.steriox.common.exception.AppException;
+import com.thlam05.steriox.common.message.StreamChatMessage;
 import com.thlam05.steriox.modules.stream.dto.request.CreateStreamChatRequest;
 import com.thlam05.steriox.modules.stream.dto.response.StreamChatResponse;
 import com.thlam05.steriox.modules.stream.entity.Stream;
@@ -27,7 +29,7 @@ public class StreamChatService {
     private final StreamRepository streamRepository;
     private final UserRepository userRepository;
     private final StreamChatMapper streamChatMapper;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
     @Transactional
     public StreamChatResponse createChat(CreateStreamChatRequest request) {
@@ -56,10 +58,18 @@ public class StreamChatService {
                 .build();
 
         StreamChatResponse response = streamChatMapper.toStreamChatResponse(streamChatRepository.save(streamChat));
-        
-        // Broadcast message to websocket subscribers
-        messagingTemplate.convertAndSend("/topic/chat/" + request.getStreamId(), response);
-        
+
+        StreamChatMessage message = StreamChatMessage.builder()
+                .chatId(response.getId())
+                .streamId(response.getStreamId())
+                .userId(response.getUser().getId())
+                .username(response.getUser().getUsername())
+                .content(response.getContent())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        rabbitTemplate.convertAndSend("steriox.topic", "chat." + request.getStreamId(), message);
+
         return response;
     }
 
