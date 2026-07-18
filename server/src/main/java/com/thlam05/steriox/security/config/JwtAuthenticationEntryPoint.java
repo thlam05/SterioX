@@ -6,8 +6,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
-import com.thlam05.steriox.common.enums.ResponseStatus;
-import com.thlam05.steriox.common.response.ApiResponse;
+import com.thlam05.steriox.common.constant.ResponseCode;
+import com.thlam05.steriox.common.dto.ApiResponse;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +19,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(
             HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException, ServletException {
-        ResponseStatus code = ResponseStatus.UNAUTHORIZED;
+        ResponseCode code = ResponseCode.UNAUTHORIZED;
 
         response.setStatus(code.getHttpStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);

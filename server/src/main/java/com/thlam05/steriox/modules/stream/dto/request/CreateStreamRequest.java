@@ -1,28 +1,22 @@
 package com.thlam05.steriox.modules.stream.dto.request;
 
-import java.util.List;
+import java.util.Set;
 
-import org.springframework.web.multipart.MultipartFile;
-
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import lombok.AccessLevel;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateStreamRequest {
-    String userId;
     String title;
     String description;
-    String status;
-    MultipartFile thumbnail;
-    List<String> categoryIds;
+    Set<String> categoryIds;
+    String thumbnail;
 }

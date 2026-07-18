@@ -1,4 +1,4 @@
-package com.thlam05.steriox.security.service;
+package com.thlam05.steriox.security.util;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -16,7 +16,7 @@ import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
-import com.thlam05.steriox.common.enums.ResponseStatus;
+import com.thlam05.steriox.common.constant.ResponseCode;
 import com.thlam05.steriox.common.exception.AppException;
 import com.thlam05.steriox.modules.user.entity.User;
 
@@ -53,7 +53,7 @@ public class JwtGenerator {
             jwsObject.sign(new MACSigner(secretKey.getBytes()));
             return jwsObject.serialize();
         } catch (JOSEException e) {
-            throw new AppException(ResponseStatus.INTERNAL_SERVER_ERROR, "Token creation error");
+            throw new AppException(ResponseCode.INTERNAL_SERVER_ERROR, "Token creation error");
         }
     }
 

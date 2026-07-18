@@ -1,21 +1,18 @@
-package com.thlam05.steriox.modules.stream.dto.request;
+package com.thlam05.steriox.modules.user.dto.request;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreateStreamChatRequest {
-    String streamId;
-    String userId;
-    String content;
+public class ChangePasswordRequest {
+    String currentPassword;
+    String newPassword;
 }

@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.thlam05.steriox.common.enums.ResponseStatus;
-import com.thlam05.steriox.common.response.ApiResponse;
+import com.thlam05.steriox.common.constant.ResponseCode;
+import com.thlam05.steriox.common.dto.ApiResponse;
 import com.thlam05.steriox.modules.stream.dto.request.CreateCategoryRequest;
 import com.thlam05.steriox.modules.stream.dto.request.UpdateCategoryRequest;
 import com.thlam05.steriox.modules.stream.dto.response.CategoryResponse;
@@ -49,6 +49,6 @@ public class CategoryController {
     @DeleteMapping("/{id}")
     public ApiResponse<?> delete(@PathVariable String id) {
         categoryService.delete(id);
-        return new ApiResponse<>(ResponseStatus.SUCCESS);
+        return new ApiResponse<>(ResponseCode.SUCCESS);
     }
 }

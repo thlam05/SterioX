@@ -5,8 +5,9 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.thlam05.steriox.common.enums.ResponseStatus;
+import com.thlam05.steriox.common.constant.ResponseCode;
 import com.thlam05.steriox.common.exception.AppException;
+import com.thlam05.steriox.modules.stream.constant.StreamMessage;
 import com.thlam05.steriox.modules.stream.dto.request.CreateStreamKeyRequest;
 import com.thlam05.steriox.modules.stream.dto.request.UpdateStreamKeyRequest;
 import com.thlam05.steriox.modules.stream.dto.response.StreamKeyResponse;
@@ -29,7 +30,7 @@ public class StreamKeyService {
         validateCreateRequest(request);
 
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND, StreamMessage.USER_NOT_FOUND));
 
         StreamKey streamKey = streamKeyRepository.findByUserId(request.getUserId())
                 .orElse(new StreamKey());
@@ -54,7 +55,7 @@ public class StreamKeyService {
     }
 
     private String generateStreamUrl(String streamKey) {
-        return "rtmp://localhost:1935/hls";
+        return StreamMessage.RTMP_BASE_URL;
     }
 
     public List<StreamKeyResponse> getAll() {
@@ -63,20 +64,20 @@ public class StreamKeyService {
 
     public StreamKeyResponse getByKey(String key) {
         StreamKey streamKey = streamKeyRepository.findById(key)
-                .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Stream key not found"));
+                .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND, StreamMessage.STREAM_KEY_NOT_FOUND));
         return streamKeyMapper.toStreamKeyResponse(streamKey);
     }
 
     public StreamKeyResponse getByUserId(String userId) {
         StreamKey streamKey = streamKeyRepository.findByUserId(userId)
-                .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND));
 
         return streamKeyMapper.toStreamKeyResponse(streamKey);
     }
 
     public StreamKeyResponse update(String key, UpdateStreamKeyRequest request) {
         StreamKey streamKey = streamKeyRepository.findById(key)
-                .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Stream key not found"));
+                .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND, StreamMessage.STREAM_KEY_NOT_FOUND));
 
         if (request.getStreamUrl() != null) {
             streamKey.setStreamUrl(request.getStreamUrl());
@@ -87,14 +88,14 @@ public class StreamKeyService {
 
     public void delete(String key) {
         if (!streamKeyRepository.existsById(key)) {
-            throw new AppException(ResponseStatus.NOT_FOUND, "Stream key not found");
+            throw new AppException(ResponseCode.NOT_FOUND, StreamMessage.STREAM_KEY_NOT_FOUND);
         }
         streamKeyRepository.deleteById(key);
     }
 
     private void validateCreateRequest(CreateStreamKeyRequest request) {
         if (request.getUserId() == null || request.getUserId().isBlank()) {
-            throw new AppException(ResponseStatus.BAD_REQUEST, "User ID is required");
+            throw new AppException(ResponseCode.BAD_REQUEST, StreamMessage.USER_ID_REQUIRED);
         }
     }
 }

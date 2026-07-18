@@ -7,8 +7,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
-import com.thlam05.steriox.common.enums.ResponseStatus;
-import com.thlam05.steriox.common.response.ApiResponse;
+import com.thlam05.steriox.common.constant.ResponseCode;
+import com.thlam05.steriox.common.dto.ApiResponse;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +21,7 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
             AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        ResponseStatus code = ResponseStatus.FORBIDDEN;
+        ResponseCode code = ResponseCode.FORBIDDEN;
         response.setStatus(code.getHttpStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         ApiResponse<?> apiResponse = ApiResponse.builder()

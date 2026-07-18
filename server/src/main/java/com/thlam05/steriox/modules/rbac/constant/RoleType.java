@@ -1,4 +1,4 @@
-package com.thlam05.steriox.common.enums;
+package com.thlam05.steriox.modules.rbac.constant;
 
 public enum RoleType {
     VIEWER,

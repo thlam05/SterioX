@@ -12,7 +12,7 @@ import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Component;
 
-import com.thlam05.steriox.security.service.JwtService;
+import com.thlam05.steriox.security.util.JwtService;
 
 import lombok.RequiredArgsConstructor;
 

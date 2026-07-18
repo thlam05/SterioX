@@ -10,8 +10,9 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.thlam05.steriox.common.enums.ResponseStatus;
+import com.thlam05.steriox.common.constant.ResponseCode;
 import com.thlam05.steriox.common.exception.AppException;
+import com.thlam05.steriox.modules.stream.constant.StreamMessage;
 import com.thlam05.steriox.modules.stream.dto.request.CreateCategoryRequest;
 import com.thlam05.steriox.modules.stream.dto.request.UpdateCategoryRequest;
 import com.thlam05.steriox.modules.stream.dto.response.CategoryResponse;
@@ -37,7 +38,7 @@ public class CategoryService {
 
     public CategoryResponse getById(String id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Category not found"));
+                .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND, StreamMessage.CATEGORY_NOT_FOUND));
         return categoryMapper.toCategoryResponse(category);
     }
 
@@ -45,7 +46,7 @@ public class CategoryService {
     public List<CategoryResponse> getAll() {
         List<CategoryResponse> allCategories = categoryMapper.toCategoryResponses(categoryRepository.findAll());
         Map<String, CategoryResponse> categoryMap = allCategories.stream()
-                .collect(Collectors.toMap(CategoryResponse::getId, category -> category));
+                .collect(Collectors.toMap(category -> category.getId(), category -> category));
 
         List<CategoryResponse> categories = new ArrayList<>();
 
@@ -70,7 +71,7 @@ public class CategoryService {
 
     public CategoryResponse update(String id, UpdateCategoryRequest request) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Category not found"));
+                .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND, StreamMessage.CATEGORY_NOT_FOUND));
 
         validateUpdateRequest(request);
         categoryMapper.updateCategoryFromRequest(request, category);
@@ -79,45 +80,44 @@ public class CategoryService {
 
     public void delete(String id) {
         if (!categoryRepository.existsById(id)) {
-            throw new AppException(ResponseStatus.NOT_FOUND, "Category not found");
+            throw new AppException(ResponseCode.NOT_FOUND, StreamMessage.CATEGORY_NOT_FOUND);
         }
         categoryRepository.deleteById(id);
     }
 
     private void validateCreateRequest(CreateCategoryRequest request) {
         if (request == null) {
-            throw new AppException(ResponseStatus.BAD_REQUEST, "Category request is required");
+            throw new AppException(ResponseCode.BAD_REQUEST, StreamMessage.CATEGORY_REQUEST_REQUIRED);
         }
-        if (request.getParentId() != null && categoryRepository.existsById(request.getParentId()) == false) {
-            System.out.println(request.getParentId());
-            throw new AppException(ResponseStatus.NOT_FOUND, "Parent category is not found");
+        if (request.getParentId() != null && !categoryRepository.existsById(request.getParentId())) {
+            throw new AppException(ResponseCode.NOT_FOUND, StreamMessage.PARENT_CATEGORY_NOT_FOUND);
         }
         if (request.getName() == null || request.getName().isBlank()) {
-            throw new AppException(ResponseStatus.BAD_REQUEST, "Category name is required");
+            throw new AppException(ResponseCode.BAD_REQUEST, StreamMessage.CATEGORY_NAME_REQUIRED);
         }
         if (request.getSlug() == null || request.getSlug().isBlank()) {
-            throw new AppException(ResponseStatus.BAD_REQUEST, "Category slug is required");
+            throw new AppException(ResponseCode.BAD_REQUEST, StreamMessage.CATEGORY_SLUG_REQUIRED);
         }
         if (request.getLevel() != null && request.getLevel() < 0) {
-            throw new AppException(ResponseStatus.BAD_REQUEST, "Category level must not be negative");
+            throw new AppException(ResponseCode.BAD_REQUEST, StreamMessage.CATEGORY_LEVEL_NON_NEGATIVE);
         }
     }
 
     private void validateUpdateRequest(UpdateCategoryRequest request) {
         if (request == null) {
-            throw new AppException(ResponseStatus.BAD_REQUEST, "Category update request is required");
+            throw new AppException(ResponseCode.BAD_REQUEST, StreamMessage.CATEGORY_UPDATE_REQUEST_REQUIRED);
         }
-        if (request.getParentId() != null && categoryRepository.existsById(request.getParentId()) == false) {
-            throw new AppException(ResponseStatus.NOT_FOUND, "Parent category is not found");
+        if (request.getParentId() != null && !categoryRepository.existsById(request.getParentId())) {
+            throw new AppException(ResponseCode.NOT_FOUND, StreamMessage.PARENT_CATEGORY_NOT_FOUND);
         }
         if (request.getName() != null && request.getName().isBlank()) {
-            throw new AppException(ResponseStatus.BAD_REQUEST, "Category name must not be blank");
+            throw new AppException(ResponseCode.BAD_REQUEST, StreamMessage.CATEGORY_NAME_NOT_BLANK);
         }
         if (request.getSlug() != null && request.getSlug().isBlank()) {
-            throw new AppException(ResponseStatus.BAD_REQUEST, "Category slug must not be blank");
+            throw new AppException(ResponseCode.BAD_REQUEST, StreamMessage.CATEGORY_SLUG_NOT_BLANK);
         }
         if (request.getLevel() != null && request.getLevel() < 0) {
-            throw new AppException(ResponseStatus.BAD_REQUEST, "Category level must not be negative");
+            throw new AppException(ResponseCode.BAD_REQUEST, StreamMessage.CATEGORY_LEVEL_NON_NEGATIVE);
         }
     }
 }

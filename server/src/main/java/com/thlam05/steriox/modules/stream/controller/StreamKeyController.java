@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.thlam05.steriox.common.response.ApiResponse;
+import com.thlam05.steriox.common.dto.ApiResponse;
 import com.thlam05.steriox.modules.stream.dto.request.CreateStreamKeyRequest;
 import com.thlam05.steriox.modules.stream.dto.request.UpdateStreamKeyRequest;
 import com.thlam05.steriox.modules.stream.dto.response.StreamKeyResponse;

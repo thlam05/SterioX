@@ -1,6 +1,6 @@
-package com.thlam05.steriox.common.response;
+package com.thlam05.steriox.common.dto;
 
-import com.thlam05.steriox.common.enums.ResponseStatus;
+import com.thlam05.steriox.common.constant.ResponseCode;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,13 +20,13 @@ public class ApiResponse<T> {
     private boolean success;
 
     public ApiResponse(T data) {
-        this.code = ResponseStatus.SUCCESS.getCode();
-        this.message = ResponseStatus.SUCCESS.getMessage();
+        this.code = ResponseCode.SUCCESS.getCode();
+        this.message = ResponseCode.SUCCESS.getMessage();
         this.data = data;
         this.success = true;
     }
 
-    public ApiResponse(ResponseStatus responseCode) {
+    public ApiResponse(ResponseCode responseCode) {
         this.code = responseCode.getCode();
         this.message = responseCode.getMessage();
         this.data = null;

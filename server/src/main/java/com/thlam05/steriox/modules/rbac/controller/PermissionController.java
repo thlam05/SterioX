@@ -2,8 +2,8 @@ package com.thlam05.steriox.modules.rbac.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.thlam05.steriox.common.enums.ResponseStatus;
-import com.thlam05.steriox.common.response.ApiResponse;
+import com.thlam05.steriox.common.constant.ResponseCode;
+import com.thlam05.steriox.common.dto.ApiResponse;
 import com.thlam05.steriox.modules.rbac.dto.request.PermissionRequest;
 import com.thlam05.steriox.modules.rbac.dto.response.PermissionResponse;
 import com.thlam05.steriox.modules.rbac.service.PermissionService;
@@ -38,6 +38,6 @@ public class PermissionController {
     @DeleteMapping("/permissions/{name}")
     public ApiResponse<?> delete(@PathVariable String name) {
         permissionService.delete(name);
-        return new ApiResponse<>(ResponseStatus.SUCCESS);
+        return new ApiResponse<>(ResponseCode.SUCCESS);
     }
 }

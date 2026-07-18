@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.thlam05.steriox.common.enums.ResponseStatus;
-import com.thlam05.steriox.common.response.ApiResponse;
+import com.thlam05.steriox.common.constant.ResponseCode;
+import com.thlam05.steriox.common.dto.ApiResponse;
 import com.thlam05.steriox.modules.rbac.dto.request.RoleRequest;
 import com.thlam05.steriox.modules.rbac.dto.request.UpdateRoleRequest;
 import com.thlam05.steriox.modules.rbac.dto.response.RoleResponse;
@@ -39,7 +39,7 @@ public class RoleController {
     @DeleteMapping("/roles/{name}")
     public ApiResponse<Void> deleteRole(@PathVariable String name) {
         roleService.delete(name);
-        return new ApiResponse<>(ResponseStatus.SUCCESS);
+        return new ApiResponse<>(ResponseCode.SUCCESS);
     }
 
     @PutMapping("/roles/{name}")

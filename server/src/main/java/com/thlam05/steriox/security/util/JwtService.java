@@ -1,11 +1,11 @@
-package com.thlam05.steriox.security.service;
+package com.thlam05.steriox.security.util;
 
 import java.text.ParseException;
 import org.springframework.stereotype.Component;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
-import com.thlam05.steriox.common.enums.ResponseStatus;
+import com.thlam05.steriox.common.constant.ResponseCode;
 import com.thlam05.steriox.common.exception.AppException;
 import com.thlam05.steriox.modules.auth.entity.InvalidatedToken;
 import com.thlam05.steriox.modules.auth.repository.InvalidatedTokenRepository;
@@ -40,7 +40,7 @@ public class JwtService {
         var userId = signedJWT.getJWTClaimsSet().getSubject();
 
         var user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND));
 
         token = generateAccessToken(user);
         return token;

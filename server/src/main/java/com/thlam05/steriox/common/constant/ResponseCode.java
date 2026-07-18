@@ -1,4 +1,4 @@
-package com.thlam05.steriox.common.enums;
+package com.thlam05.steriox.common.constant;
 
 import org.springframework.http.HttpStatus;
 
@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Getter
-public enum ResponseStatus {
+public enum ResponseCode {
 
     // ===== SUCCESS =====
     SUCCESS(
@@ -37,11 +37,6 @@ public enum ResponseStatus {
             HttpStatus.NOT_FOUND),
 
     // ===== AUTH ERRORS =====
-    INVALID_USERNAME_OR_PASSWORD(
-            2000,
-            "Invalid username or password",
-            HttpStatus.BAD_REQUEST),
-
     USER_ALREADY_EXISTS(
             2001,
             "User already exists",
@@ -57,3 +52,4 @@ public enum ResponseStatus {
     private final String message;
     private final HttpStatus httpStatus;
 }
+

@@ -1,4 +1,4 @@
-package com.thlam05.steriox.security.service;
+package com.thlam05.steriox.security.util;
 
 import java.text.ParseException;
 import java.time.temporal.ChronoUnit;
@@ -12,7 +12,7 @@ import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import com.thlam05.steriox.common.enums.ResponseStatus;
+import com.thlam05.steriox.common.constant.ResponseCode;
 import com.thlam05.steriox.common.exception.AppException;
 import com.thlam05.steriox.modules.auth.repository.InvalidatedTokenRepository;
 
@@ -36,7 +36,7 @@ public class JwtValidator {
         boolean verified = signedJWT.verify(verifier);
 
         if (!verified) {
-            throw new AppException(ResponseStatus.UNAUTHORIZED, "Invalid token");
+            throw new AppException(ResponseCode.UNAUTHORIZED, "Invalid token");
         }
 
         JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
@@ -49,7 +49,7 @@ public class JwtValidator {
         String jti = claimsSet.getJWTID();
         boolean revoked = invalidatedTokenRepository.existsById(jti);
         if (revoked) {
-            throw new AppException(ResponseStatus.UNAUTHORIZED, "Token revoked");
+            throw new AppException(ResponseCode.UNAUTHORIZED, "Token revoked");
         }
     }
 
@@ -60,7 +60,7 @@ public class JwtValidator {
                 .plus(refreshableDuration, ChronoUnit.SECONDS)
                 .toEpochMilli()).before(new Date())
                 : claimsSet.getExpirationTime().before(new Date())) {
-            throw new AppException(ResponseStatus.UNAUTHORIZED, "Token expired");
+            throw new AppException(ResponseCode.UNAUTHORIZED, "Token expired");
         }
     }
 }
