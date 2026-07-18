@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.nimbusds.jose.JOSEException;
-import com.thlam05.steriox.common.enums.ResponseStatus;
-import com.thlam05.steriox.common.response.ApiResponse;
+import com.thlam05.steriox.common.constant.ResponseCode;
+import com.thlam05.steriox.common.dto.ApiResponse;
 import com.thlam05.steriox.modules.auth.dto.request.IntrospectRequest;
 import com.thlam05.steriox.modules.auth.dto.request.LoginRequest;
 import com.thlam05.steriox.modules.auth.dto.request.LogoutRequest;
@@ -48,7 +48,7 @@ public class AuthController {
     @PostMapping("/auth/logout")
     public ApiResponse<TokenResponse> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
         authService.logout(request);
-        return new ApiResponse<>(ResponseStatus.SUCCESS);
+        return new ApiResponse<>(ResponseCode.SUCCESS);
     }
 
     @PostMapping("/auth/refresh")

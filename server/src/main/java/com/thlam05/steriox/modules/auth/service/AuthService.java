@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
-import com.thlam05.steriox.common.enums.ResponseStatus;
-import com.thlam05.steriox.common.enums.RoleType;
+import com.thlam05.steriox.common.constant.ResponseCode;
 import com.thlam05.steriox.common.exception.AppException;
+import com.thlam05.steriox.modules.auth.constant.AuthMessage;
 import com.thlam05.steriox.modules.auth.dto.request.IntrospectRequest;
 import com.thlam05.steriox.modules.auth.dto.request.LoginRequest;
 import com.thlam05.steriox.modules.auth.dto.request.LogoutRequest;
@@ -22,11 +22,12 @@ import com.thlam05.steriox.modules.auth.dto.response.LoginResponse;
 import com.thlam05.steriox.modules.auth.dto.response.TokenResponse;
 import com.thlam05.steriox.modules.auth.entity.InvalidatedToken;
 import com.thlam05.steriox.modules.auth.repository.InvalidatedTokenRepository;
+import com.thlam05.steriox.modules.rbac.constant.RoleType;
 import com.thlam05.steriox.modules.rbac.repository.RoleRepository;
 import com.thlam05.steriox.modules.user.entity.User;
 import com.thlam05.steriox.modules.user.mapper.UserMapper;
 import com.thlam05.steriox.modules.user.repository.UserRepository;
-import com.thlam05.steriox.security.service.JwtService;
+import com.thlam05.steriox.security.util.JwtService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -43,17 +44,17 @@ public class AuthService {
 
     public LoginResponse register(RegisterRequest request) {
         if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {
-            throw new AppException(ResponseStatus.BAD_REQUEST, "Email already exists.");
+            throw new AppException(ResponseCode.BAD_REQUEST, AuthMessage.EMAIL_ALREADY_EXISTS);
         }
         if (userRepository.existsByUsernameIgnoreCase(request.getUsername())) {
-            throw new AppException(ResponseStatus.BAD_REQUEST, "Username already exists.");
+            throw new AppException(ResponseCode.BAD_REQUEST, AuthMessage.USERNAME_ALREADY_EXISTS);
         }
         User user = User.builder()
                 .email(request.getEmail().trim())
                 .username(request.getUsername().trim())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .roles(Set.of(roleRepository.findById(RoleType.VIEWER.toString())
-                        .orElseThrow(() -> new AppException(ResponseStatus.NOT_FOUND, "Role not found"))))
+                .roles(Set.of(roleRepository.findById(RoleType.VIEWER.name())
+                        .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND, AuthMessage.ROLE_NOT_FOUND))))
                 .avatarImageUrl("https://picsum.photos/400/400")
                 .build();
         userRepository.save(user);
@@ -64,9 +65,9 @@ public class AuthService {
     public LoginResponse login(LoginRequest request) {
         User user = userRepository
                 .findByEmail(request.getEmail().trim())
-                .orElseThrow(() -> new AppException(ResponseStatus.INVALID_USERNAME_OR_PASSWORD));
+                .orElseThrow(() -> new AppException(ResponseCode.BAD_REQUEST, AuthMessage.INVALID_USERNAME_OR_PASSWORD));
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new AppException(ResponseStatus.INVALID_USERNAME_OR_PASSWORD);
+            throw new AppException(ResponseCode.BAD_REQUEST, AuthMessage.INVALID_USERNAME_OR_PASSWORD);
         }
         String token = jwtService.generateAccessToken(user);
         return new LoginResponse(token, userMapper.toUserResponse(user));
@@ -85,7 +86,7 @@ public class AuthService {
 
             invalidatedTokenRepository.save(invalidatedToken);
         } catch (Exception e) {
-            throw new AppException(ResponseStatus.INTERNAL_SERVER_ERROR, "Error when logging out: " + e.getMessage());
+            throw new AppException(ResponseCode.INTERNAL_SERVER_ERROR, AuthMessage.LOGOUT_ERROR_PREFIX + e.getMessage());
         }
     }
 

@@ -17,13 +17,11 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.FieldDefaults;
 
 @Entity(name = "streams")
 @Table(name = "streams")
@@ -32,7 +30,6 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @Getter
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Stream extends BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -52,9 +49,6 @@ public class Stream extends BaseModel {
     @Column(name = "description")
     String description;
 
-    // @Column(name = "status", length = 20)
-    // String status;
-
     @Column(name = "is_active")
     Boolean isActive;
 
@@ -66,15 +60,6 @@ public class Stream extends BaseModel {
 
     @Column(name = "thumbnail")
     String thumbnail;
-
-    // @Column(name = "latency")
-    // String latency;
-
-    // @Column(name = "dvr")
-    // boolean dvr;
-
-    // @Column(name = "vod")
-    // boolean vod;
 
     @Column(name = "total_views")
     Integer totalViews;

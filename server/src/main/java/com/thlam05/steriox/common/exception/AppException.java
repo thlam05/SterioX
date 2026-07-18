@@ -1,23 +1,23 @@
 package com.thlam05.steriox.common.exception;
 
-import com.thlam05.steriox.common.enums.ResponseStatus;
+import com.thlam05.steriox.common.constant.ResponseCode;
 
 import lombok.Getter;
 
 @Getter
 public class AppException extends RuntimeException {
 
-    private final ResponseStatus responseStatus;
+    private final ResponseCode responseCode;
 
-    public AppException(ResponseStatus responseStatus) {
-        super(responseStatus.getMessage());
-        this.responseStatus = responseStatus;
+    public AppException(ResponseCode responseCode) {
+        super(responseCode.getMessage());
+        this.responseCode = responseCode;
     }
 
     public AppException(
-            ResponseStatus responseStatus,
+            ResponseCode responseCode,
             String customMessage) {
         super(customMessage);
-        this.responseStatus = responseStatus;
+        this.responseCode = responseCode;
     }
 }
