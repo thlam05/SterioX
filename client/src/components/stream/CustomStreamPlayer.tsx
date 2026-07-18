@@ -1,8 +1,6 @@
-'use client';
-
 import React, { useEffect, useRef, useState } from 'react';
 import Hls, { type HlsConfig } from 'hls.js';
-import { Play, Pause, Volume2, VolumeX, Maximize2, Settings, Tv, Radio, Minimize2 } from 'lucide-react'; // Thêm VolumeX cho trực quan
+import { Play, Pause, Volume2, VolumeX, Maximize2, Settings, Tv, Radio, Minimize2 } from 'lucide-react';
 
 interface StreamPlayerProps {
   src: string;

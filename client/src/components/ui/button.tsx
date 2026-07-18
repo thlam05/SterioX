@@ -1,7 +1,7 @@
 ﻿import type { ButtonHTMLAttributes } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'outline'; // Đã đổi 'secondary' thành 'outline'
+  variant?: 'primary' | 'outline';
   label?: string;
 }
 

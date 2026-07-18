@@ -1,26 +1,33 @@
 import { streamApi } from "@/api/streamApi";
 import MainLayout from "@/layouts/MainLayout";
 import HomePage from "@/pages/HomePage";
-import LivestreamDashboard from "@/pages/LivestreamDashboardPage";
-import LivestreamPage from "@/pages/LivestreamPage";
-import LivestreamSetupPage from "@/pages/LivestreamSetupPage";
+import StreamDashboard from "@/pages/StreamDashboardPage";
+import StreamPage from "@/pages/StreamPage";
+import StreamSetupPage from "@/pages/StreamSetupPage";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import SettingPage from "@/pages/SettingPage";
+import { PATHS } from "@/routes/paths";
+import { useAuthStore } from "@/stores/authStore";
 import type { StreamResponse } from "@/types/streamType";
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, redirect } from "react-router";
 
 export const router = createBrowserRouter([
   {
-    path: "/login",
+    path: PATHS.AUTH.LOGIN,
     element: <LoginPage />
   },
   {
-    path: "/register",
+    path: PATHS.AUTH.REGISTER,
     element: <RegisterPage />
   },
   {
-    path: "/",
+    path: PATHS.HOME,
+    loader: () => {
+      const { isAuthenticated } = useAuthStore.getState();
+      if (!isAuthenticated) return redirect(PATHS.AUTH.LOGIN);
+      return null;
+    },
     element: <MainLayout />,
     children: [
       {
@@ -28,30 +35,30 @@ export const router = createBrowserRouter([
         element: <HomePage />
       },
       {
-        path: "livestreams/:livestreamId",
+        path: "streams/:streamId",
         loader: async ({ params }): Promise<StreamResponse | null> => {
           try {
-            if (!params.livestreamId) return null;
-            const stream = await streamApi.getStreamById(params.livestreamId);
+            if (!params.streamId) return null;
+            const stream = await streamApi.getStreamById(params.streamId);
             return stream;
           } catch (err) {
             console.error(err);
             return null;
           }
         },
-        element: <LivestreamPage />
+        element: <StreamPage />
       },
       {
         path: "setting",
         element: <SettingPage />
       },
       {
-        path: "livestreams/setup",
-        element: <LivestreamSetupPage />
+        path: "streams/setup",
+        element: <StreamSetupPage />
       },
       {
-        path: "livestreams/dashboard",
-        element: <LivestreamDashboard />
+        path: "streams/dashboard",
+        element: <StreamDashboard />
       }
     ]
   }

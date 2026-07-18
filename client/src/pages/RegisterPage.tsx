@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router";
 import { authApi } from "@/api/authApi";
 import { useAuthStore } from "@/stores/authStore";
+import { PATHS } from "@/routes/paths";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ export default function RegisterPage() {
       authApi.register({ email, username: name, password })
         .then((data) => {
           login({ user: data.user, token: data.token, rememberMe: true });
-          navigate("/");
+          navigate(PATHS.HOME);
         })
         .catch((error) => {
           setRegisterError(
@@ -87,7 +88,7 @@ export default function RegisterPage() {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={PATHS.HOME} replace />;
   }
 
   return (
@@ -97,7 +98,7 @@ export default function RegisterPage() {
         <Logo />
         <div className="hidden md:flex items-center space-x-4 text-sm font-bold">
           <span className="text-secondary">Đã có tài khoản?</span>
-          <Link to="/login">
+          <Link to={PATHS.AUTH.LOGIN}>
             <Button variant="outline">
               Đăng nhập
             </Button>
@@ -245,7 +246,7 @@ export default function RegisterPage() {
           {/* Mobile Register Link */}
           <div className="mt-6 text-center text-sm md:hidden">
             <span className="text-secondary">Đã có tài khoản? </span>
-            <Link to="/login" className="text-primary font-bold hover:underline">Đăng nhập</Link>
+            <Link to={PATHS.AUTH.LOGIN} className="text-primary font-bold hover:underline">Đăng nhập</Link>
           </div>
         </div>
       </main>

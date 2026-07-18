@@ -21,6 +21,6 @@ export type LoginResponse = {
   user: UserResponse
 };
 
-export type InstrspecResponse = {
+export type IntrospectResponse = {
   valid: boolean;
 }

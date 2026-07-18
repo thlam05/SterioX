@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router";
 import { authApi } from "@/api/authApi";
 import { useAuthStore } from "@/stores/authStore";
+import { PATHS } from "@/routes/paths";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export default function LoginPage() {
       authApi.login({ email, password })
         .then((data) => {
           login({ user: data.user, token: data.token, rememberMe });
-          navigate("/");
+          navigate(PATHS.HOME);
         })
         .catch((error) => {
           setLoginError(
@@ -44,7 +45,7 @@ export default function LoginPage() {
     if (!email) {
       setEmailError("Email không được để trống.");
       isValid = false;
-    } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(email)) {
+    } else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(email)) {
       setEmailError("Email không hợp lệ.");
       isValid = false;
     } else {
@@ -65,7 +66,7 @@ export default function LoginPage() {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={PATHS.HOME} replace />;
   }
 
   return (
@@ -75,7 +76,7 @@ export default function LoginPage() {
         <Logo />
         <div className="hidden md:flex items-center space-x-4 text-sm font-bold">
           <span className="text-secondary">Chưa có tài khoản?</span>
-          <Link to="/register">
+          <Link to={PATHS.AUTH.REGISTER}>
             <Button variant="outline">
               Đăng ký
             </Button>
@@ -210,7 +211,7 @@ export default function LoginPage() {
           {/* Mobile Register Link */}
           <div className="mt-6 text-center text-sm md:hidden">
             <span className="text-secondary">Chưa có tài khoản? </span>
-            <Link to="/register" className="text-primary font-bold hover:underline">Đăng ký</Link>
+            <Link to={PATHS.AUTH.REGISTER} className="text-primary font-bold hover:underline">Đăng ký</Link>
           </div>
         </div>
       </main>

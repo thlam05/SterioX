@@ -1,14 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEffect, useRef, useState } from "react";
+import { StreamKeyField } from "@/components/stream/StreamKeyField";
 import {
   Video,
-  Copy,
-  Check,
-  Eye,
-  EyeOff,
   Image as ImageIcon,
-  AlertCircle,
   Sparkles,
   HelpCircle,
   ToggleLeft,
@@ -23,6 +19,7 @@ import {
 import { streamApi, streamKeyApi } from "@/api/streamApi";
 import { useAuthStore } from "@/stores/authStore";
 import { useNavigate } from "react-router";
+import { PATHS } from "@/routes/paths";
 import { categoryApi } from "@/api/categoryApi";
 import type { CategoryResponse } from "@/types/categoryType";
 
@@ -38,8 +35,8 @@ const streamLatency = {
   ultra: "ULTRA"
 }
 
-export default function LivestreamSetupPage() {
-  const { isAuthenticated, user } = useAuthStore();
+export default function StreamSetupPage() {
+  const { user } = useAuthStore();
 
   const navigate = useNavigate();
 
@@ -69,33 +66,43 @@ export default function LivestreamSetupPage() {
   const [categoriesData, setCategoriesData] = useState<CategoryResponse[]>([]);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/login");
-      return;
-    }
+    const abortController = new AbortController();
 
     const fetchCategories = async () => {
-      const categories = await categoryApi.getCategories();
-      if (categories) setCategoriesData(categories);
+      try {
+        const categories = await categoryApi.getCategories();
+        if (!abortController.signal.aborted && categories) setCategoriesData(categories);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+        console.log(error);
+      }
     }
 
     fetchCategories();
-  }, [isAuthenticated, navigate]);
+
+    return () => abortController.abort();
+  }, []);
 
   useEffect(() => {
     if (!user?.id) return;
+    const abortController = new AbortController();
 
     const loadStreamKey = async () => {
       try {
         const data = await streamKeyApi.getStreamKey(user.id);
-        setStreamKey(data.streamKey ?? null);
-        setStreamUrl(data.streamUrl ?? null);
+        if (!abortController.signal.aborted) {
+          setStreamKey(data.streamKey ?? null);
+          setStreamUrl(data.streamUrl ?? null);
+        }
       } catch (error) {
-        console.error("Failed to load stream key", error);
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+        console.error("Không thể tải stream key", error);
       }
     };
 
     loadStreamKey();
+
+    return () => abortController.abort();
   }, [user?.id]);
 
   const handleCreateStreamKey = async () => {
@@ -236,7 +243,7 @@ export default function LivestreamSetupPage() {
         thumbnail: thumbnailFile,
         categoryIds
       });
-      navigate("/livestreams/dashboard");
+      navigate(PATHS.STREAMS.DASHBOARD);
       return;
     } catch (error) {
       console.error("Failed to save livestream settings", error);
@@ -476,42 +483,15 @@ export default function LivestreamSetupPage() {
                   <h3 className="text-sm font-black tracking-tight uppercase">Cấu hình phần mềm</h3>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-secondary uppercase tracking-tighter">Server URL</label>
-                    <div className="relative group">
-                      <Input readOnly value={streamUrl} className="bg-accent font-mono text-[11px] pr-10 border-accent" />
-                      <button type="button" onClick={handleCopyStreamUrl} className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary hover:text-primary transition-colors">
-                        {copied === "streamUrl" ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between items-end">
-                      <label className="text-[10px] font-bold text-secondary uppercase tracking-tighter">Stream Key</label>
-                      <span className="text-[9px] font-bold text-danger flex items-center gap-1 bg-selection px-1.5 py-0.5 rounded uppercase">
-                        <AlertCircle className="w-3 h-3" /> Bảo mật
-                      </span>
-                    </div>
-                    <div className="relative group">
-                      <Input
-                        type={showStreamKey ? "text" : "password"}
-                        readOnly
-                        value={streamKey}
-                        className="bg-accent font-mono text-[11px] pr-20 tracking-widest border-accent"
-                      />
-                      <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-                        <button type="button" onClick={() => setShowStreamKey(!showStreamKey)} className="p-1.5 text-secondary hover:text-foreground">
-                          {showStreamKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
-                        <button type="button" onClick={handleCopyStreamKey} className="p-1.5 text-secondary hover:text-foreground">
-                          {copied === "streamKey" ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <StreamKeyField
+                  streamUrl={streamUrl}
+                  streamKey={streamKey}
+                  showStreamKey={showStreamKey}
+                  copied={copied}
+                  onToggleShowKey={() => setShowStreamKey(!showStreamKey)}
+                  onCopyUrl={handleCopyStreamUrl}
+                  onCopyKey={handleCopyStreamKey}
+                />
               </div>
             ) : (
               /* Trạng thái chưa đăng ký Key */

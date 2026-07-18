@@ -40,7 +40,7 @@ export type CreateStreamRequest = {
   categoryIds: string[];
 }
 
-export type HeartBeatMessge = {
+export type HeartBeatMessage = {
   userId: string;
   message: string;
 }

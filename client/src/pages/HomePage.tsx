@@ -1,6 +1,5 @@
 import { streamApi } from "@/api/streamApi";
 import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/stores/authStore";
 import type { StreamResponse } from "@/types/streamType";
 import {
   Flame,
@@ -14,35 +13,39 @@ import {
   MoreVertical
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
+import { PATHS } from "@/routes/paths";
 
 export default function HomePage() {
-  const { isAuthenticated } = useAuthStore();
-
-  const navigate = useNavigate();
 
   const [livestreams, setLivestreams] = useState<StreamResponse[]>([]);
   const [topLivestreams, setTopLivestream] = useState<StreamResponse[]>([]);
   const [regularLivestream, setRegularLivestream] = useState<StreamResponse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/login");
-      return;
-    }
+    const abortController = new AbortController();
 
     const fetchTopLivestreams = async () => {
       try {
         const livestreams = await streamApi.getTopStream();
-        console.log(livestreams);
-        setLivestreams(livestreams);
+        if (!abortController.signal.aborted) {
+          setLivestreams(livestreams);
+        }
       } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
         console.log(error);
+      } finally {
+        if (!abortController.signal.aborted) {
+          setIsLoading(false);
+        }
       }
     }
 
     fetchTopLivestreams();
-  }, [isAuthenticated, navigate]);
+
+    return () => abortController.abort();
+  }, []);
 
   useEffect(() => {
     if (!livestreams) return;
@@ -58,6 +61,14 @@ export default function HomePage() {
     { name: "Âm nhạc Trực tuyến", count: "8.9k đang xem", icon: Music, bgEmoji: "🎵", color: "text-success" },
     { name: "Học tập & Sáng tạo", count: "5.1k đang xem", icon: MonitorPlay, bgEmoji: "📚", color: "text-warning" },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="w-full bg-background text-foreground font-sans flex items-center justify-center min-h-[400px]">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full bg-background text-foreground font-sans space-y-10">
@@ -104,7 +115,7 @@ export default function HomePage() {
 
         {/* 1 luồng Stream (video) view cao chiếm 2 ô ngang 1 ô dọc */}
         {topLivestreams.map((stream, index) => (
-          <Link to={`/livestreams/${stream.id}`} key={index} className="md:col-span-2 md:row-span-1 group flex flex-col bg-background border border-accent rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-200">
+          <Link to={PATHS.STREAMS.DETAIL(stream.id)} key={index} className="md:col-span-2 md:row-span-1 group flex flex-col bg-background border border-accent rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-200">
             <div className="relative aspect-video bg-foreground overflow-hidden">
               <div className="absolute top-3 left-3 bg-danger text-background text-xs font-black px-2 py-0.5 rounded-md tracking-wider z-10">
                 Live
@@ -204,7 +215,7 @@ export default function HomePage() {
 
         {/* Các livestream khác xếp theo lưới tiêu chuẩn của hàng nội dung */}
         {regularLivestream.map((stream, index) => (
-          <Link to={`/livestreams/${stream.id}`} key={index} className="md:col-span-1 group flex flex-col bg-background border border-accent rounded-2xl overflow-hidden hover:border-secondary transition-all duration-200">
+          <Link to={PATHS.STREAMS.DETAIL(stream.id)} key={index} className="md:col-span-1 group flex flex-col bg-background border border-accent rounded-2xl overflow-hidden hover:border-secondary transition-all duration-200">
             <div className="relative aspect-video bg-foreground overflow-hidden">
               <div className="absolute top-2 left-2 bg-secondary text-background text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
                 Đang phát

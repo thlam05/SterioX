@@ -1,10 +1,17 @@
 export const PATHS = {
-  PUBLIC: {
+  AUTH: {
     LOGIN: "/login",
-    REGISTER: "register"
+    REGISTER: "/register",
   },
+  HOME: "/",
+  STREAMS: {
+    DETAIL: (id: string) => `/streams/${id}`,
+    SETUP: "/streams/setup",
+    DASHBOARD: "/streams/dashboard",
+  },
+  SETTING: "/setting",
   ERROR: {
     NOT_FOUND: "*",
-    FORBIDDEN: "/403"
-  }
-}
+    FORBIDDEN: "/403",
+  },
+} as const;

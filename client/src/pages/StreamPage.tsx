@@ -1,112 +1,49 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { CustomStreamPlayer } from "@/components/stream/CustomStreamPlayer";
+import { ChatPanel } from "@/components/stream/ChatPanel";
 import {
   Radio,
   Users,
-  MessageSquare,
   Heart,
-  Send,
   Sparkles,
   Share2,
   Award,
   Gift,
 } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
-import { useNavigate, useLoaderData } from "react-router";
-import { useSocket } from "@/context/SocketContext";
-import type { HeartBeatMessge, LivestreamLikeResponse, LivestreamStatusResponse, StreamResponse, StreamChatResponse } from "@/types/streamType";
+import { useLoaderData } from "react-router";
+import { useStreamSocket } from "@/hooks/useStreamSocket";
+import type { StreamResponse } from "@/types/streamType";
 import { streamApi, streamChatApi } from "@/api/streamApi";
 
-export default function LivestreamPage() {
-  const { user, isAuthenticated } = useAuthStore();
-  const { isConnected, sendMessage, subscribeTopic } = useSocket();
-  const navigate = useNavigate();
+export default function StreamPage() {
+  const { user } = useAuthStore();
   const loaderData = useLoaderData() as StreamResponse | null;
 
   const [stream, setStream] = useState<StreamResponse | null>(loaderData);
   const [chatMessage, setChatMessage] = useState("");
-  const [chats, setChats] = useState<StreamChatResponse[]>([]);
-
-  const [currentViews, setCurrentViews] = useState(0);
-  const [currentLikes, setCurrentLikes] = useState(0);
-
   const [isFollowed, setIsFollowed] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
 
-  const tags = ["Java", "SpringBoot", "SystemDesign", "HighPerformance"];
+  const { currentViews, currentLikes, chats, setChats } = useStreamSocket(stream?.id, user?.id);
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/login");
-      return;
-    }
-  }, [isAuthenticated, navigate]);
+  const tags = stream?.title ? stream.title.split(" ").slice(0, 5) : [];
 
   useEffect(() => {
     setStream(loaderData);
   }, [loaderData]);
 
   useEffect(() => {
-    if (!stream || !stream.id) return;
-
-    let unsubscribe: () => void = () => { };
-    let unsubscribeLikes: () => void = () => { };
-    let unsubscribeChat: () => void = () => { };
-    let heartbeatInterval: NodeJS.Timeout | null = null;
-
-    const setupSocketActions = () => {
-      unsubscribe = subscribeTopic(`/topic/status-livestream/${stream.id}`, (message: LivestreamStatusResponse) => {
-        const { views, likes } = message;
-        setCurrentViews(views);
-        setCurrentLikes(likes);
-      });
-
-      unsubscribeLikes = subscribeTopic(`/topic/likes-livestreams/${stream.id}`, (message: LivestreamLikeResponse) => {
-        setCurrentLikes(message.likes);
-      });
-
-      unsubscribeChat = subscribeTopic(`/topic/chat/${stream.id}`, (message: StreamChatResponse) => {
-        setChats((prev) => [...prev, message]);
-      });
-
-      const sendHeartbeat = () => {
-        if (user?.id) {
-          const payload: HeartBeatMessge = {
-            userId: user?.id,
-            message: "PING"
-          }
-          sendMessage(`/app/view-livestream/${stream.id}`, payload);
-        }
-      };
-
-      sendHeartbeat();
-      heartbeatInterval = setInterval(sendHeartbeat, 10000);
-    };
-
-    if (isConnected) {
-      setupSocketActions();
-    }
-
-    return () => {
-      unsubscribe();
-      unsubscribeLikes();
-      unsubscribeChat();
-      if (heartbeatInterval != null) {
-        clearInterval(heartbeatInterval);
-      }
-    }
-  }, [stream, isConnected]);
-
-  useEffect(() => {
     if (!stream) return;
+    const abortController = new AbortController();
 
     const fetchLikeStatus = async () => {
       try {
         const { isLiked } = await streamApi.checkStatusLikedStream(stream.id);
-        setIsLiked(isLiked);
+        if (!abortController.signal.aborted) setIsLiked(isLiked);
       } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
         console.log(error);
       }
     }
@@ -114,17 +51,17 @@ export default function LivestreamPage() {
     const fetchChatHistory = async () => {
       try {
         const history = await streamChatApi.getChats(stream.id);
-        setChats(history);
+        if (!abortController.signal.aborted) setChats(history);
       } catch (error) {
-        console.error("Failed to load chat history", error);
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+        console.error("Không thể tải lịch sử chat", error);
       }
     };
 
-    setCurrentLikes(stream.totalLikes);
-    setCurrentViews(stream.totalViews);
-
     fetchLikeStatus();
     fetchChatHistory();
+
+    return () => abortController.abort();
   }, [stream])
 
   const handleLikeStream = async () => {
@@ -150,14 +87,9 @@ export default function LivestreamPage() {
       await streamChatApi.sendChat(stream.id, user.id, chatMessage.trim());
       setChatMessage("");
     } catch (error) {
-      console.error("Failed to send chat message", error);
+      console.error("Không thể gửi tin nhắn", error);
     }
   };
-
-  const mockDonations = [
-    { id: 1, user: "Duy Mạnh", amount: "50,000 VND", message: "Ủng hộ anh Lâm chia sẻ kiến thức hay!" },
-    { id: 2, user: "Ngọc Linh", amount: "100,000 VND", message: "Project cuốn quá anh ơi." }
-  ];
 
   return (
     <div className="w-full bg-background text-foreground font-sans space-y-6 selection:bg-selection">
@@ -293,61 +225,21 @@ export default function LivestreamPage() {
             <h3 className="text-sm font-black text-secondary uppercase tracking-wider">
               Các luồng phát sóng đề xuất
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* {suggestedStreams.map((stream) => ( ... ))} */}
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
           </div>
         </div>
 
         {/* Cột phải: Khung tương tác trò chuyện & Vinh danh quyên góp */}
         <div className="space-y-6">
 
-          {/* Hộp thoại trò chuyện thời gian thực */}
-          <div className="bg-background border border-accent rounded-3xl flex flex-col h-[400px] overflow-hidden">
-            <div className="p-4 border-b border-accent bg-background flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-black tracking-tight">Trò chuyện trực tiếp</h3>
-              </div>
-              <span className="text-[11px] font-bold bg-selection text-primary px-2 py-0.5 rounded-full">
-                Kết nối tốt
-              </span>
-            </div>
-
-            {/* Danh sách các tin nhắn */}
-            <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-background">
-              {chats.map((chat) => {
-                const isStreamer = chat.user.id === stream?.user?.id;
-                const timeStr = new Date(chat.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                return (
-                  <div key={chat.id} className="text-xs leading-relaxed flex items-start gap-2">
-                    <span className="text-secondary font-medium tracking-tighter shrink-0 pt-0.5">{timeStr}</span>
-                    <div>
-                      <span className={`font-black mr-2 ${isStreamer ? 'text-primary bg-selection px-1.5 py-0.5 rounded-md text-[10px]' : 'text-foreground'}`}>
-                        {chat.user.username}
-                      </span>
-                      <span className="text-secondary">{chat.content}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Khu vực gửi tin nhắn */}
-            <form onSubmit={handleSendChat} className="p-3 border-t border-accent bg-background flex gap-2">
-              <div className="flex-1">
-                <Input
-                  type="text"
-                  placeholder="Gửi tin nhắn..."
-                  value={chatMessage}
-                  onChange={(e) => setChatMessage(e.target.value)}
-                />
-              </div>
-              <Button type="submit" variant="primary" className="px-4 py-2 rounded-xl flex items-center justify-center">
-                <Send className="w-4 h-4" />
-              </Button>
-            </form>
-          </div>
+          <ChatPanel
+            chats={chats}
+            streamUserId={stream?.user?.id}
+            chatMessage={chatMessage}
+            onChatMessageChange={setChatMessage}
+            onSendChat={handleSendChat}
+            placeholder="Gửi tin nhắn..."
+          />
 
           {/* Danh sách ủng hộ, quyên góp gần đây */}
           <div className="bg-background border border-accent p-4 rounded-3xl space-y-3">
@@ -356,19 +248,9 @@ export default function LivestreamPage() {
             </h3>
 
             <div className="space-y-2.5">
-              {mockDonations.map((donation) => (
-                <div key={donation.id} className="bg-background border border-accent p-3 rounded-xl flex flex-col gap-1 transition-all">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-bold text-foreground">{donation.user}</span>
-                    <span className="text-xs font-black text-success bg-accent px-2 py-0.5 rounded-md">
-                      {donation.amount}
-                    </span>
-                  </div>
-                  <p className="text-xs text-secondary italic leading-normal">
-                    "{donation.message}"
-                  </p>
-                </div>
-              ))}
+              <p className="text-xs text-secondary italic text-center py-4">
+                Chưa có quyên góp nào. Hãy là người đầu tiên!
+              </p>
             </div>
           </div>
 

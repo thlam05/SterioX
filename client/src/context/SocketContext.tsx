@@ -4,8 +4,8 @@ import { useAuthStore } from '../stores/authStore';
 
 interface SocketContextType {
   isConnected: boolean;
-  sendMessage: (destination: string, payload: any) => void;
-  subscribeTopic: (topic: string, callback: (message: any) => void) => () => void;
+  sendMessage: (destination: string, payload: Record<string, unknown>) => void;
+  subscribeTopic: <T>(topic: string, callback: (message: T) => void) => () => void;
 }
 
 const SocketContext = createContext<SocketContextType | null>(null);
@@ -33,7 +33,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       return;
     }
 
-    console.log('🔌 Đang khởi tạo kết nối Socket...');
+    console.log('🔄 Đang kết nối Socket...');
 
     const client = new Client({
       brokerURL: import.meta.env.VITE_SOCKET_URL,
@@ -44,14 +44,14 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     });
 
     client.onConnect = (_) => {
-      console.log('Socket Connected!');
+      console.log('🔌 Đã kết nối Socket!');
       setIsConnected(true);
       pendingSubscriptionsRef.current.forEach((subscribe) => subscribe());
       pendingSubscriptionsRef.current = [];
     };
 
     client.onDisconnect = () => {
-      console.log('Socket Disconnected!');
+      console.log('🔌 Đã ngắt kết nối Socket!');
       setIsConnected(false);
     };
 
@@ -69,18 +69,18 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     };
   }, [isAuthenticated, token]);
 
-  const sendMessage = (destination: string, payload: any) => {
+  const sendMessage = (destination: string, payload: Record<string, unknown>) => {
     if (stompClientRef.current && stompClientRef.current.connected) {
       stompClientRef.current.publish({
         destination,
         body: JSON.stringify(payload),
       });
     } else {
-      console.warn('Message sent failed. The socket is not connected!');
+      console.warn('Không thể gửi tin nhắn. Socket chưa kết nối!');
     }
   };
 
-  const subscribeTopic = (topic: string, callback: (message: any) => void) => {
+  const subscribeTopic = <T,>(topic: string, callback: (message: T) => void) => {
     if (!stompClientRef.current) return () => { };
 
     let subscription: StompSubscription | null = null;
@@ -89,7 +89,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     const subscribeNow = () => {
       if (!stompClientRef.current || !stompClientRef.current.connected || cancelled) return;
       subscription = stompClientRef.current.subscribe(topic, (message) => {
-        callback(JSON.parse(message.body));
+        callback(JSON.parse(message.body) as T);
       });
     };
 
@@ -103,7 +103,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       cancelled = true;
       if (subscription) {
         subscription.unsubscribe();
-        console.log(`Unlistened to this channel.: ${topic}`);
+        console.log(`Đã hủy đăng ký kênh: ${topic}`);
       }
     };
   };

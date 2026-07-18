@@ -18,8 +18,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           type={actualType}
           className={`
             w-full px-3.5 py-2.5 text-sm font-normal rounded-xl border outline-none transition-all duration-200
-            bg-surface text-surface-foreground placeholder:text-muted-foreground/60
-            disabled:opacity-50 disabled:bg-muted disabled:cursor-not-allowed
+            bg-background text-foreground placeholder:text-secondary/60
+            disabled:opacity-50 disabled:bg-accent disabled:cursor-not-allowed
             ${isPassword ? 'pr-12' : ''}
             
             ${error

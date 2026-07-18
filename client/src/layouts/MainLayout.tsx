@@ -14,43 +14,35 @@ import {
   Menu,
   X,
   Flame,
-  Eye,
 } from "lucide-react";
 import { useAuthStore } from "@/stores/authStore";
 import { Link } from "react-router";
 import { Outlet } from "react-router";
 import { authApi } from "@/api/authApi";
 import type { TokenResponse } from "@/types/authType";
+import { PATHS } from "@/routes/paths";
 
 export default function MainLayout() {
-  const { user, token, logout, setToken } = useAuthStore();
+  const { user, token, isAuthenticated, logout, setToken } = useAuthStore();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const { isAuthenticated } = useAuthStore();
 
   const navigationItems = [
-    { icon: Home, label: "Trang chủ", path: "/", active: true },
-    { icon: Tv, label: "Livestream", path: "/livestreams/dashboard" },
-    { icon: Compass, label: "Khám phá", path: "/livestreams" },
-    { icon: Heart, label: "Theo dõi", path: "/livestreams" },
-    { icon: History, label: "Lịch sử xem", path: "/livestreams" },
-    { icon: Settings, label: "Cài đặt", path: "/setting" }
-  ];
-
-  const channels = [
-    { name: "Dev_Master", viewers: "4.5k", live: true, avatar: "D" },
-    { name: "TechReviewer", viewers: "2.1k", live: true, avatar: "T" },
-    { name: "AudioSpace", viewers: "920", live: false, avatar: "A" },
-    { name: "DesignLife", viewers: "1.2k", live: true, avatar: "D" },
+    { icon: Home, label: "Trang chủ", path: PATHS.HOME, active: true },
+    { icon: Tv, label: "Stream", path: PATHS.STREAMS.DASHBOARD },
+    { icon: Compass, label: "Khám phá", path: PATHS.HOME },
+    { icon: Heart, label: "Theo dõi", path: PATHS.HOME },
+    { icon: History, label: "Lịch sử xem", path: PATHS.HOME },
+    { icon: Settings, label: "Cài đặt", path: PATHS.SETTING }
   ];
 
   useEffect(() => {
     if (!token) return;
 
-    const introspecToken = async () => {
+    const introspectToken = async () => {
       try {
-        const valid = await authApi.introspec(token);
+        const valid = await authApi.introspect(token);
 
         if (!valid) {
           try {
@@ -66,7 +58,7 @@ export default function MainLayout() {
       }
     }
 
-    introspecToken();
+    introspectToken();
   }, [token]);
 
   return (
@@ -110,7 +102,7 @@ export default function MainLayout() {
               <Bell className="w-5 h-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>
             </Button>
-            <Link to={"/livestreams/setup"}>
+            <Link to={PATHS.STREAMS.SETUP}>
               <Button variant="primary" className="hidden sm:flex items-center gap-2">
                 <Flame className="w-4 h-4" /> Lên sóng ngay
               </Button>
@@ -125,7 +117,7 @@ export default function MainLayout() {
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <Link to="/login">
+            <Link to={PATHS.AUTH.LOGIN}>
               <Button className="px-4 py-2 border-accent text-foreground hover:bg-accent">
                 Đăng nhập
               </Button>
@@ -155,27 +147,6 @@ export default function MainLayout() {
             </nav>
 
             <hr className="border-accent" />
-
-            {/* Recommended Channels */}
-            <div className={!isSidebarOpen ? "md:hidden" : ""}>
-              <h3 className="px-3 text-xs font-bold text-secondary tracking-wider mb-3">Kênh đang theo dõi</h3>
-              <div className="space-y-2">
-                {channels.map((channel, index) => (
-                  <a key={index} href="#" className="flex items-center justify-between p-2 rounded-xl hover:bg-accent transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-sm border border-accent">
-                        {channel.avatar}
-                      </div>
-                      <div className="text-sm font-medium">
-                        <p className="text-foreground truncate max-w-[110px]">{channel.name}</p>
-                        {channel.live && <p className="text-xs text-secondary flex items-center gap-1"><Eye className="w-3 h-3 text-danger" /> {channel.viewers}</p>}
-                      </div>
-                    </div>
-                    {channel.live && <div className="w-2 h-2 rounded-full bg-danger"></div>}
-                  </a>
-                ))}
-              </div>
-            </div>
           </div>
         </aside>
 

@@ -23,7 +23,7 @@ export const streamApi = {
     })
     return response.data.data;
   },
-  async getStreamOnlineOfUSer(userId: string) {
+  async getStreamOnlineOfUser(userId: string) {
     const response = await api.get<ApiResponse<StreamResponse>>(`/streams/user/${userId}`)
     return response.data.data;
   },
@@ -44,11 +44,11 @@ export const streamApi = {
     return response.data.data;
   },
   async likeStreamById(id: string) {
-    const response = await api.post<ApiResponse<any>>(`/streams/like/${id}`);
+    const response = await api.post<ApiResponse<Record<string, unknown>>>(`/streams/like/${id}`);
     return response.data;
   },
-  async unlikeStreamById(id: String) {
-    const response = await api.post<ApiResponse<any>>(`/streams/unlike/${id}`);
+  async unlikeStreamById(id: string) {
+    const response = await api.post<ApiResponse<Record<string, unknown>>>(`/streams/unlike/${id}`);
     return response.data;
   },
   async checkStatusLikedStream(id: string) {

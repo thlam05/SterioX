@@ -12,6 +12,6 @@ export type CategoryResponse = {
 export type CreateCategoryRequest = {
 	name: string;
 	parentId: string;
-	slu: string;
+	slug: string;
 	level: number;
 };
