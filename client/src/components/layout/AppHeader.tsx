@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import Logo from "@/components/ui/Logo";
-import { Search, Bell, Flame, Menu, X } from "lucide-react";
-import { Link } from "react-router";
-import { PATHS } from "@/routes/paths";
-import type { UserResponse } from "@/types/userType";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import Logo from '@/components/ui/Logo';
+import { Search, Bell, Flame, Menu, X } from 'lucide-react';
+import { Link } from 'react-router';
+import { PATHS } from '@/routes/paths';
+import type { UserResponse } from '@/types/userType';
 
 interface AppHeaderProps {
   isSidebarOpen: boolean;
@@ -31,7 +31,11 @@ export default function AppHeader({
           className="p-2 border-none bg-transparent text-foreground hover:bg-accent"
           onClick={onToggleSidebar}
         >
-          {isSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          {isSidebarOpen ? (
+            <X className="w-5 h-5" />
+          ) : (
+            <Menu className="w-5 h-5" />
+          )}
         </Button>
         <Logo />
       </div>
@@ -59,14 +63,17 @@ export default function AppHeader({
             <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-danger rounded-full"></span>
           </Button>
           <Link to={PATHS.STREAMS.SETUP}>
-            <Button variant="primary" className="hidden sm:flex items-center gap-2">
+            <Button
+              variant="primary"
+              className="hidden sm:flex items-center gap-2"
+            >
               <Flame className="w-4 h-4" /> Lên sóng ngay
             </Button>
           </Link>
           <div className="w-9 h-9 rounded-full bg-accent text-foreground flex items-center justify-center font-bold border border-primary">
             <img
               src={user?.avatarImageUrl}
-              alt={user?.username || "Avatar"}
+              alt={user?.username || 'Avatar'}
               className="w-full h-full rounded-full object-cover"
             />
           </div>

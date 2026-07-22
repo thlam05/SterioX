@@ -1,6 +1,6 @@
-import { Home, Tv, Compass, Heart, History, Settings } from "lucide-react";
-import { Link } from "react-router";
-import { PATHS } from "@/routes/paths";
+import { Home, Tv, Compass, Heart, History, Settings } from 'lucide-react';
+import { Link } from 'react-router';
+import { PATHS } from '@/routes/paths';
 
 interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
@@ -10,12 +10,12 @@ interface NavItem {
 }
 
 const navigationItems: NavItem[] = [
-  { icon: Home, label: "Trang chủ", path: PATHS.HOME, active: true },
-  { icon: Tv, label: "Stream", path: PATHS.STREAMS.DASHBOARD },
-  { icon: Compass, label: "Khám phá", path: PATHS.HOME },
-  { icon: Heart, label: "Theo dõi", path: PATHS.HOME },
-  { icon: History, label: "Lịch sử xem", path: PATHS.HOME },
-  { icon: Settings, label: "Cài đặt", path: PATHS.SETTING },
+  { icon: Home, label: 'Trang chủ', path: PATHS.HOME, active: true },
+  { icon: Tv, label: 'Stream', path: PATHS.STREAMS.DASHBOARD },
+  { icon: Compass, label: 'Khám phá', path: PATHS.HOME },
+  { icon: Heart, label: 'Theo dõi', path: PATHS.HOME },
+  { icon: History, label: 'Lịch sử xem', path: PATHS.HOME },
+  { icon: Settings, label: 'Cài đặt', path: PATHS.SETTING },
 ];
 
 interface SidebarProps {
@@ -24,17 +24,21 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen }: SidebarProps) {
   return (
-    <aside className={`h-full bg-background border-r border-accent transition-all duration-300 flex flex-col justify-between overflow-y-auto shrink-0 ${isOpen ? "w-64" : "w-0 md:w-20"}`}>
+    <aside
+      className={`h-full bg-background border-r border-accent transition-all duration-300 flex flex-col justify-between overflow-y-auto shrink-0 ${isOpen ? 'w-64' : 'w-0 md:w-20'}`}
+    >
       <div className="p-4 space-y-6">
         <nav className="space-y-1">
           {navigationItems.map((item, index) => (
             <Link
               key={index}
               to={item.path}
-              className={`flex items-center gap-4 px-3 py-3 rounded-xl text-sm font-medium transition-colors ${item.active ? "bg-selection text-primary" : "text-foreground hover:bg-accent"}`}
+              className={`flex items-center gap-4 px-3 py-3 rounded-xl text-sm font-medium transition-colors ${item.active ? 'bg-selection text-primary' : 'text-foreground hover:bg-accent'}`}
             >
-              <item.icon className={`w-5 h-5 ${item.active ? "text-primary" : "text-secondary"}`} />
-              <span className={!isOpen ? "md:hidden" : ""}>{item.label}</span>
+              <item.icon
+                className={`w-5 h-5 ${item.active ? 'text-primary' : 'text-secondary'}`}
+              />
+              <span className={!isOpen ? 'md:hidden' : ''}>{item.label}</span>
             </Link>
           ))}
         </nav>

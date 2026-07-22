@@ -1,11 +1,21 @@
-import React, { createContext, useContext, useEffect, useState, useRef, type ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+  type ReactNode,
+} from 'react';
 import { Client, type StompSubscription } from '@stomp/stompjs';
 import { useAuthStore } from '../stores/authStore';
 
 interface SocketContextType {
   isConnected: boolean;
   sendMessage: (destination: string, payload: Record<string, unknown>) => void;
-  subscribeTopic: <T>(topic: string, callback: (message: T) => void) => () => void;
+  subscribeTopic: <T>(
+    topic: string,
+    callback: (message: T) => void,
+  ) => () => void;
 }
 
 const SocketContext = createContext<SocketContextType | null>(null);
@@ -69,7 +79,10 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     };
   }, [isAuthenticated, token]);
 
-  const sendMessage = (destination: string, payload: Record<string, unknown>) => {
+  const sendMessage = (
+    destination: string,
+    payload: Record<string, unknown>,
+  ) => {
     if (stompClientRef.current && stompClientRef.current.connected) {
       stompClientRef.current.publish({
         destination,
@@ -80,14 +93,22 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     }
   };
 
-  const subscribeTopic = <T,>(topic: string, callback: (message: T) => void) => {
-    if (!stompClientRef.current) return () => { };
+  const subscribeTopic = <T,>(
+    topic: string,
+    callback: (message: T) => void,
+  ) => {
+    if (!stompClientRef.current) return () => {};
 
     let subscription: StompSubscription | null = null;
     let cancelled = false;
 
     const subscribeNow = () => {
-      if (!stompClientRef.current || !stompClientRef.current.connected || cancelled) return;
+      if (
+        !stompClientRef.current ||
+        !stompClientRef.current.connected ||
+        cancelled
+      )
+        return;
       subscription = stompClientRef.current.subscribe(topic, (message) => {
         callback(JSON.parse(message.body) as T);
       });
@@ -109,7 +130,9 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   };
 
   return (
-    <SocketContext.Provider value={{ isConnected, sendMessage, subscribeTopic }}>
+    <SocketContext.Provider
+      value={{ isConnected, sendMessage, subscribeTopic }}
+    >
       {children}
     </SocketContext.Provider>
   );

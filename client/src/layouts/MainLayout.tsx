@@ -1,15 +1,15 @@
-import { Outlet } from "react-router";
-import { useState } from "react";
-import { useAuthStore } from "@/stores/authStore";
-import AppHeader from "@/components/layout/AppHeader";
-import Sidebar from "@/components/layout/Sidebar";
-import useTokenIntrospection from "@/hooks/useTokenIntrospection";
+import { Outlet } from 'react-router';
+import { useState } from 'react';
+import { useAuthStore } from '@/stores/authStore';
+import AppHeader from '@/components/layout/AppHeader';
+import Sidebar from '@/components/layout/Sidebar';
+import useTokenIntrospection from '@/hooks/useTokenIntrospection';
 
 export default function MainLayout() {
   const { user, isAuthenticated } = useAuthStore();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
 
   useTokenIntrospection();
 

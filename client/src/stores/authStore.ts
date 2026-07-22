@@ -1,27 +1,33 @@
-import type { UserResponse } from "@/types/userType";
-import { create } from "zustand";
+import type { UserResponse } from '@/types/userType';
+import { create } from 'zustand';
 
 type AuthState = {
   user: UserResponse | null;
   token: string | null;
   isAuthenticated: boolean;
-  login: (payload: { user: UserResponse; token: string; rememberMe?: boolean }) => void;
+  login: (payload: {
+    user: UserResponse;
+    token: string;
+    rememberMe?: boolean;
+  }) => void;
   updateUser: (user: UserResponse) => void;
   logout: () => void;
   setToken: (token: string) => void;
   hydrate: () => void;
 };
 
-const TOKEN_KEY = "steriox_token";
-const USER_KEY = "steriox_user";
-const STORAGE_TYPE_KEY = "steriox_auth_storage_type";
+const TOKEN_KEY = 'steriox_token';
+const USER_KEY = 'steriox_user';
+const STORAGE_TYPE_KEY = 'steriox_auth_storage_type';
 
-const isBrowser = typeof window !== "undefined";
+const isBrowser = typeof window !== 'undefined';
 
 const getActiveStorage = (): Storage | null => {
   if (!isBrowser) return null;
-  const type = window.localStorage.getItem(STORAGE_TYPE_KEY) || window.sessionStorage.getItem(STORAGE_TYPE_KEY);
-  return type === "local" ? window.localStorage : window.sessionStorage;
+  const type =
+    window.localStorage.getItem(STORAGE_TYPE_KEY) ||
+    window.sessionStorage.getItem(STORAGE_TYPE_KEY);
+  return type === 'local' ? window.localStorage : window.sessionStorage;
 };
 
 const clearAuthStorage = () => {
@@ -62,7 +68,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       clearAuthStorage();
 
       const storage = rememberMe ? window.localStorage : window.sessionStorage;
-      const storageType = rememberMe ? "local" : "session";
+      const storageType = rememberMe ? 'local' : 'session';
 
       storage.setItem(TOKEN_KEY, token);
       storage.setItem(USER_KEY, JSON.stringify(user));
@@ -94,7 +100,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       storage.setItem(TOKEN_KEY, token);
     }
     set({
-      token: token
+      token: token,
     });
   },
 

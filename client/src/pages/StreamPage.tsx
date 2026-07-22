@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { CustomStreamPlayer } from "@/components/stream/CustomStreamPlayer";
-import { ChatPanel } from "@/components/stream/ChatPanel";
+import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { CustomStreamPlayer } from '@/components/stream/CustomStreamPlayer';
+import { ChatPanel } from '@/components/stream/ChatPanel';
 import {
   Radio,
   Users,
@@ -10,25 +10,28 @@ import {
   Share2,
   Award,
   Gift,
-} from "lucide-react";
-import { useAuthStore } from "@/stores/authStore";
-import { useLoaderData } from "react-router";
-import { useStreamSocket } from "@/hooks/useStreamSocket";
-import type { StreamResponse } from "@/types/streamType";
-import { streamApi, streamChatApi } from "@/api/streamApi";
+} from 'lucide-react';
+import { useAuthStore } from '@/stores/authStore';
+import { useLoaderData } from 'react-router';
+import { useStreamSocket } from '@/hooks/useStreamSocket';
+import type { StreamResponse } from '@/types/streamType';
+import { streamApi, streamChatApi } from '@/api/streamApi';
 
 export default function StreamPage() {
   const { user } = useAuthStore();
   const loaderData = useLoaderData() as StreamResponse | null;
 
   const [stream, setStream] = useState<StreamResponse | null>(loaderData);
-  const [chatMessage, setChatMessage] = useState("");
+  const [chatMessage, setChatMessage] = useState('');
   const [isFollowed, setIsFollowed] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
 
-  const { currentViews, currentLikes, chats, setChats } = useStreamSocket(stream?.id, user?.id);
+  const { currentViews, currentLikes, chats, setChats } = useStreamSocket(
+    stream?.id,
+    user?.id,
+  );
 
-  const tags = stream?.title ? stream.title.split(" ").slice(0, 5) : [];
+  const tags = stream?.title ? stream.title.split(' ').slice(0, 5) : [];
 
   useEffect(() => {
     setStream(loaderData);
@@ -43,18 +46,20 @@ export default function StreamPage() {
         const { isLiked } = await streamApi.checkStatusLikedStream(stream.id);
         if (!abortController.signal.aborted) setIsLiked(isLiked);
       } catch (error) {
-        if (error instanceof DOMException && error.name === 'AbortError') return;
+        if (error instanceof DOMException && error.name === 'AbortError')
+          return;
         console.log(error);
       }
-    }
+    };
 
     const fetchChatHistory = async () => {
       try {
         const history = await streamChatApi.getChats(stream.id);
         if (!abortController.signal.aborted) setChats(history);
       } catch (error) {
-        if (error instanceof DOMException && error.name === 'AbortError') return;
-        console.error("Không thể tải lịch sử chat", error);
+        if (error instanceof DOMException && error.name === 'AbortError')
+          return;
+        console.error('Không thể tải lịch sử chat', error);
       }
     };
 
@@ -62,7 +67,7 @@ export default function StreamPage() {
     fetchChatHistory();
 
     return () => abortController.abort();
-  }, [stream])
+  }, [stream]);
 
   const handleLikeStream = async () => {
     if (!stream || !user) return;
@@ -77,7 +82,7 @@ export default function StreamPage() {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   const handleSendChat = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,15 +90,14 @@ export default function StreamPage() {
 
     try {
       await streamChatApi.sendChat(stream.id, user.id, chatMessage.trim());
-      setChatMessage("");
+      setChatMessage('');
     } catch (error) {
-      console.error("Không thể gửi tin nhắn", error);
+      console.error('Không thể gửi tin nhắn', error);
     }
   };
 
   return (
     <div className="w-full bg-background text-foreground font-sans space-y-6 selection:bg-selection">
-
       {/* Thống kê nhanh trạng thái dòng chảy */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className="bg-background border border-accent p-4 rounded-2xl flex items-center gap-3">
@@ -102,7 +106,9 @@ export default function StreamPage() {
           </div>
           <div>
             <p className="text-xs text-secondary font-medium">Trạng thái</p>
-            <span className={`text-sm font-black flex items-center gap-1 ${stream?.isActive ? 'text-danger' : 'text-secondary'}`}>
+            <span
+              className={`text-sm font-black flex items-center gap-1 ${stream?.isActive ? 'text-danger' : 'text-secondary'}`}
+            >
               {stream?.isActive ? 'Trực tiếp' : 'Ngoại tuyến'}
             </span>
           </div>
@@ -114,7 +120,9 @@ export default function StreamPage() {
           </div>
           <div>
             <p className="text-xs text-secondary font-medium">Người xem</p>
-            <span className="text-sm font-black text-foreground">{currentViews ?? 0}</span>
+            <span className="text-sm font-black text-foreground">
+              {currentViews ?? 0}
+            </span>
           </div>
         </div>
 
@@ -124,20 +132,22 @@ export default function StreamPage() {
           </div>
           <div>
             <p className="text-xs text-secondary font-medium">Lượt thích</p>
-            <span className="text-sm font-black text-foreground">{currentLikes ?? 0}</span>
+            <span className="text-sm font-black text-foreground">
+              {currentLikes ?? 0}
+            </span>
           </div>
         </div>
       </div>
 
       {/* Khu vực nội dung chính */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
         {/* Cột trái và giữa: Màn hình xem trước và Cấu hình */}
         <div className="lg:col-span-2 space-y-6">
-
           {/* Trình xem trước luồng video */}
           <div className="relative aspect-video rounded-3xl border border-accent overflow-hidden group bg-black">
-            <CustomStreamPlayer src={stream?.playUrl ? stream.playUrl : ""}></CustomStreamPlayer>
+            <CustomStreamPlayer
+              src={stream?.playUrl ? stream.playUrl : ''}
+            ></CustomStreamPlayer>
           </div>
 
           {/* Bảng điều khiển tác vụ cốt lõi */}
@@ -150,7 +160,9 @@ export default function StreamPage() {
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <h1 className="text-lg font-black text-foreground">Steriox_TechMaster</h1>
+                    <h1 className="text-lg font-black text-foreground">
+                      Steriox_TechMaster
+                    </h1>
                     <span className="bg-warning text-foreground text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5">
                       <Award className="w-3 h-3" /> Đối tác
                     </span>
@@ -165,22 +177,20 @@ export default function StreamPage() {
               <div className="flex items-center gap-2 flex-wrap">
                 {/* Nút Theo dõi */}
                 <Button
-                  variant={isFollowed ? "outline" : "primary"}
+                  variant={isFollowed ? 'outline' : 'primary'}
                   onClick={() => setIsFollowed(!isFollowed)}
                   className="font-bold flex items-center gap-2 px-5"
                 >
-                  {isFollowed ? "Đã theo dõi" : "Theo dõi"}
+                  {isFollowed ? 'Đã theo dõi' : 'Theo dõi'}
                 </Button>
 
                 <Button
-                  variant={isLiked ? "outline" : "primary"}
+                  variant={isLiked ? 'outline' : 'primary'}
                   onClick={handleLikeStream}
                   className="font-bold flex items-center gap-2 px-5"
                 >
-                  <Heart
-                    className={`w-4 h-4`}
-                  />
-                  {isLiked ? "Đã thích" : "Thích"}
+                  <Heart className={`w-4 h-4`} />
+                  {isLiked ? 'Đã thích' : 'Thích'}
                 </Button>
 
                 {/* Nút Tặng quà */}
@@ -188,7 +198,8 @@ export default function StreamPage() {
                   variant="outline"
                   className="font-bold flex items-center gap-2 border-accent"
                 >
-                  <Gift className="w-4 h-4 text-warning fill-warning/20" /> Tặng quà
+                  <Gift className="w-4 h-4 text-warning fill-warning/20" /> Tặng
+                  quà
                 </Button>
                 {/* Nút Chia sẻ */}
                 <Button
@@ -205,17 +216,25 @@ export default function StreamPage() {
             {/* Tiêu đề và Mô tả bài viết */}
             <div className="space-y-2">
               <h2 className="text-xl font-extrabold text-foreground leading-snug">
-                Hướng dẫn xây dựng nền tảng livestream quy mô lớn với ReactJS, NextJS 16 và Tailwind CSS
+                Hướng dẫn xây dựng nền tảng livestream quy mô lớn với ReactJS,
+                NextJS 16 và Tailwind CSS
               </h2>
               <div className="flex flex-wrap gap-2 pt-1">
                 {tags.map((tag, idx) => (
-                  <span key={idx} className="text-xs font-bold bg-accent text-foreground px-3 py-1 rounded-md">
+                  <span
+                    key={idx}
+                    className="text-xs font-bold bg-accent text-foreground px-3 py-1 rounded-md"
+                  >
                     #{tag}
                   </span>
                 ))}
               </div>
               <p className="text-sm text-secondary leading-relaxed pt-2">
-                Chào mừng các bạn đến với buổi học thực chiến tối nay. Chúng ta sẽ cùng nhau phân tích kiến trúc hệ thống dữ liệu thời gian thực, cách tối ưu hóa hiệu năng render luồng dữ liệu và áp dụng hệ thống thiết kế màu sắc chuẩn chỉnh toàn cầu. Đừng ngần ngại đặt câu hỏi tại khung chat nhé!
+                Chào mừng các bạn đến với buổi học thực chiến tối nay. Chúng ta
+                sẽ cùng nhau phân tích kiến trúc hệ thống dữ liệu thời gian
+                thực, cách tối ưu hóa hiệu năng render luồng dữ liệu và áp dụng
+                hệ thống thiết kế màu sắc chuẩn chỉnh toàn cầu. Đừng ngần ngại
+                đặt câu hỏi tại khung chat nhé!
               </p>
             </div>
           </div>
@@ -231,7 +250,6 @@ export default function StreamPage() {
 
         {/* Cột phải: Khung tương tác trò chuyện & Vinh danh quyên góp */}
         <div className="space-y-6">
-
           <ChatPanel
             chats={chats}
             streamUserId={stream?.user?.id}
@@ -244,7 +262,8 @@ export default function StreamPage() {
           {/* Danh sách ủng hộ, quyên góp gần đây */}
           <div className="bg-background border border-accent p-4 rounded-3xl space-y-3">
             <h3 className="text-sm font-black tracking-tight flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-warning" /> Vinh danh quyên góp mới nhất
+              <Sparkles className="w-4 h-4 text-warning" /> Vinh danh quyên góp
+              mới nhất
             </h3>
 
             <div className="space-y-2.5">
@@ -253,9 +272,7 @@ export default function StreamPage() {
               </p>
             </div>
           </div>
-
         </div>
-
       </div>
     </div>
   );

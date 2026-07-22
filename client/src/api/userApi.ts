@@ -1,19 +1,22 @@
-import { api, type ApiResponse } from "@/api/apiClient";
-import type { UserRequest, UserResponse } from "@/types/userType";
+import { api, type ApiResponse } from '@/api/apiClient';
+import type { UserRequest, UserResponse } from '@/types/userType';
 
 export const userApi = {
   async getUsers() {
-    const response = await api.get<ApiResponse<UserResponse[]>>("/users");
+    const response = await api.get<ApiResponse<UserResponse[]>>('/users');
     return response.data.data;
   },
 
   async createUser(payload: UserRequest) {
-    const response = await api.post<ApiResponse<UserResponse>>("/users", payload);
+    const response = await api.post<ApiResponse<UserResponse>>(
+      '/users',
+      payload,
+    );
     return response.data.data;
   },
 
   async getMe() {
-    const response = await api.get<ApiResponse<UserResponse>>("/users/me");
+    const response = await api.get<ApiResponse<UserResponse>>('/users/me');
     return response.data.data;
   },
 
@@ -23,7 +26,10 @@ export const userApi = {
   },
 
   async updateUser(id: string, payload: UserRequest) {
-    const response = await api.put<ApiResponse<UserResponse>>(`/users/${id}`, payload);
+    const response = await api.put<ApiResponse<UserResponse>>(
+      `/users/${id}`,
+      payload,
+    );
     return response.data.data;
   },
 

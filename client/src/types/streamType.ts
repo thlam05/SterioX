@@ -1,5 +1,5 @@
-import type { CategoryResponse } from "./categoryType";
-import type { UserResponse } from "./userType";
+import type { CategoryResponse } from './categoryType';
+import type { UserResponse } from './userType';
 
 export type StreamKeyResponse = {
   streamKey: string;
@@ -29,7 +29,7 @@ export type StreamResponse = {
 
 export type CreateStreamKeyRequest = {
   userId: string;
-  isActive: boolean
+  isActive: boolean;
 };
 
 export type CreateStreamRequest = {
@@ -38,29 +38,29 @@ export type CreateStreamRequest = {
   description: string;
   thumbnail: File | null;
   categoryIds: string[];
-}
+};
 
 export type HeartBeatMessage = {
   userId: string;
   message: string;
-}
+};
 
 export type LivestreamStatusResponse = {
   views: number;
   likes: number;
-}
+};
 
 export type LivestreamLikeRequest = {
   userId: string;
-}
+};
 
 export type LivestreamLikeResponse = {
   likes: number;
-}
+};
 
 export type LivestreamLikeStatusResponse = {
   isLiked: boolean;
-}
+};
 
 export type StreamChatResponse = {
   id: string;
@@ -70,4 +70,4 @@ export type StreamChatResponse = {
   isPinned: boolean;
   isToxic: boolean;
   createdAt: string;
-}
+};

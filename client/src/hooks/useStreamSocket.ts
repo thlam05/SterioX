@@ -1,8 +1,16 @@
-import { useEffect, useState } from "react";
-import { useSocket } from "@/context/SocketContext";
-import type { HeartBeatMessage, LivestreamLikeResponse, LivestreamStatusResponse, StreamChatResponse } from "@/types/streamType";
+import { useEffect, useState } from 'react';
+import { useSocket } from '@/context/SocketContext';
+import type {
+  HeartBeatMessage,
+  LivestreamLikeResponse,
+  LivestreamStatusResponse,
+  StreamChatResponse,
+} from '@/types/streamType';
 
-export function useStreamSocket(streamId: string | undefined, userId: string | undefined) {
+export function useStreamSocket(
+  streamId: string | undefined,
+  userId: string | undefined,
+) {
   const { isConnected, sendMessage, subscribeTopic } = useSocket();
   const [currentViews, setCurrentViews] = useState(0);
   const [currentLikes, setCurrentLikes] = useState(0);
@@ -17,23 +25,32 @@ export function useStreamSocket(streamId: string | undefined, userId: string | u
     let heartbeatInterval: ReturnType<typeof setInterval> | null = null;
 
     const setupSocketActions = () => {
-      unsubscribeStatus = subscribeTopic(`/topic/status-stream/${streamId}`, (message: LivestreamStatusResponse) => {
-        setCurrentViews(message.views);
-        setCurrentLikes(message.likes);
-      });
+      unsubscribeStatus = subscribeTopic(
+        `/topic/status-stream/${streamId}`,
+        (message: LivestreamStatusResponse) => {
+          setCurrentViews(message.views);
+          setCurrentLikes(message.likes);
+        },
+      );
 
-      unsubscribeLikes = subscribeTopic(`/topic/likes-streams/${streamId}`, (message: LivestreamLikeResponse) => {
-        setCurrentLikes(message.likes);
-      });
+      unsubscribeLikes = subscribeTopic(
+        `/topic/likes-streams/${streamId}`,
+        (message: LivestreamLikeResponse) => {
+          setCurrentLikes(message.likes);
+        },
+      );
 
-      unsubscribeChat = subscribeTopic(`/topic/chat/${streamId}`, (message: StreamChatResponse) => {
-        setChats((prev) => [...prev, message]);
-      });
+      unsubscribeChat = subscribeTopic(
+        `/topic/chat/${streamId}`,
+        (message: StreamChatResponse) => {
+          setChats((prev) => [...prev, message]);
+        },
+      );
 
       const sendHeartbeat = () => {
         const payload: HeartBeatMessage = {
           userId,
-          message: "PING",
+          message: 'PING',
         };
         sendMessage(`/app/view-stream/${streamId}`, payload);
       };

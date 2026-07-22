@@ -1,4 +1,4 @@
-import type { UserResponse } from "./userType";
+import type { UserResponse } from './userType';
 
 export type LoginRequest = {
   email: string;
@@ -18,9 +18,9 @@ export type TokenResponse = {
 
 export type LoginResponse = {
   token: string;
-  user: UserResponse
+  user: UserResponse;
 };
 
 export type IntrospectResponse = {
   valid: boolean;
-}
+};

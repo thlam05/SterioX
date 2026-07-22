@@ -1,6 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Hls, { type HlsConfig } from 'hls.js';
-import { Play, Pause, Volume2, VolumeX, Maximize2, Settings, Tv, Radio, Minimize2 } from 'lucide-react';
+import {
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  Maximize2,
+  Settings,
+  Tv,
+  Radio,
+  Minimize2,
+} from 'lucide-react';
 
 interface StreamPlayerProps {
   src: string;
@@ -56,7 +66,8 @@ export const CustomStreamPlayer = ({ src }: StreamPlayerProps) => {
       hls.attachMedia(video);
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        video.play()
+        video
+          .play()
           .then(() => setIsPlaying(true))
           .catch((err) => console.log(err));
       });
@@ -67,7 +78,8 @@ export const CustomStreamPlayer = ({ src }: StreamPlayerProps) => {
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = src;
       video.addEventListener('loadedmetadata', () => {
-        video.play()
+        video
+          .play()
           .then(() => setIsPlaying(true))
           .catch((err) => console.log(err));
       });
@@ -144,8 +156,7 @@ export const CustomStreamPlayer = ({ src }: StreamPlayerProps) => {
       } else {
         video.currentTime = video.duration - 1;
       }
-    }
-    else if (video.seekable && video.seekable.length > 0) {
+    } else if (video.seekable && video.seekable.length > 0) {
       const latestSeekableTime = video.seekable.end(video.seekable.length - 1);
       video.currentTime = latestSeekableTime;
     }
@@ -156,7 +167,10 @@ export const CustomStreamPlayer = ({ src }: StreamPlayerProps) => {
   };
 
   return (
-    <div ref={containerRef} className="relative group rounded-2xl bg-foreground overflow-hidden shadow-xl aspect-video w-full max-w-[1200px] mx-auto select-none font-sans">
+    <div
+      ref={containerRef}
+      className="relative group rounded-2xl bg-foreground overflow-hidden shadow-xl aspect-video w-full max-w-[1200px] mx-auto select-none font-sans"
+    >
       <video
         ref={videoRef}
         playsInline
@@ -168,16 +182,20 @@ export const CustomStreamPlayer = ({ src }: StreamPlayerProps) => {
         <button
           type="button"
           onClick={jumpToLiveEdge}
-          className={`${isAtLiveEdge ? 'bg-danger text-background' : 'bg-neutral-600 text-white hover:bg-neutral-500'
-            } text-xs font-black px-3 py-1 rounded-md flex items-center gap-1.5 shadow-md transition-all cursor-pointer`}
+          className={`${
+            isAtLiveEdge
+              ? 'bg-danger text-background'
+              : 'bg-neutral-600 text-white hover:bg-neutral-500'
+          } text-xs font-black px-3 py-1 rounded-md flex items-center gap-1.5 shadow-md transition-all cursor-pointer`}
         >
-          <Radio className={`w-3.5 h-3.5 ${isAtLiveEdge ? 'animate-pulse text-background' : 'text-neutral-400'}`} />
+          <Radio
+            className={`w-3.5 h-3.5 ${isAtLiveEdge ? 'animate-pulse text-background' : 'text-neutral-400'}`}
+          />
           Live
         </button>
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-foreground via-foreground/75 to-transparent p-4 flex flex-col space-y-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-
         <div className="h-1 w-full bg-secondary/40 rounded-full overflow-hidden cursor-default">
           <div className="h-full w-full bg-primary rounded-full"></div>
         </div>
@@ -189,7 +207,11 @@ export const CustomStreamPlayer = ({ src }: StreamPlayerProps) => {
               onClick={togglePlay}
               className="text-background hover:text-primary transition-colors focus:outline-none cursor-pointer"
             >
-              {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+              {isPlaying ? (
+                <Pause className="w-5 h-5" />
+              ) : (
+                <Play className="w-5 h-5" />
+              )}
             </button>
 
             <div className="flex items-center space-x-2">
@@ -198,7 +220,11 @@ export const CustomStreamPlayer = ({ src }: StreamPlayerProps) => {
                 onClick={toggleMute}
                 className="text-background hover:text-primary transition-colors focus:outline-none cursor-pointer"
               >
-                {isMuted ? <VolumeX className="w-5 h-5 text-secondary" /> : <Volume2 className="w-5 h-5" />}
+                {isMuted ? (
+                  <VolumeX className="w-5 h-5 text-secondary" />
+                ) : (
+                  <Volume2 className="w-5 h-5" />
+                )}
               </button>
               <input
                 type="range"
@@ -212,10 +238,16 @@ export const CustomStreamPlayer = ({ src }: StreamPlayerProps) => {
           </div>
 
           <div className="flex items-center space-x-4">
-            <button type="button" className="text-background hover:text-primary transition-colors focus:outline-none cursor-pointer">
+            <button
+              type="button"
+              className="text-background hover:text-primary transition-colors focus:outline-none cursor-pointer"
+            >
               <Settings className="w-5 h-5" />
             </button>
-            <button type="button" className="text-background hover:text-primary transition-colors focus:outline-none cursor-pointer">
+            <button
+              type="button"
+              className="text-background hover:text-primary transition-colors focus:outline-none cursor-pointer"
+            >
               <Tv className="w-5 h-5" />
             </button>
             <button
@@ -231,7 +263,6 @@ export const CustomStreamPlayer = ({ src }: StreamPlayerProps) => {
             </button>
           </div>
         </div>
-
       </div>
     </div>
   );

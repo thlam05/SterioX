@@ -1,7 +1,7 @@
-import { useEffect } from "react";
-import { useAuthStore } from "@/stores/authStore";
-import { authApi } from "@/api/authApi";
-import type { TokenResponse } from "@/types/authType";
+import { useEffect } from 'react';
+import { useAuthStore } from '@/stores/authStore';
+import { authApi } from '@/api/authApi';
+import type { TokenResponse } from '@/types/authType';
 
 export default function useTokenIntrospection() {
   const { token, logout, setToken } = useAuthStore();

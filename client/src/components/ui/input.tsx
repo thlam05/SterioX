@@ -5,7 +5,19 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ error, className = '', type, required, minLength, maxLength, pattern, ...props }, ref) => {
+  (
+    {
+      error,
+      className = '',
+      type,
+      required,
+      minLength,
+      maxLength,
+      pattern,
+      ...props
+    },
+    ref,
+  ) => {
     const [showPassword, setShowPassword] = useState(false);
     const isPassword = type === 'password';
 
@@ -22,9 +34,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             disabled:opacity-50 disabled:bg-accent disabled:cursor-not-allowed
             ${isPassword ? 'pr-12' : ''}
             
-            ${error
-              ? 'border-2 border-danger-light focus:border-danger'
-              : 'border-2 border-accent focus:border-primary'
+            ${
+              error
+                ? 'border-2 border-danger-light focus:border-danger'
+                : 'border-2 border-accent focus:border-primary'
             }
             
             ${className}
@@ -43,7 +56,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
 Input.displayName = 'Input';

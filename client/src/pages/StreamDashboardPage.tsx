@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useEffect, useState } from "react";
-import { CustomStreamPlayer } from "@/components/stream/CustomStreamPlayer";
-import { ChatPanel } from "@/components/stream/ChatPanel";
-import { StreamKeyField } from "@/components/stream/StreamKeyField";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useEffect, useState } from 'react';
+import { CustomStreamPlayer } from '@/components/stream/CustomStreamPlayer';
+import { ChatPanel } from '@/components/stream/ChatPanel';
+import { StreamKeyField } from '@/components/stream/StreamKeyField';
 import {
   Radio,
   Tv,
@@ -15,12 +15,12 @@ import {
   AlertTriangle,
   Sparkles,
   Share2,
-  Power
-} from "lucide-react";
-import { useAuthStore } from "@/stores/authStore";
-import { useStreamSocket } from "@/hooks/useStreamSocket";
-import { streamApi, streamKeyApi, streamChatApi } from "@/api/streamApi";
-import type { StreamResponse } from "@/types/streamType";
+  Power,
+} from 'lucide-react';
+import { useAuthStore } from '@/stores/authStore';
+import { useStreamSocket } from '@/hooks/useStreamSocket';
+import { streamApi, streamKeyApi, streamChatApi } from '@/api/streamApi';
+import type { StreamResponse } from '@/types/streamType';
 
 export default function StreamDashboard() {
   const { user } = useAuthStore();
@@ -28,15 +28,18 @@ export default function StreamDashboard() {
   const [streamKey, setStreamKey] = useState<string | null>(null);
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [showStreamKey, setShowStreamKey] = useState(false);
-  const [copied, setCopied] = useState<"streamUrl" | "streamKey" | null>(null);
+  const [copied, setCopied] = useState<'streamUrl' | 'streamKey' | null>(null);
 
   const [stream, setStream] = useState<StreamResponse | null>(null);
-  const [streamTitle, setStreamTitle] = useState("");
-  const [category, setCategory] = useState("");
-  const [chatMessage, setChatMessage] = useState("");
+  const [streamTitle, setStreamTitle] = useState('');
+  const [category, setCategory] = useState('');
+  const [chatMessage, setChatMessage] = useState('');
   const [enableOnStream, setEnableOnStream] = useState(false);
 
-  const { currentViews, currentLikes, chats, setChats } = useStreamSocket(stream?.id, user?.id);
+  const { currentViews, currentLikes, chats, setChats } = useStreamSocket(
+    stream?.id,
+    user?.id,
+  );
 
   useEffect(() => {
     setEnableOnStream(!!stream);
@@ -57,10 +60,11 @@ export default function StreamDashboard() {
           }
         }
       } catch (error) {
-        if (error instanceof DOMException && error.name === 'AbortError') return;
+        if (error instanceof DOMException && error.name === 'AbortError')
+          return;
         console.log(error);
       }
-    }
+    };
 
     fetchStreaming();
 
@@ -79,8 +83,9 @@ export default function StreamDashboard() {
           setStreamUrl(data.streamUrl ?? null);
         }
       } catch (error) {
-        if (error instanceof DOMException && error.name === 'AbortError') return;
-        console.error("Không thể tải stream key", error);
+        if (error instanceof DOMException && error.name === 'AbortError')
+          return;
+        console.error('Không thể tải stream key', error);
       }
     };
 
@@ -92,7 +97,7 @@ export default function StreamDashboard() {
   const handleCopyStreamKey = () => {
     if (streamKey) {
       navigator.clipboard.writeText(streamKey);
-      setCopied("streamKey");
+      setCopied('streamKey');
       setTimeout(() => setCopied(null), 2000);
     }
   };
@@ -100,7 +105,7 @@ export default function StreamDashboard() {
   const handleCopyStreamUrl = () => {
     if (streamUrl) {
       navigator.clipboard.writeText(streamUrl);
-      setCopied("streamUrl");
+      setCopied('streamUrl');
       setTimeout(() => setCopied(null), 2000);
     }
   };
@@ -110,7 +115,7 @@ export default function StreamDashboard() {
 
     const streamResponse = await streamApi.startStreamById(stream.id);
     setStream(streamResponse);
-  }
+  };
 
   const handleSendChat = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,15 +123,14 @@ export default function StreamDashboard() {
 
     try {
       await streamChatApi.sendChat(stream.id, user.id, chatMessage.trim());
-      setChatMessage("");
+      setChatMessage('');
     } catch (error) {
-      console.error("Không thể gửi tin nhắn", error);
+      console.error('Không thể gửi tin nhắn', error);
     }
   };
 
   return (
     <div className="w-full bg-background text-foreground font-sans space-y-6 selection:bg-selection">
-
       {/* Thống kê nhanh trạng thái dòng chảy */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className="bg-background border border-accent p-4 rounded-2xl flex items-center gap-3">
@@ -135,7 +139,9 @@ export default function StreamDashboard() {
           </div>
           <div>
             <p className="text-xs text-secondary font-medium">Trạng thái</p>
-            <span className={`text-sm font-black flex items-center gap-1 ${stream?.isActive ? 'text-danger' : 'text-secondary'}`}>
+            <span
+              className={`text-sm font-black flex items-center gap-1 ${stream?.isActive ? 'text-danger' : 'text-secondary'}`}
+            >
               {stream?.isActive ? 'Trực tiếp' : 'Ngoại tuyến'}
             </span>
           </div>
@@ -147,7 +153,9 @@ export default function StreamDashboard() {
           </div>
           <div>
             <p className="text-xs text-secondary font-medium">Người xem</p>
-            <span className="text-sm font-black text-foreground">{currentViews}</span>
+            <span className="text-sm font-black text-foreground">
+              {currentViews}
+            </span>
           </div>
         </div>
 
@@ -157,7 +165,9 @@ export default function StreamDashboard() {
           </div>
           <div>
             <p className="text-xs text-secondary font-medium">Lượt thích</p>
-            <span className="text-sm font-black text-foreground">{currentLikes}</span>
+            <span className="text-sm font-black text-foreground">
+              {currentLikes}
+            </span>
           </div>
         </div>
 
@@ -194,20 +204,21 @@ export default function StreamDashboard() {
 
       {/* Khu vực nội dung chính */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
         {/* Cột trái và giữa: Màn hình xem trước và Cấu hình */}
         <div className="lg:col-span-2 space-y-6">
-
           {/* Trình xem trước luồng video */}
           <div className="relative aspect-video rounded-3xl border border-accent overflow-hidden group bg-black">
-            <CustomStreamPlayer src={stream?.playUrl ? stream.playUrl : ""}></CustomStreamPlayer>
+            <CustomStreamPlayer
+              src={stream?.playUrl ? stream.playUrl : ''}
+            ></CustomStreamPlayer>
           </div>
 
           {/* Bảng điều khiển tác vụ cốt lõi */}
           <div className="bg-background border border-accent p-6 rounded-3xl space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-base font-black tracking-tight flex items-center gap-2">
-                <Sliders className="w-5 h-5 text-primary" /> Công cụ thao tác nhanh
+                <Sliders className="w-5 h-5 text-primary" /> Công cụ thao tác
+                nhanh
               </h3>
               <div className="flex gap-2">
                 <Button
@@ -218,10 +229,16 @@ export default function StreamDashboard() {
                 >
                   <Power className="w-3.5 h-3.5" /> On stream
                 </Button>
-                <Button variant="outline" className="text-xs font-bold flex items-center gap-1.5 text-danger border-accent">
+                <Button
+                  variant="outline"
+                  className="text-xs font-bold flex items-center gap-1.5 text-danger border-accent"
+                >
                   <AlertTriangle className="w-3.5 h-3.5" /> Báo cáo sự cố
                 </Button>
-                <Button variant="outline" className="text-xs font-bold flex items-center gap-1.5 border-accent">
+                <Button
+                  variant="outline"
+                  className="text-xs font-bold flex items-center gap-1.5 border-accent"
+                >
                   <Share2 className="w-3.5 h-3.5" /> Chia sẻ luồng
                 </Button>
               </div>
@@ -264,7 +281,6 @@ export default function StreamDashboard() {
 
         {/* Cột phải: Khung tương tác trò chuyện & Vinh danh quyên góp */}
         <div className="space-y-6">
-
           <ChatPanel
             chats={chats}
             streamUserId={stream?.user?.id}
@@ -277,7 +293,8 @@ export default function StreamDashboard() {
           {/* Danh sách ủng hộ, quyên góp gần đây */}
           <div className="bg-background border border-accent p-4 rounded-3xl space-y-3">
             <h3 className="text-sm font-black tracking-tight flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-warning" /> Vinh danh quyên góp mới nhất
+              <Sparkles className="w-4 h-4 text-warning" /> Vinh danh quyên góp
+              mới nhất
             </h3>
 
             <div className="space-y-2.5">
@@ -286,9 +303,7 @@ export default function StreamDashboard() {
               </p>
             </div>
           </div>
-
         </div>
-
       </div>
     </div>
   );

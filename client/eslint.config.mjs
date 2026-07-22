@@ -21,7 +21,19 @@ export default tseslint.config(
       'jsx-a11y/alt-text': 'warn',
       'jsx-a11y/anchor-is-valid': 'warn',
       'quotes': ['error', 'single', { 'avoidEscape': true, 'allowTemplateLiterals': true }],
-      'tailwindcss/no-arbitrary-value': 'error'
+      'tailwindcss/no-arbitrary-value': 'error',
+      'import-x/no-relative-parent-imports': 'error',
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['./*', '../*'],
+              message: 'Không dùng relative import! Hãy sử dụng Alias `@/` (Ví dụ: "@/components/...").',
+            },
+          ],
+        },
+      ],
     },
   },
   {
