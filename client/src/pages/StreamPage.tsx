@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { CustomStreamPlayer } from '@/components/stream/CustomStreamPlayer';
 import { ChatPanel } from '@/components/stream/ChatPanel';
 import {

@@ -1,4 +1,4 @@
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/Input';
 import { Copy, Check, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 interface StreamKeyFieldProps {

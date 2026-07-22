@@ -1,7 +1,7 @@
 import Logo from '@/components/ui/Logo';
-import { Button } from '../ui/button';
 import { Link, useLocation } from 'react-router';
 import { PATHS } from '@/routes/paths';
+import { Button } from '@/components/ui/Button';
 
 export default function AuthHeader() {
   const { pathname } = useLocation();
@@ -15,19 +15,19 @@ export default function AuthHeader() {
         {isLogin ? (
           <>
             <Link to={PATHS.AUTH.LOGIN}>
-              <Button variant="outline">Đăng nhập</Button>
+              <Button>Đăng nhập</Button>
             </Link>
             <Link to={PATHS.AUTH.REGISTER}>
-              <Button>Đăng ký</Button>
+              <Button variant="outline">Đăng ký</Button>
             </Link>
           </>
         ) : (
           <>
             <Link to={PATHS.AUTH.LOGIN}>
-              <Button>Đăng nhập</Button>
+              <Button variant="outline">Đăng nhập</Button>
             </Link>
             <Link to={PATHS.AUTH.REGISTER}>
-              <Button variant="outline">Đăng ký</Button>
+              <Button>Đăng ký</Button>
             </Link>
           </>
         )}

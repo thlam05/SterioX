@@ -1,5 +1,5 @@
 import { streamApi } from '@/api/streamApi';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import type { StreamResponse } from '@/types/streamType';
 import {
   Flame,
