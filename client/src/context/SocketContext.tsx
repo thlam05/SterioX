@@ -1,6 +1,5 @@
 import React, {
   createContext,
-  useContext,
   useEffect,
   useState,
   useRef,
@@ -53,7 +52,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       connectHeaders: token ? { Authorization: `Bearer ${token}` } : {},
     });
 
-    client.onConnect = (_) => {
+    client.onConnect = () => {
       console.log('🔌 Đã kết nối Socket!');
       setIsConnected(true);
       pendingSubscriptionsRef.current.forEach((subscribe) => subscribe());
@@ -138,10 +137,4 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   );
 };
 
-export const useSocket = (): SocketContextType => {
-  const context = useContext(SocketContext);
-  if (!context) {
-    throw new Error('useSocket must be used within a SocketProvider');
-  }
-  return context;
-};
+export { SocketContext };

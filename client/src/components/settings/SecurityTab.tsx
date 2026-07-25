@@ -22,7 +22,8 @@ export function SecurityTab() {
                 Mật khẩu đăng nhập hệ thống
               </h5>
               <p className="text-[11px] text-secondary">
-                Cập nhật mật khẩu định kỳ để nâng cao tính an toàn thông tin cá nhân.
+                Cập nhật mật khẩu định kỳ để nâng cao tính an toàn thông tin cá
+                nhân.
               </p>
             </div>
           </div>
@@ -42,7 +43,8 @@ export function SecurityTab() {
                 Xác thực hai yếu tố bảo mật bảo vệ tài khoản (2FA)
               </h5>
               <p className="text-[11px] text-secondary">
-                Yêu cầu nhập mã otp bảo mật từ điện thoại khi đăng nhập thiết bị lạ.
+                Yêu cầu nhập mã otp bảo mật từ điện thoại khi đăng nhập thiết bị
+                lạ.
               </p>
             </div>
           </div>
@@ -61,7 +63,8 @@ export function SecurityTab() {
               Thiết bị đang kết nối hiện tại
             </h6>
             <p className="text-[11px] text-secondary">
-              Trình duyệt web chrome chạy trên nền tảng hệ điều hành windows - thành phố hồ chí minh, việt nam.
+              Trình duyệt web chrome chạy trên nền tảng hệ điều hành windows -
+              thành phố hồ chí minh, việt nam.
             </p>
           </div>
         </div>

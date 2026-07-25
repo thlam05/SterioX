@@ -76,8 +76,8 @@ export function StreamInfoPanel({
 
       <div className="space-y-2">
         <h2 className="text-xl font-extrabold text-foreground leading-snug">
-          Hướng dẫn xây dựng nền tảng livestream quy mô lớn với ReactJS,
-          NextJS 16 và Tailwind CSS
+          Hướng dẫn xây dựng nền tảng livestream quy mô lớn với ReactJS, NextJS
+          16 và Tailwind CSS
         </h2>
         <div className="flex flex-wrap gap-2 pt-1">
           {tags.map((tag, idx) => (
@@ -90,11 +90,11 @@ export function StreamInfoPanel({
           ))}
         </div>
         <p className="text-sm text-secondary leading-relaxed pt-2">
-          Chào mừng các bạn đến với buổi học thực chiến tối nay. Chúng ta
-          sẽ cùng nhau phân tích kiến trúc hệ thống dữ liệu thời gian
-          thực, cách tối ưu hóa hiệu năng render luồng dữ liệu và áp dụng
-          hệ thống thiết kế màu sắc chuẩn chỉnh toàn cầu. Đừng ngần ngại
-          đặt câu hỏi tại khung chat nhé!
+          Chào mừng các bạn đến với buổi học thực chiến tối nay. Chúng ta sẽ
+          cùng nhau phân tích kiến trúc hệ thống dữ liệu thời gian thực, cách
+          tối ưu hóa hiệu năng render luồng dữ liệu và áp dụng hệ thống thiết kế
+          màu sắc chuẩn chỉnh toàn cầu. Đừng ngần ngại đặt câu hỏi tại khung
+          chat nhé!
         </p>
       </div>
     </div>

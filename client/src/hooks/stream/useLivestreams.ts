@@ -1,13 +1,9 @@
 import { streamApi } from '@/api/streamApi';
 import type { StreamResponse } from '@/types/streamType';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export function useLivestreams() {
   const [livestreams, setLivestreams] = useState<StreamResponse[]>([]);
-  const [topLivestreams, setTopLivestream] = useState<StreamResponse[]>([]);
-  const [regularLivestream, setRegularLivestream] = useState<StreamResponse[]>(
-    [],
-  );
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -35,12 +31,12 @@ export function useLivestreams() {
     return () => abortController.abort();
   }, []);
 
-  useEffect(() => {
-    if (!livestreams) return;
+  const topLivestreams = useMemo(() => livestreams.slice(0, 2), [livestreams]);
 
-    setTopLivestream(livestreams.slice(0, 2));
-    setRegularLivestream(livestreams.slice(2, 11));
-  }, [livestreams]);
+  const regularLivestream = useMemo(
+    () => livestreams.slice(2, 11),
+    [livestreams],
+  );
 
   return { topLivestreams, regularLivestream, isLoading };
 }

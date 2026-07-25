@@ -27,13 +27,19 @@ export function PrivacySelector({ value, onChange }: PrivacySelectorProps) {
                 checked={isSelected}
                 onChange={() => onChange(item.id)}
               />
-              <Icon className={`w-5 h-5 ${isSelected ? 'text-primary' : 'text-secondary'}`} />
+              <Icon
+                className={`w-5 h-5 ${isSelected ? 'text-primary' : 'text-secondary'}`}
+              />
               <div className="flex-grow">
                 <p className="text-sm font-bold">{item.label}</p>
                 <p className="text-[10px] text-secondary">{item.desc}</p>
               </div>
-              <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${isSelected ? 'border-primary' : 'border-accent'}`}>
-                {isSelected && <div className="w-2 h-2 rounded-full bg-primary" />}
+              <div
+                className={`w-4 h-4 rounded-full border flex items-center justify-center ${isSelected ? 'border-primary' : 'border-accent'}`}
+              >
+                {isSelected && (
+                  <div className="w-2 h-2 rounded-full bg-primary" />
+                )}
               </div>
             </label>
           );

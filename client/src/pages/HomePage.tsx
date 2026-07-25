@@ -28,10 +28,7 @@ export default function HomePage() {
           <TopStreamCard key={index} stream={stream} />
         ))}
 
-        <SectionHeader
-          title="Khám phá theo chuyên mục"
-          barColor="bg-primary"
-        />
+        <SectionHeader title="Khám phá theo chuyên mục" barColor="bg-primary" />
 
         {categories.map((cat, index) => (
           <CategoryCard key={index} category={cat} />

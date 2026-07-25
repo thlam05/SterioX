@@ -26,7 +26,10 @@ export function PasswordField({
           Mật khẩu
         </label>
         {showForgotPassword && (
-          <a href="#" className="text-xs text-primary font-bold hover:underline">
+          <a
+            href="#"
+            className="text-xs text-primary font-bold hover:underline"
+          >
             Quên mật khẩu?
           </a>
         )}

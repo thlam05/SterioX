@@ -4,7 +4,11 @@ type TermsCheckboxProps = {
   error?: string;
 };
 
-export function TermsCheckbox({ checked, onChange, error }: TermsCheckboxProps) {
+export function TermsCheckbox({
+  checked,
+  onChange,
+  error,
+}: TermsCheckboxProps) {
   return (
     <div>
       <div className="flex items-start gap-3 pt-2">

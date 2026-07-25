@@ -55,12 +55,10 @@ export function StreamKeySection({
           <KeyRound className="w-8 h-8" />
         </div>
         <div>
-          <h3 className="text-sm font-black uppercase">
-            Chưa có khóa luồng
-          </h3>
+          <h3 className="text-sm font-black uppercase">Chưa có khóa luồng</h3>
           <p className="text-[10px] text-secondary mt-1 px-4">
-            Bạn cần khởi tạo Stream Key để bắt đầu truyền tín hiệu từ
-            phần mềm (OBS, vMix...)
+            Bạn cần khởi tạo Stream Key để bắt đầu truyền tín hiệu từ phần mềm
+            (OBS, vMix...)
           </p>
         </div>
         <Button

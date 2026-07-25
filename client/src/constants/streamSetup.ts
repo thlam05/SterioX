@@ -21,9 +21,24 @@ export type PrivacyOption = {
 };
 
 export const PRIVACY_OPTIONS: PrivacyOption[] = [
-  { id: STREAM_STATUS.PUBLIC, label: 'Công khai', desc: 'Ai cũng thấy', icon: Globe },
-  { id: STREAM_STATUS.UNLISTED, label: 'Không công khai', desc: 'Chỉ người có link', icon: Link2 },
-  { id: STREAM_STATUS.PRIVATE, label: 'Riêng tư', desc: 'Chỉ mình bạn', icon: Lock },
+  {
+    id: STREAM_STATUS.PUBLIC,
+    label: 'Công khai',
+    desc: 'Ai cũng thấy',
+    icon: Globe,
+  },
+  {
+    id: STREAM_STATUS.UNLISTED,
+    label: 'Không công khai',
+    desc: 'Chỉ người có link',
+    icon: Link2,
+  },
+  {
+    id: STREAM_STATUS.PRIVATE,
+    label: 'Riêng tư',
+    desc: 'Chỉ mình bạn',
+    icon: Lock,
+  },
 ];
 
 export const LATENCY_LABELS: Record<string, string> = {

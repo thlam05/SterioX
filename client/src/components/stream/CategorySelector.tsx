@@ -84,7 +84,9 @@ export function CategorySelector({
                     <div
                       className={`w-4 h-4 rounded-full border flex items-center justify-center ${isSubSelected ? 'border-primary' : 'border-accent'}`}
                     >
-                      {isSubSelected && <div className="w-2 h-2 rounded-full bg-primary" />}
+                      {isSubSelected && (
+                        <div className="w-2 h-2 rounded-full bg-primary" />
+                      )}
                     </div>
                   </button>
                 );
@@ -103,7 +105,11 @@ export function CategorySelector({
               <>
                 <ChevronRight className="w-3 h-3 text-secondary" />
                 <span className="text-primary">
-                  {activeParent?.subCategories?.find((s) => s.id === subCategory)?.name}
+                  {
+                    activeParent?.subCategories?.find(
+                      (s) => s.id === subCategory,
+                    )?.name
+                  }
                 </span>
               </>
             )}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { useStreamSocket } from '@/hooks/stream/useStreamSocket';
 import { streamApi, streamKeyApi, streamChatApi } from '@/api/streamApi';
@@ -16,16 +16,13 @@ export function useStreamDashboard() {
   const [streamTitle, setStreamTitle] = useState('');
   const [category, setCategory] = useState('');
   const [chatMessage, setChatMessage] = useState('');
-  const [enableOnStream, setEnableOnStream] = useState(false);
 
   const { currentViews, currentLikes, chats, setChats } = useStreamSocket(
     stream?.id,
     user?.id,
   );
 
-  useEffect(() => {
-    setEnableOnStream(!!stream);
-  }, [stream]);
+  const enableOnStream = useMemo(() => !!stream, [stream]);
 
   useEffect(() => {
     if (!user) return;
@@ -51,7 +48,7 @@ export function useStreamDashboard() {
     fetchStreaming();
 
     return () => abortController.abort();
-  }, [user]);
+  }, [user, setChats]);
 
   useEffect(() => {
     if (!user?.id) return;

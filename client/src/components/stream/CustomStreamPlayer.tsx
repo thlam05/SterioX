@@ -103,7 +103,7 @@ export const CustomStreamPlayer = ({ src }: StreamPlayerProps) => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       video.removeEventListener('timeupdate', checkLiveStatus);
     };
-  }, [src]);
+  }, [isMuted, volume, src]);
 
   const togglePlay = () => {
     if (!videoRef.current) return;

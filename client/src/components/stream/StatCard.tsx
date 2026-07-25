@@ -12,8 +12,12 @@ export function StatCard({ stat, isActive, dynamicValue }: StatCardProps) {
 
   return (
     <div className="bg-background border border-accent p-4 rounded-2xl flex items-center gap-3">
-      <div className={`w-10 h-10 rounded-xl bg-accent flex items-center justify-center ${stat.iconColor}`}>
-        <Icon className={`w-5 h-5 ${stat.icon === stat.icon ? '' : ''} ${isActive ? 'animate-pulse' : ''}`} />
+      <div
+        className={`w-10 h-10 rounded-xl bg-accent flex items-center justify-center ${stat.iconColor}`}
+      >
+        <Icon
+          className={`w-5 h-5 ${stat.icon === stat.icon ? '' : ''} ${isActive ? 'animate-pulse' : ''}`}
+        />
       </div>
       <div>
         <p className="text-xs text-secondary font-medium">{stat.label}</p>

@@ -7,7 +7,12 @@ type SettingRowProps = {
   action: ReactNode;
 };
 
-export function SettingRow({ icon, title, description, action }: SettingRowProps) {
+export function SettingRow({
+  icon,
+  title,
+  description,
+  action,
+}: SettingRowProps) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-accent border border-accent rounded-xl">
       <div className="flex items-center gap-3">

@@ -31,12 +31,10 @@ export function ProfileTab({
   return (
     <div className="space-y-6">
       <div>
-        <h4 className="text-base font-bold text-foreground">
-          Hồ sơ cá nhân
-        </h4>
+        <h4 className="text-base font-bold text-foreground">Hồ sơ cá nhân</h4>
         <p className="text-xs text-secondary mt-1">
-          Cập nhật thông tin công khai hiển thị trên kênh trực tuyến cá
-          nhân của bạn.
+          Cập nhật thông tin công khai hiển thị trên kênh trực tuyến cá nhân của
+          bạn.
         </p>
       </div>
 

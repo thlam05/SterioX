@@ -5,19 +5,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  (
-    {
-      error,
-      className = '',
-      type,
-      required,
-      minLength,
-      maxLength,
-      pattern,
-      ...props
-    },
-    ref,
-  ) => {
+  ({ error, className = '', type, ...props }, ref) => {
     const [showPassword, setShowPassword] = useState(false);
     const isPassword = type === 'password';
 

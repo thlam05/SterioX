@@ -16,15 +16,15 @@ export function HeroBanner() {
           SterioX Developer Conference 2026
         </h2>
         <p className="text-sm md:text-base text-accent max-w-md leading-relaxed">
-          Cập nhật những xu hướng công nghệ đột phá nhất, kết nối các lập
-          trình viên xuất sắc và trải nghiệm không gian triển lãm ảo.
+          Cập nhật những xu hướng công nghệ đột phá nhất, kết nối các lập trình
+          viên xuất sắc và trải nghiệm không gian triển lãm ảo.
         </p>
       </div>
 
       <div className="z-20 flex flex-wrap items-center gap-4 pt-6">
         <div className="flex items-center gap-2 text-xs md:text-sm text-accent">
-          <TrendingUp className="w-4 h-4 text-success" />{' '}
-          <strong>45.9k</strong> người đang theo dõi sự kiện trực tiếp
+          <TrendingUp className="w-4 h-4 text-success" /> <strong>45.9k</strong>{' '}
+          người đang theo dõi sự kiện trực tiếp
         </div>
       </div>
     </section>

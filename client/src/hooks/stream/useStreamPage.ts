@@ -22,10 +22,6 @@ export function useStreamPage() {
   const tags = stream?.title ? stream.title.split(' ').slice(0, 5) : [];
 
   useEffect(() => {
-    setStream(loaderData);
-  }, [loaderData]);
-
-  useEffect(() => {
     if (!stream) return;
     const abortController = new AbortController();
 
@@ -55,7 +51,7 @@ export function useStreamPage() {
     fetchChatHistory();
 
     return () => abortController.abort();
-  }, [stream]);
+  }, [stream, setChats]);
 
   const handleLikeStream = async () => {
     if (!stream || !user) return;

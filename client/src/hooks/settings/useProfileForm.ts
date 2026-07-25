@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { userApi } from '@/api/userApi';
 import { PROFILE_UPDATE_ERROR } from '@/constants/settings';
@@ -10,11 +10,6 @@ export function useProfileForm() {
   const [newEmail, setNewEmail] = useState(user?.email ?? '');
   const [profileError, setProfileError] = useState('');
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
-
-  useEffect(() => {
-    setNewUsername(user?.username ?? '');
-    setNewEmail(user?.email ?? '');
-  }, [user]);
 
   const isProfileChanged =
     newUsername !== (user?.username ?? '') || newEmail !== (user?.email ?? '');
@@ -50,7 +45,14 @@ export function useProfileForm() {
     } finally {
       setIsUpdatingProfile(false);
     }
-  }, [user, newUsername, newEmail, isProfileChanged, isUpdatingProfile, updateUser]);
+  }, [
+    user,
+    newUsername,
+    newEmail,
+    isProfileChanged,
+    isUpdatingProfile,
+    updateUser,
+  ]);
 
   return {
     newUsername,

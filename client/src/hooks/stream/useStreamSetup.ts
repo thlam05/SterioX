@@ -4,7 +4,11 @@ import { streamApi, streamKeyApi } from '@/api/streamApi';
 import { categoryApi } from '@/api/categoryApi';
 import { useAuthStore } from '@/stores/authStore';
 import { PATHS } from '@/routes/paths';
-import { STREAM_STATUS, STREAM_LATENCY, THUMBNAIL_MAX_SIZE } from '@/constants/streamSetup';
+import {
+  STREAM_STATUS,
+  STREAM_LATENCY,
+  THUMBNAIL_MAX_SIZE,
+} from '@/constants/streamSetup';
 import { SETUP_VALIDATION } from '@/constants/validation';
 import type { CategoryResponse } from '@/types/categoryType';
 
@@ -123,7 +127,9 @@ export function useStreamSetup() {
     fileInputRef.current?.click();
   };
 
-  const handleThumbnailSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleThumbnailSelect = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     event.target.value = '';
     if (!file) return;
@@ -235,19 +241,35 @@ export function useStreamSetup() {
   };
 
   return {
-    title, setTitle,
-    description, setDescription,
-    status, setStatus,
-    streamKey, streamUrl,
-    showStreamKey, setShowStreamKey,
+    title,
+    setTitle,
+    description,
+    setDescription,
+    status,
+    setStatus,
+    streamKey,
+    streamUrl,
+    showStreamKey,
+    setShowStreamKey,
     copied,
-    thumbnail, thumbnailPreview,
-    titleError, descriptionError, thumbnailError, categoryError,
-    isSubmitting, submitError,
-    latency, setLatency,
-    dvr, setDvr,
-    vod, setVod,
-    parentCategory, subCategory, setSubCategory, categoriesData,
+    thumbnail,
+    thumbnailPreview,
+    titleError,
+    descriptionError,
+    thumbnailError,
+    categoryError,
+    isSubmitting,
+    submitError,
+    latency,
+    setLatency,
+    dvr,
+    setDvr,
+    vod,
+    setVod,
+    parentCategory,
+    subCategory,
+    setSubCategory,
+    categoriesData,
     activeParent,
     handleCreateStreamKey,
     handleCopyStreamKey,

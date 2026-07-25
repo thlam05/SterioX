@@ -1,11 +1,4 @@
-import {
-  Radio,
-  Users,
-  Heart,
-  Clock,
-  Activity,
-  Tv,
-} from 'lucide-react';
+import { Radio, Users, Heart, Clock, Activity, Tv } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 export type StatItem = {
