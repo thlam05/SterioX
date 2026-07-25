@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import AppHeader from '@/components/layout/AppHeader';
 import Sidebar from '@/components/layout/Sidebar';
-import useTokenIntrospection from '@/hooks/useTokenIntrospection';
+import { useTokenIntrospection } from '@/hooks/auth/useTokenIntrospection';
 
 export default function MainLayout() {
   const { user, isAuthenticated } = useAuthStore();

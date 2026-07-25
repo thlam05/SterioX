@@ -6,6 +6,12 @@ import type {
   LivestreamStatusResponse,
   StreamChatResponse,
 } from '@/types/streamType';
+import {
+  SOCKET_TOPICS,
+  SOCKET_ENDPOINTS,
+  HEARTBEAT_INTERVAL_MS,
+  HEARTBEAT_MESSAGE,
+} from '@/constants/stream';
 
 export function useStreamSocket(
   streamId: string | undefined,
@@ -26,7 +32,7 @@ export function useStreamSocket(
 
     const setupSocketActions = () => {
       unsubscribeStatus = subscribeTopic(
-        `/topic/status-stream/${streamId}`,
+        SOCKET_TOPICS.STATUS_STREAM(streamId),
         (message: LivestreamStatusResponse) => {
           setCurrentViews(message.views);
           setCurrentLikes(message.likes);
@@ -34,14 +40,14 @@ export function useStreamSocket(
       );
 
       unsubscribeLikes = subscribeTopic(
-        `/topic/likes-streams/${streamId}`,
+        SOCKET_TOPICS.LIKES_STREAM(streamId),
         (message: LivestreamLikeResponse) => {
           setCurrentLikes(message.likes);
         },
       );
 
       unsubscribeChat = subscribeTopic(
-        `/topic/chat/${streamId}`,
+        SOCKET_TOPICS.CHAT(streamId),
         (message: StreamChatResponse) => {
           setChats((prev) => [...prev, message]);
         },
@@ -50,13 +56,13 @@ export function useStreamSocket(
       const sendHeartbeat = () => {
         const payload: HeartBeatMessage = {
           userId,
-          message: 'PING',
+          message: HEARTBEAT_MESSAGE,
         };
-        sendMessage(`/app/view-stream/${streamId}`, payload);
+        sendMessage(SOCKET_ENDPOINTS.VIEW_STREAM(streamId), payload);
       };
 
       sendHeartbeat();
-      heartbeatInterval = setInterval(sendHeartbeat, 10000);
+      heartbeatInterval = setInterval(sendHeartbeat, HEARTBEAT_INTERVAL_MS);
     };
 
     if (isConnected) {
