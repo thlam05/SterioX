@@ -5,6 +5,7 @@ import { Search, Bell, Flame, Menu, X } from 'lucide-react';
 import { Link } from 'react-router';
 import { PATHS } from '@/routes/paths';
 import type { UserResponse } from '@/types/userType';
+import { Input } from '@/components/ui/Input';
 
 interface AppHeaderProps {
   isSidebarOpen: boolean;

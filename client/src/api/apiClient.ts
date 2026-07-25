@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { useAuthStore } from '@/stores/authStore';
+import { PATHS } from '@/routes/paths';
 
 export type ApiResponse<T> = {
   code: number;
@@ -33,7 +34,7 @@ api.interceptors.response.use(
       if (error.response.status === 401) {
         const { logout } = useAuthStore.getState();
         logout();
-        window.location.href = '/login';
+        window.location.href = PATHS.AUTH.LOGIN;
       }
       return Promise.reject(error.response.data);
     }
