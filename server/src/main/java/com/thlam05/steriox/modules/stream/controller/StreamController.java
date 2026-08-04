@@ -34,6 +34,11 @@ public class StreamController {
         return new ApiResponse<>(response);
     }
 
+    @PostMapping("/streams/{id}/views")
+    public String viewStream(@PathVariable String id) {
+        return "";
+    }
+
     @GetMapping("/streams")
     public ApiResponse<List<StreamResponse>> getAll(@RequestParam(required = false) String userId) {
         List<StreamResponse> response;
