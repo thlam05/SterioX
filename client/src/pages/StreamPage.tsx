@@ -5,26 +5,17 @@ import { StreamInfoPanel } from '@/components/stream/StreamInfoPanel';
 import { SuggestedStreams } from '@/components/stream/SuggestedStreams';
 import { DonationPanel } from '@/components/stream/DonationPanel';
 import { STREAM_STATS } from '@/constants/streamDashboard';
-import { useStreamPage } from '@/hooks/stream/useStreamPage';
+import { useGetStream } from '@/hooks/stream/useGetStream';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { useLoaderData } from 'react-router';
 
 export default function StreamPage() {
-  const {
-    stream,
-    chatMessage,
-    setChatMessage,
-    isFollowed,
-    setIsFollowed,
-    isLiked,
-    currentViews,
-    currentLikes,
-    chats,
-    tags,
-    handleLikeStream,
-    handleSendChat,
-  } = useStreamPage();
+  const streamId = useLoaderData();
 
-  const isActive = stream?.isActive;
-  const statusStat = STREAM_STATS[0];
+  const { stream, isLoading } = useGetStream({ streamId });
+
+  if (isLoading) return <LoadingSpinner/>;
+
 
   return (
     <div className="w-full bg-background text-foreground font-sans space-y-6 selection:bg-selection">

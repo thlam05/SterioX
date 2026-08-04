@@ -1,10 +1,11 @@
-package com.thlam05.steriox.modules.user.dto.response;
+package com.thlam05.steriox.modules.chat.dto.response;
 
-import java.util.List;
+import java.time.LocalDateTime;
+
+import com.thlam05.steriox.modules.user.dto.response.UserResponse;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,14 +13,13 @@ import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserResponse {
+public class ChatMessageResponse {
     String id;
-    String username;
-    String email;
-    String avatarImageUrl;
-    List<String> roles;
+    String streamId;
+    UserResponse user;
+    String content;
+    LocalDateTime createdAt;
 }

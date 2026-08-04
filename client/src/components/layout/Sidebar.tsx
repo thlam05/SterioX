@@ -25,20 +25,28 @@ interface SidebarProps {
 export default function Sidebar({ isOpen }: SidebarProps) {
   return (
     <aside
-      className={`h-full bg-background border-r border-accent transition-all duration-300 flex flex-col justify-between overflow-y-auto shrink-0 ${isOpen ? 'w-64' : 'w-0 md:w-20'}`}
+      className={`h-full bg-background border-r border-accent flex flex-col justify-between shrink-0
+        transition-[width] duration-300 ease-in-out will-change-[width]
+        ${isOpen ? 'w-64' : 'w-0 md:w-20'}`}
     >
-      <div className="p-4 space-y-6">
+      <div className="p-4 space-y-6 w-64">
         <nav className="space-y-1">
           {navigationItems.map((item, index) => (
             <Link
               key={index}
               to={item.path}
-              className={`flex items-center gap-4 px-3 py-3 rounded-xl text-sm font-medium transition-colors ${item.active ? 'bg-selection text-primary' : 'text-foreground hover:bg-accent'}`}
+              className={`flex items-center gap-4 px-3 py-3 rounded-xl text-sm font-medium transition-colors duration-200
+                ${item.active ? 'bg-selection text-primary' : 'text-foreground hover:bg-accent'}`}
             >
               <item.icon
-                className={`w-5 h-5 ${item.active ? 'text-primary' : 'text-secondary'}`}
+                className={`w-5 h-5 shrink-0 ${item.active ? 'text-primary' : 'text-secondary'}`}
               />
-              <span className={!isOpen ? 'md:hidden' : ''}>{item.label}</span>
+              <span
+                className={`whitespace-nowrap transition-opacity duration-200
+                  ${isOpen ? 'opacity-100' : 'opacity-0 md:opacity-100 md:hidden'}`}
+              >
+                {item.label}
+              </span>
             </Link>
           ))}
         </nav>

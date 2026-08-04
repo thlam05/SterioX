@@ -45,14 +45,14 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
-    @PreAuthorize("hasAuthority('READ:USER')")
+    // @PreAuthorize("hasAuthority('READ:USER')")
     public UserResponse getById(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND, UserMessage.USER_NOT_FOUND));
         return userMapper.toUserResponse(user);
     }
 
-    @PreAuthorize("hasAuthority('READ:USER')")
+    // @PreAuthorize("hasAuthority('READ:USER')")
     public List<UserResponse> getAll() {
         List<User> users = userRepository.findAll();
         return userMapper.toUserResponses(users);

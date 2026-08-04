@@ -12,16 +12,15 @@ export type StreamKeyResponse = {
 export type StreamResponse = {
   id: string;
   user: UserResponse;
+  categories: CategoryResponse[];
   title: string;
   description: string;
-  thumbnail: string;
-  playUrl: string;
   isActive: boolean;
   onStream: boolean;
+  playUrl: string;
+  thumbnail: string;
   totalViews: number;
   totalLikes: number;
-  scheduledAt: Date;
-  categories: CategoryResponse[];
   startedAt: Date;
   endedAt: Date;
   createdAt: Date;

@@ -1,4 +1,3 @@
-import { streamApi } from '@/api/streamApi';
 import MainLayout from '@/layouts/MainLayout';
 import HomePage from '@/pages/HomePage';
 import StreamDashboard from '@/pages/StreamDashboardPage';
@@ -9,7 +8,6 @@ import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
 import { PATHS } from '@/routes/paths';
 import { useAuthStore } from '@/stores/authStore';
-import type { StreamResponse } from '@/types/streamType';
 import { createBrowserRouter, redirect } from 'react-router';
 import AuthLayout from '@/layouts/AuthLayout';
 
@@ -43,15 +41,9 @@ export const router = createBrowserRouter([
       },
       {
         path: 'streams/:streamId',
-        loader: async ({ params }): Promise<StreamResponse | null> => {
-          try {
-            if (!params.streamId) return null;
-            const stream = await streamApi.getStreamById(params.streamId);
-            return stream;
-          } catch (err) {
-            console.error(err);
-            return null;
-          }
+        loader: async ({ params }): Promise<string | null> => {
+          if (!params.streamId) return null;
+          return params.streamId;
         },
         element: <StreamPage />,
       },
