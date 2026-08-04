@@ -1,4 +1,4 @@
-package com.thlam05.steriox.modules.chat.constant;
+package com.thlam05.steriox.modules.streamchat.constant;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

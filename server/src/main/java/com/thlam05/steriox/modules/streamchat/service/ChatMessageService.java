@@ -1,4 +1,4 @@
-package com.thlam05.steriox.modules.chat.service;
+package com.thlam05.steriox.modules.streamchat.service;
 
 import java.util.List;
 
@@ -6,13 +6,13 @@ import org.springframework.stereotype.Service;
 
 import com.thlam05.steriox.common.constant.ResponseCode;
 import com.thlam05.steriox.common.exception.AppException;
-import com.thlam05.steriox.modules.chat.constant.ChatMessageMessage;
-import com.thlam05.steriox.modules.chat.dto.request.CreateChatMessageRequest;
-import com.thlam05.steriox.modules.chat.dto.request.UpdateChatMessageRequest;
-import com.thlam05.steriox.modules.chat.dto.response.ChatMessageResponse;
-import com.thlam05.steriox.modules.chat.entity.ChatMessage;
-import com.thlam05.steriox.modules.chat.mapper.ChatMessageMapper;
-import com.thlam05.steriox.modules.chat.repository.ChatMessageRepository;
+import com.thlam05.steriox.modules.streamchat.constant.ChatMessageMessage;
+import com.thlam05.steriox.modules.streamchat.dto.request.CreateChatMessageRequest;
+import com.thlam05.steriox.modules.streamchat.dto.request.UpdateChatMessageRequest;
+import com.thlam05.steriox.modules.streamchat.dto.response.ChatMessageResponse;
+import com.thlam05.steriox.modules.streamchat.entity.ChatMessage;
+import com.thlam05.steriox.modules.streamchat.mapper.ChatMessageMapper;
+import com.thlam05.steriox.modules.streamchat.repository.ChatMessageRepository;
 import com.thlam05.steriox.modules.stream.entity.Stream;
 import com.thlam05.steriox.modules.stream.repository.StreamRepository;
 import com.thlam05.steriox.modules.user.entity.User;

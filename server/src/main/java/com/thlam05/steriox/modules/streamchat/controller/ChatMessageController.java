@@ -1,4 +1,4 @@
-package com.thlam05.steriox.modules.chat.controller;
+package com.thlam05.steriox.modules.streamchat.controller;
 
 import java.util.List;
 
@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.thlam05.steriox.common.constant.ResponseCode;
 import com.thlam05.steriox.common.dto.ApiResponse;
-import com.thlam05.steriox.modules.chat.dto.request.CreateChatMessageRequest;
-import com.thlam05.steriox.modules.chat.dto.request.UpdateChatMessageRequest;
-import com.thlam05.steriox.modules.chat.dto.response.ChatMessageResponse;
-import com.thlam05.steriox.modules.chat.service.ChatMessageService;
+import com.thlam05.steriox.modules.streamchat.dto.request.CreateChatMessageRequest;
+import com.thlam05.steriox.modules.streamchat.dto.request.UpdateChatMessageRequest;
+import com.thlam05.steriox.modules.streamchat.dto.response.ChatMessageResponse;
+import com.thlam05.steriox.modules.streamchat.service.ChatMessageService;
 
 import lombok.RequiredArgsConstructor;
 

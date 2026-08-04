@@ -1,4 +1,4 @@
-package com.thlam05.steriox.modules.chat.dto.response;
+package com.thlam05.steriox.modules.streamchat.dto.response;
 
 import java.time.LocalDateTime;
 

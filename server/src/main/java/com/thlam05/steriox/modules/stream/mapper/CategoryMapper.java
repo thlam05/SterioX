@@ -20,6 +20,8 @@ public interface CategoryMapper {
     Category toCategory(CreateCategoryRequest request);
 
     @Mapping(target = "subCategories", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     CategoryResponse toCategoryResponse(Category category);
 
     List<CategoryResponse> toCategoryResponses(List<Category> categories);

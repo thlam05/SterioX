@@ -1,4 +1,4 @@
-package com.thlam05.steriox.modules.chat.entity;
+package com.thlam05.steriox.modules.streamchat.entity;
 
 import com.thlam05.steriox.common.model.BaseModel;
 import com.thlam05.steriox.modules.stream.entity.Stream;

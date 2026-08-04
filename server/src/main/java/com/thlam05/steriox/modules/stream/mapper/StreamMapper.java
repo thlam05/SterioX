@@ -27,6 +27,7 @@ public interface StreamMapper {
     @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "user.username", target = "username")
     @Mapping(source = "user.avatarImageUrl", target = "avatarImageUrl")
+    @Mapping(target = "createdAt", ignore = true)
     StreamResponse toStreamResponse(Stream stream);
 
     List<StreamResponse> toStreamResponses(List<Stream> streams);

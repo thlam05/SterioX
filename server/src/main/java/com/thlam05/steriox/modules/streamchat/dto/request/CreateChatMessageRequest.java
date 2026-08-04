@@ -1,4 +1,4 @@
-package com.thlam05.steriox.modules.chat.dto.request;
+package com.thlam05.steriox.modules.streamchat.dto.request;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,6 +12,6 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpdateChatMessageRequest {
+public class CreateChatMessageRequest {
     String content;
 }

@@ -18,6 +18,7 @@ public interface StreamKeyMapper {
     StreamKey toStreamKey(CreateStreamKeyRequest request);
 
     @Mapping(source = "user.id", target = "userId")
+    @Mapping(target = "updatedAt", ignore = true)
     StreamKeyResponse toStreamKeyResponse(StreamKey entity);
 
     List<StreamKeyResponse> toStreamKeyResponses(List<StreamKey> entities);
