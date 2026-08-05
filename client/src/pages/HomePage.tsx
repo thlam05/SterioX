@@ -1,32 +1,15 @@
 import { useState } from "react";
 import {
   Flame,
-  UserCheck,
-  Eye,
   Heart,
-  Radio,
   SlidersHorizontal,
   Compass,
+  Eye,
+  Radio,
+  UserCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-
-interface Streamer {
-  id: string;
-  name: string;
-  avatar: string;
-  isVerified?: boolean;
-}
-
-interface LiveStreamItem {
-  id: string;
-  title: string;
-  streamer: Streamer;
-  category: string;
-  thumbnail: string;
-  viewerCount: number;
-  isLive: boolean;
-  tags: string[];
-}
+import { Banner, type LiveStreamItem } from "@/components/features/home/Banner";
 
 interface Category {
   id: string;
@@ -47,7 +30,8 @@ const CATEGORIES: Category[] = [
 const MOCK_STREAMS: LiveStreamItem[] = [
   {
     id: "1",
-    title: "🔥 Tâm sự đêm khuya cùng mọi người | Chơi game & hát theo yêu cầu",
+    title: "Tâm sự đêm khuya cùng mọi người",
+    description: "lorem Tâm sự đêm khuya cùng mọi người",
     streamer: {
       id: "s1",
       name: "Minh Anh Live",
@@ -169,76 +153,7 @@ export default function HomePage() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 flex flex-col gap-8">
         {/* Featured Hero Banner */}
         {featuredStream && !searchQuery && selectedCategory === "all" && (
-          <section className="relative rounded-3xl overflow-hidden border border-border bg-accent/30 shadow-xl">
-            <div className="relative aspect-video md:aspect-[21/9] w-full overflow-hidden">
-              <img
-                src={featuredStream.thumbnail}
-                alt={featuredStream.title}
-                className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-
-              {/* LIVE Badge */}
-              <div className="absolute top-4 left-4 flex items-center gap-2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold shadow-md animate-pulse">
-                <span className="w-2 h-2 rounded-full bg-white" />
-                DANG LIVE
-              </div>
-
-              {/* Viewers Badge */}
-              <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-black/60 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-medium">
-                <Eye className="w-3.5 h-3.5 text-primary" />
-                <span>
-                  {featuredStream.viewerCount.toLocaleString()} người xem
-                </span>
-              </div>
-
-              {/* Hero Stream Info */}
-              <div className="absolute bottom-0 inset-x-0 p-6 md:p-8 flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
-                <div className="space-y-3 max-w-2xl">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={featuredStream.streamer.avatar}
-                      alt={featuredStream.streamer.name}
-                      className="w-12 h-12 rounded-full border-2 border-primary object-cover shadow-md"
-                    />
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <h3 className="font-bold text-lg md:text-xl text-foreground">
-                          {featuredStream.streamer.name}
-                        </h3>
-                        {featuredStream.streamer.isVerified && (
-                          <UserCheck className="w-4 h-4 text-primary" />
-                        )}
-                      </div>
-                      <p className="text-xs text-secondary font-medium">
-                        {featuredStream.category}
-                      </p>
-                    </div>
-                  </div>
-
-                  <h1 className="text-xl md:text-3xl font-extrabold text-foreground leading-tight drop-shadow-sm">
-                    {featuredStream.title}
-                  </h1>
-
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {featuredStream.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-xs px-2.5 py-1 rounded-md bg-primary-light text-primary font-medium border border-primary/20"
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <Button className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/25 transition-all">
-                  <Radio className="w-5 h-5 animate-pulse" />
-                  Xem Ngay
-                </Button>
-              </div>
-            </div>
-          </section>
+          <Banner stream={featuredStream} />
         )}
 
         {/* Category Filter Horizontal Scroll */}
