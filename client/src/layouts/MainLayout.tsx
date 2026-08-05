@@ -6,12 +6,10 @@ export default function MainLayout() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="flex">
+      <div className="flex min-h-[calc(100vh-64px)]">
         <Sidebar />
-        <main className="flex-1 p-4 lg:p-6">
-          <div className="rounded-2xl border border-border bg-accent/40 p-6 text-secondary">
-            <Outlet></Outlet>
-          </div>
+        <main className="flex-1 overflow-auto px-2 py-2 lg:px-4 lg:py-4">
+          <Outlet />
         </main>
       </div>
     </div>

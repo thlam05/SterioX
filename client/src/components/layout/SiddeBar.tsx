@@ -22,8 +22,8 @@ export default function Sidebar() {
   const pathname = location.pathname;
 
   return (
-    <aside className="hidden w-64 shrink-0 border-r border-border bg-background px-4 py-4 lg:flex lg:flex-col">
-      <nav className="flex flex-1 flex-col gap-1">
+    <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-border bg-background px-4 py-4 lg:flex lg:flex-col">
+      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.to;
@@ -38,14 +38,14 @@ export default function Sidebar() {
                   : "text-secondary hover:bg-primary-light hover:text-foreground"
               }`}
             >
-              <Icon className="h-5 w-5" />
+              <Icon className="h-5 w-5 shrink-0" />
               <span>{item.label}</span>
             </Link>
           );
         })}
       </nav>
 
-      <div className="mt-auto rounded-2xl border border-border bg-accent/60 p-3">
+      <div className="mt-auto shrink-0 rounded-2xl border border-border bg-accent/60 p-3">
         <p className="text-sm font-semibold text-foreground">
           Expand your experience
         </p>

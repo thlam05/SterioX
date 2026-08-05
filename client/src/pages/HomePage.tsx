@@ -146,7 +146,7 @@ const MOCK_STREAMS: LiveStreamItem[] = [
   },
 ];
 
-export default function HomeScreen() {
+export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -165,8 +165,6 @@ export default function HomeScreen() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
-      {/* Header Bar */}
-
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 flex flex-col gap-8">
         {/* Featured Hero Banner */}
