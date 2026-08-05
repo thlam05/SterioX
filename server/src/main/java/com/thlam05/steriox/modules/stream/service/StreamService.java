@@ -1,13 +1,16 @@
 package com.thlam05.steriox.modules.stream.service;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.thlam05.steriox.common.constant.ResponseCode;
 import com.thlam05.steriox.common.exception.AppException;
+import com.thlam05.steriox.common.util.S3Util;
 import com.thlam05.steriox.modules.stream.constant.StreamMessage;
 import com.thlam05.steriox.modules.stream.dto.request.CreateStreamRequest;
 import com.thlam05.steriox.modules.stream.dto.request.UpdateStreamRequest;
@@ -30,8 +33,9 @@ public class StreamService {
     private final UserRepository userRepository;
     private final StreamMapper streamMapper;
     private final EntityManager entityManager;
+    private final S3Util s3Util;
 
-    public StreamResponse create(CreateStreamRequest request, String userId) {
+    public StreamResponse create(CreateStreamRequest request, String userId, MultipartFile thumbnailFile) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ResponseCode.NOT_FOUND, StreamMessage.USER_NOT_FOUND));
 
@@ -41,6 +45,12 @@ public class StreamService {
         stream.setOnStream(false);
         stream.setTotalViews(0);
         stream.setTotalLikes(0);
+
+        try {
+            stream.setThumbnail(s3Util.uploadFile(thumbnailFile));
+        } catch (IOException e) {
+            throw new AppException(ResponseCode.INTERNAL_SERVER_ERROR, StreamMessage.THUMBNAIL_UPLOAD_FAILED);
+        }
 
         if (request.getCategoryIds() != null && !request.getCategoryIds().isEmpty()) {
             Set<Category> categories = new HashSet<>();
