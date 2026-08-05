@@ -18,7 +18,7 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">
-        <Button variant="primary" className="h-10">
+        <Button variant="primary" className="h-10 border-accent-foreground">
           <span>Go live</span>
         </Button>
 

@@ -1,15 +1,8 @@
 import { useState } from "react";
-import {
-  Flame,
-  Heart,
-  SlidersHorizontal,
-  Compass,
-  Eye,
-  Radio,
-  UserCheck,
-} from "lucide-react";
+import { Flame, SlidersHorizontal, Compass } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Banner, type LiveStreamItem } from "@/components/features/home/Banner";
+import { StreamCard } from "@/components/features/home/StreamCard";
 
 interface Category {
   id: string;
@@ -149,14 +142,11 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
-      {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 flex flex-col gap-8">
-        {/* Featured Hero Banner */}
         {featuredStream && !searchQuery && selectedCategory === "all" && (
           <Banner stream={featuredStream} />
         )}
 
-        {/* Category Filter Horizontal Scroll */}
         <section className="flex items-center justify-between gap-4 border-b border-border/60 pb-4">
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
             {CATEGORIES.map((cat) => {
@@ -220,75 +210,7 @@ export default function HomePage() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredStreams.map((stream) => (
-                <article
-                  key={stream.id}
-                  className="group flex flex-col bg-accent/20 border border-border/80 rounded-2xl overflow-hidden hover:shadow-xl hover:border-primary/40 transition-all duration-300"
-                >
-                  {/* Thumbnail Wrapper */}
-                  <div className="relative aspect-video w-full overflow-hidden bg-accent">
-                    <img
-                      src={stream.thumbnail}
-                      alt={stream.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-
-                    {/* LIVE Status Badge */}
-                    <div className="absolute top-3 left-3 bg-primary text-primary-foreground text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1.5 uppercase tracking-wider shadow-sm">
-                      <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                      Live
-                    </div>
-
-                    {/* Viewer Counter */}
-                    <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[11px] px-2.5 py-0.5 rounded-full flex items-center gap-1 font-medium">
-                      <Eye className="w-3 h-3 text-primary" />
-                      {stream.viewerCount.toLocaleString()}
-                    </div>
-
-                    {/* Overlay Play Action */}
-                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <div className="w-12 h-12 rounded-full bg-primary/90 text-primary-foreground flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
-                        <Radio className="w-6 h-6 animate-pulse" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card Info */}
-                  <div className="p-4 flex flex-col flex-1 justify-between gap-3">
-                    <div className="space-y-2">
-                      <h3 className="font-semibold text-sm line-clamp-2 text-foreground group-hover:text-primary transition-colors leading-snug">
-                        {stream.title}
-                      </h3>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-2 border-t border-border/40">
-                      <div className="flex items-center gap-2.5">
-                        <img
-                          src={stream.streamer.avatar}
-                          alt={stream.streamer.name}
-                          className="w-8 h-8 rounded-full object-cover border border-primary/40"
-                        />
-                        <div className="flex flex-col">
-                          <span className="text-xs font-medium text-foreground flex items-center gap-1">
-                            {stream.streamer.name}
-                            {stream.streamer.isVerified && (
-                              <UserCheck className="w-3 h-3 text-primary" />
-                            )}
-                          </span>
-                          <span className="text-[10px] text-secondary">
-                            {stream.category}
-                          </span>
-                        </div>
-                      </div>
-
-                      <Button
-                        variant="ghost"
-                        className="h-8 w-8 rounded-full text-secondary hover:text-primary hover:bg-primary-light/50 transition-colors"
-                      >
-                        <Heart className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </article>
+                <StreamCard key={stream.id} stream={stream} />
               ))}
             </div>
           )}
