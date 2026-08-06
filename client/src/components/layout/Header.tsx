@@ -2,6 +2,7 @@ import { Bell, Search } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import Logo from "@/components/ui/Logo";
+import { Link } from "react-router";
 
 export default function Header() {
   return (
@@ -18,9 +19,11 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3">
-        <Button variant="primary" className="h-10 border-accent-foreground">
-          <span>Go live</span>
-        </Button>
+        <Link to={"/streams/setup"}>
+          <Button variant="primary" className="h-10 border-accent-foreground">
+            <span>Go live</span>
+          </Button>
+        </Link>
 
         <Button
           variant="ghost"

@@ -23,7 +23,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const baseClasses =
-  "inline-flex flex-row items-center justify-center gap-2 whitespace-nowrap rounded-xl border font-semibold transition-all duration-200 outline-none active:scale-95 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-60";
+  "inline-flex flex-row items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-accent-foreground font-semibold transition-all duration-200 outline-none active:scale-95 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-60";
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
