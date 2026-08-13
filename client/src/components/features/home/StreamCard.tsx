@@ -1,6 +1,6 @@
 import { Eye, Heart, Play, UserCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import type { LiveStreamItem } from "./Banner";
+import type { LiveStreamItem } from "@/components/features/home/Banner";
 
 interface StreamCardProps {
   stream: LiveStreamItem;

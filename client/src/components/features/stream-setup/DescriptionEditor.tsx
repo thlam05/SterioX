@@ -100,7 +100,7 @@ export default function DescriptionEditor({
 
         <div className="relative pt-2">
           {!editor.getText().trim() && (
-            <span className="pointer-events-none absolute left-3 top-4 text-sm text-secondary/60">
+            <span className="pointer-events-none absolute left-3 top-4 text-sm text-secondary">
               {placeholder}
             </span>
           )}

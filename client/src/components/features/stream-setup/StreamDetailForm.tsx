@@ -1,110 +1,33 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
-import { Folder, Globe, Tag, Image as ImageIcon } from "lucide-react";
-import { Input } from "@/components/ui/Input";
-import DescriptionEditor from "./DescriptionEditor";
+import { Folder, Globe, Image as ImageIcon, Tag } from "lucide-react";
+import { useState } from "react";
 
-// --- Category data: 2 levels (category -> subcategories) ---
-const CATEGORIES = [
-  {
-    id: "gaming",
-    name: "Gaming",
-    subcategories: [
-      { id: "fps", name: "FPS" },
-      { id: "moba", name: "MOBA" },
-      { id: "rpg", name: "RPG" },
-      { id: "sandbox", name: "Sandbox / Survival" },
-    ],
-  },
-  {
-    id: "music",
-    name: "Music",
-    subcategories: [
-      { id: "live-performance", name: "Live Performance" },
-      { id: "dj-set", name: "DJ Set" },
-      { id: "production", name: "Music Production" },
-    ],
-  },
-  {
-    id: "talk",
-    name: "Just Chatting",
-    subcategories: [
-      { id: "irl", name: "IRL" },
-      { id: "qna", name: "Q&A" },
-      { id: "podcast", name: "Podcast" },
-    ],
-  },
-  {
-    id: "art",
-    name: "Art & Creative",
-    subcategories: [
-      { id: "drawing", name: "Drawing & Painting" },
-      { id: "design", name: "Design" },
-      { id: "crafting", name: "Crafting" },
-    ],
-  },
-  {
-    id: "education",
-    name: "Education",
-    subcategories: [
-      { id: "coding", name: "Coding" },
-      { id: "language", name: "Language Learning" },
-      { id: "science", name: "Science" },
-    ],
-  },
-  {
-    id: "sports",
-    name: "Sports",
-    subcategories: [
-      { id: "football", name: "Football" },
-      { id: "esports", name: "Esports" },
-      { id: "fitness", name: "Fitness" },
-    ],
-  },
-];
+import { Input } from "@/components/ui/Input";
+import DescriptionEditor from "@/components/features/stream-setup/DescriptionEditor";
+import {
+  CATEGORIES,
+  PRIVACY_OPTIONS,
+  type PrivacyValue,
+} from "@/constants/StreamCategories";
+import { useCategorySelection } from "@/hooks/features/stream-setup/useCategorySelection";
+import { useTagsInput } from "@/hooks/features/stream-setup/useTagInput";
+
+const TITLE_MAX_LENGTH = 100;
 
 export default function StreamDetailForm() {
   const [streamTitle, setStreamTitle] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState(CATEGORIES[0].id);
-  const [selectedSubcategory, setSelectedSubcategory] = useState(
-    CATEGORIES[0].subcategories[0].id,
-  );
-  const [privacy, setPrivacy] = useState("public");
+  const [privacy, setPrivacy] = useState<PrivacyValue>("public");
   const [description, setDescription] = useState("");
-  const [tags, setTags] = useState([]);
-  const [tagInput, setTagInput] = useState("");
 
-  const currentSubcategories = useMemo(() => {
-    return (
-      CATEGORIES.find((cat) => cat.id === selectedCategory)?.subcategories ?? []
-    );
-  }, [selectedCategory]);
+  const {
+    selectedCategory,
+    setSelectedCategory,
+    selectedSubcategory,
+    setSelectedSubcategory,
+    currentSubcategories,
+  } = useCategorySelection();
 
-  // Whenever the top-level category changes, reset subcategory to its first option
-  useEffect(() => {
-    if (currentSubcategories.length > 0) {
-      setSelectedSubcategory(currentSubcategories[0].id);
-    } else {
-      setSelectedSubcategory("");
-    }
-  }, [selectedCategory, currentSubcategories]);
-
-  // --- Tag handlers ---
-  const handleAddTag = useCallback(
-    (e) => {
-      if (e.key !== "Enter") return;
-      e.preventDefault();
-      const value = tagInput.trim().replace(/^#/, "");
-      if (value && !tags.includes(value)) {
-        setTags((prev) => [...prev, value]);
-      }
-      setTagInput("");
-    },
-    [tagInput, tags],
-  );
-
-  const handleRemoveTag = useCallback((tagToRemove) => {
-    setTags((prev) => prev.filter((t) => t !== tagToRemove));
-  }, []);
+  const { tags, tagInput, setTagInput, handleAddTag, handleRemoveTag } =
+    useTagsInput();
 
   return (
     <section className="lg:col-span-5 flex flex-col gap-6">
@@ -118,13 +41,13 @@ export default function StreamDetailForm() {
           <label className="text-xs font-semibold text-secondary flex items-center justify-between">
             <span>Stream Title</span>
             <span className="text-[10px] text-secondary">
-              {streamTitle.length}/100
+              {streamTitle.length}/{TITLE_MAX_LENGTH}
             </span>
           </label>
           <Input
             value={streamTitle}
             onChange={(e) => setStreamTitle(e.target.value)}
-            maxLength={100}
+            maxLength={TITLE_MAX_LENGTH}
             placeholder="Enter an engaging title for viewers..."
             className="bg-accent border border-border focus:ring-2 focus:ring-primary"
           />
@@ -171,12 +94,14 @@ export default function StreamDetailForm() {
             </label>
             <select
               value={privacy}
-              onChange={(e) => setPrivacy(e.target.value)}
+              onChange={(e) => setPrivacy(e.target.value as PrivacyValue)}
               className="w-full bg-accent border border-border rounded-xl px-3 py-2 text-sm font-medium text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
             >
-              <option value="public">Public</option>
-              <option value="unlisted">Unlisted</option>
-              <option value="private">Private</option>
+              {PRIVACY_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
         </div>
