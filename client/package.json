@@ -12,8 +12,12 @@
   "dependencies": {
     "@stomp/stompjs": "^7.3.0",
     "@tailwindcss/vite": "^4.3.0",
+    "@tiptap/pm": "^3.29.2",
+    "@tiptap/react": "^3.29.2",
+    "@tiptap/starter-kit": "^3.29.2",
     "@videojs/react": "^10.0.0-beta.24",
     "axios": "^1.16.1",
+    "dompurify": "^3.4.13",
     "hls.js": "^1.6.16",
     "lucide-react": "^1.16.0",
     "react": "^19.2.6",
