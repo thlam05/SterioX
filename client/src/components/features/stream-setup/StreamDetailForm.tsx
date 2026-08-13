@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Input } from "@/components/ui/Input";
 import DescriptionEditor from "@/components/features/stream-setup/DescriptionEditor";
 import {
-  CATEGORIES,
   PRIVACY_OPTIONS,
   type PrivacyValue,
 } from "@/constants/StreamCategories";
@@ -19,6 +18,8 @@ export default function StreamDetailForm() {
   const [description, setDescription] = useState("");
 
   const {
+    categories,
+    loading,
     selectedCategory,
     setSelectedCategory,
     selectedSubcategory,
@@ -63,13 +64,18 @@ export default function StreamDetailForm() {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full bg-accent border border-border rounded-xl px-3 py-2 text-sm font-medium text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+              disabled={loading}
+              className="w-full bg-accent border border-border rounded-xl px-3 py-2 text-sm font-medium text-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all disabled:opacity-50"
             >
-              {CATEGORIES.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
+              {loading ? (
+                <option value="">Loading categories...</option>
+              ) : (
+                categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))
+              )}
             </select>
 
             {/* Level 2: Subcategory, depends on selected category */}

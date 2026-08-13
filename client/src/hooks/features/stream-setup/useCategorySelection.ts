@@ -1,22 +1,35 @@
-import { CATEGORIES } from "@/constants/StreamCategories";
 import { useEffect, useMemo, useState } from "react";
+import { useCategories } from "@/hooks/common/useCategories";
 
 export function useCategorySelection() {
-  const [selectedCategory, setSelectedCategory] = useState(CATEGORIES[0].id);
-  const [selectedSubcategory, setSelectedSubcategory] = useState(
-    CATEGORIES[0].subcategories[0]?.id ?? "",
-  );
+  const { categories, loading, error } = useCategories();
 
-  const currentSubcategories = useMemo(
-    () => CATEGORIES.find((cat) => cat.id === selectedCategory)?.subcategories ?? [],
-    [selectedCategory],
-  );
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedSubcategory, setSelectedSubcategory] = useState("");
 
   useEffect(() => {
-    setSelectedSubcategory(currentSubcategories[0]?.id ?? "");
+    if (categories.length > 0 && !selectedCategory) {
+      setSelectedCategory(categories[0].id);
+    }
+  }, [categories, selectedCategory]);
+
+  const currentSubcategories = useMemo(() => {
+    if (!selectedCategory) return [];
+    return categories.find((cat) => cat.id === selectedCategory)?.subCategories ?? [];
+  }, [categories, selectedCategory]);
+
+  useEffect(() => {
+    if (currentSubcategories.length > 0) {
+      setSelectedSubcategory(currentSubcategories[0].id);
+    } else {
+      setSelectedSubcategory("");
+    }
   }, [currentSubcategories]);
 
   return {
+    categories,
+    loading,
+    error,
     selectedCategory,
     setSelectedCategory,
     selectedSubcategory,

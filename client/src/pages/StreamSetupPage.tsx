@@ -1,94 +1,12 @@
-import React, { useRef, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Settings, Radio, ArrowLeft, Video, VideoOff } from "lucide-react";
 import StreamCredentials from "@/components/features/stream-setup/StreamCredentials";
 import StreamDetailForm from "@/components/features/stream-setup/StreamDetailForm";
 
-interface StreamCategory {
-  id: string;
-  name: string;
-}
-
-const CATEGORIES: StreamCategory[] = [
-  { id: "chat", name: "Chat & Talk" },
-  { id: "gaming", name: "Gaming & Esports" },
-  { id: "beauty", name: "Beauty & Style" },
-  { id: "music", name: "Music & Performance" },
-  { id: "tech", name: "Technology & Programming" },
-  { id: "eating", name: "Mukbang & Food" },
-];
-
 export default function StreamSetupPage() {
-  const [streamTitle, setStreamTitle] = useState<string>(
-    "🔥 Weekend Hangout - Chat & Sing Requests",
-  );
-  const [description, setDescription] = useState<string>(
-    "<p>Hello everyone! Today I will <strong>chat</strong>, <em>sing</em> and hang out with you all.</p>",
-  );
-  const descriptionRef = useRef<HTMLDivElement>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>("chat");
-  const [privacy, setPrivacy] = useState<"public" | "private" | "unlisted">(
-    "public",
-  );
-  const [tags, setTags] = useState<string[]>(["Chill", "Chat", "Interactive"]);
-  const [tagInput, setTagInput] = useState<string>("");
-
   const [streamKey] = useState<string>("live_sk_94827103984719283741");
   const [streamUrl] = useState<string>("rtmp://live.pinklive.com/app/");
-  const [showStreamKey, setShowStreamKey] = useState<boolean>(false);
-  const [copiedKey, setCopiedKey] = useState<boolean>(false);
-  const [copiedUrl, setCopiedUrl] = useState<boolean>(false);
-
-  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && tagInput.trim()) {
-      e.preventDefault();
-      if (!tags.includes(tagInput.trim())) {
-        setTags([...tags, tagInput.trim()]);
-      }
-      setTagInput("");
-    }
-  };
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter((tag) => tag !== tagToRemove));
-  };
-
-  const handleFormatText = (command: "bold" | "italic" | "underline") => {
-    document.execCommand(command, false);
-    descriptionRef.current?.focus();
-  };
-
-  const handleInsertLink = () => {
-    const url = window.prompt("Enter URL:", "https://");
-    if (!url) return;
-
-    const selectedText = window.getSelection()?.toString() || "Link";
-    document.execCommand(
-      "insertHTML",
-      false,
-      `<a href="${url}" target="_blank" rel="noopener noreferrer">${selectedText}</a>`,
-    );
-    descriptionRef.current?.focus();
-    handleDescriptionInput();
-  };
-
-  const handleDescriptionInput = () => {
-    if (descriptionRef.current) {
-      setDescription(descriptionRef.current.innerHTML);
-    }
-  };
-
-  const handleCopyKey = () => {
-    navigator.clipboard.writeText(streamKey);
-    setCopiedKey(true);
-    setTimeout(() => setCopiedKey(false), 2000);
-  };
-
-  const handleCopyUrl = () => {
-    navigator.clipboard.writeText(streamUrl);
-    setCopiedUrl(true);
-    setTimeout(() => setCopiedUrl(false), 2000);
-  };
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
@@ -132,7 +50,7 @@ export default function StreamSetupPage() {
           </div>
 
           {/* Software / OBS Stream Credentials */}
-          <StreamCredentials streamUrl={streamUrl} streamKey={streamUrl} />
+          <StreamCredentials streamUrl={streamUrl} streamKey={streamKey} />
         </section>
 
         <StreamDetailForm></StreamDetailForm>
