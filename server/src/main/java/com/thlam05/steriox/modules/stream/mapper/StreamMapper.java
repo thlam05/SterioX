@@ -9,7 +9,7 @@ import com.thlam05.steriox.modules.stream.dto.request.CreateStreamRequest;
 import com.thlam05.steriox.modules.stream.dto.response.StreamResponse;
 import com.thlam05.steriox.modules.stream.entity.Stream;
 
-@Mapper(componentModel = "spring", uses = {CategoryMapper.class})
+@Mapper(componentModel = "spring", uses = { CategoryMapper.class })
 public interface StreamMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -18,6 +18,7 @@ public interface StreamMapper {
     @Mapping(target = "isActive", ignore = true)
     @Mapping(target = "onStream", ignore = true)
     @Mapping(target = "playUrl", ignore = true)
+    @Mapping(target = "thumbnail", ignore = true)
     @Mapping(target = "totalViews", ignore = true)
     @Mapping(target = "totalLikes", ignore = true)
     @Mapping(target = "startedAt", ignore = true)

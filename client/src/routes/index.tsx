@@ -1,7 +1,7 @@
 import MainLayout from "@/layouts/MainLayout";
 import HomePage from "@/pages/HomePage";
-import StreamSetupPage from "@/pages/StreamSetupPage";
-import { createBrowserRouter } from "react-router";
+import CreatorFlowPage from "@/pages/CreatorFlowPage";
+import { createBrowserRouter, Navigate } from "react-router";
 
 export const router = createBrowserRouter([
   {
@@ -14,7 +14,31 @@ export const router = createBrowserRouter([
       },
       {
         path: "/streams/setup",
-        element: <StreamSetupPage />,
+        element: <Navigate to="/creator/streams/room-aurora/new" replace />,
+      },
+      {
+        path: "/creator",
+        element: <CreatorFlowPage />,
+      },
+      {
+        path: "/creator/streams/:streamId/new",
+        element: <CreatorFlowPage />,
+      },
+      {
+        path: "/creator/streams/:streamId/setup",
+        element: <CreatorFlowPage />,
+      },
+      {
+        path: "/creator/streams/:streamId/check",
+        element: <CreatorFlowPage />,
+      },
+      {
+        path: "/creator/streams/:streamId/live",
+        element: <CreatorFlowPage />,
+      },
+      {
+        path: "/creator/streams/:streamId/summary",
+        element: <CreatorFlowPage />,
       },
     ],
   },
