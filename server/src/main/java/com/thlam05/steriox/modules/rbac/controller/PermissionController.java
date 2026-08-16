@@ -25,7 +25,7 @@ public class PermissionController {
 
     @GetMapping("/permissions")
     public ApiResponse<List<PermissionResponse>> getAll() {
-        var response = permissionService.getAll();
+        List<PermissionResponse> response = permissionService.getAll();
         return new ApiResponse<>(response);
     }
 

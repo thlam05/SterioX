@@ -1,234 +1,78 @@
-import { streamApi } from "@/api/streamApi";
-import { Button } from "@/components/ui/button";
-import { useAuthStore } from "@/stores/authStore";
-import type { StreamResponse } from "@/types/streamType";
-import {
-  Flame,
-  Eye,
-  ChevronRight,
-  TrendingUp,
-  Gamepad2,
-  Code,
-  Music,
-  MonitorPlay,
-  MoreVertical
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useState } from "react";
+import { Compass, Eye, Flame, Search, SlidersHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Banner, type LiveStreamItem } from "@/components/features/home/Banner";
+import { StreamCard } from "@/components/features/home/StreamCard";
+
+interface Category {
+  id: string;
+  name: string;
+}
+
+const CATEGORIES: Category[] = [
+  { id: "all", name: "All live" },
+  { id: "gaming", name: "Gaming" },
+  { id: "talk", name: "Talk" },
+  { id: "music", name: "Music" },
+  { id: "beauty", name: "Beauty" },
+  { id: "tech", name: "Tech" },
+  { id: "food", name: "Food" },
+];
+
+const MOCK_STREAMS: LiveStreamItem[] = [
+  { id: "1", title: "Late night stories, no script", description: "A quiet room for honest conversations and whatever is on your mind.", streamer: { id: "s1", name: "Minh Anh Live", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80", isVerified: true }, category: "Talk", thumbnail: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&auto=format&fit=crop&q=80", viewerCount: 12450, isLive: true, tags: ["Stories", "Chill"] },
+  { id: "2", title: "Ranked finals with the squad", streamer: { id: "s2", name: "ProGamer_VN", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150&auto=format&fit=crop&q=80", isVerified: true }, category: "Gaming", thumbnail: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&auto=format&fit=crop&q=80", viewerCount: 8920, isLive: true, tags: ["Esports", "FPS"] },
+  { id: "3", title: "Soft glam makeup session", streamer: { id: "s3", name: "Thao Nhi Beauty", avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" }, category: "Beauty", thumbnail: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&auto=format&fit=crop&q=80", viewerCount: 3410, isLive: true, tags: ["Makeup", "Tutorial"] },
+  { id: "4", title: "Acoustic night: take a request", streamer: { id: "s4", name: "Hoang Band", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80" }, category: "Music", thumbnail: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80", viewerCount: 5600, isLive: true, tags: ["Acoustic", "Live"] },
+  { id: "5", title: "Building a tiny AI workstation", streamer: { id: "s5", name: "TechMaster", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80", isVerified: true }, category: "Tech", thumbnail: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80", viewerCount: 1890, isLive: true, tags: ["Build", "AI"] },
+  { id: "6", title: "Seafood feast and fan questions", streamer: { id: "s6", name: "Foodie Linh", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&auto=format&fit=crop&q=80" }, category: "Food", thumbnail: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80", viewerCount: 7200, isLive: true, tags: ["Food", "Chat"] },
+];
 
 export default function HomePage() {
-  const { isAuthenticated } = useAuthStore();
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const navigate = useNavigate();
-
-  const [livestreams, setLivestreams] = useState<StreamResponse[]>([]);
-  const [topLivestreams, setTopLivestream] = useState<StreamResponse[]>([]);
-  const [regularLivestream, setRegularLivestream] = useState<StreamResponse[]>([]);
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/login");
-      return;
-    }
-
-    const fetchTopLivestreams = async () => {
-      try {
-        const livestreams = await streamApi.getTopStream();
-        console.log(livestreams);
-        setLivestreams(livestreams);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    fetchTopLivestreams();
-  }, [isAuthenticated, navigate]);
-
-  useEffect(() => {
-    if (!livestreams) return;
-
-    setTopLivestream(livestreams.slice(0, 2));
-    setRegularLivestream(livestreams.slice(2, 11));
-
-  }, [livestreams]);
-
-  const categories = [
-    { name: "Công nghệ & Đời sống", count: "12.4k đang xem", icon: Code, bgEmoji: "💻", color: "text-primary" },
-    { name: "Giải đấu Trò chơi", count: "45.2k đang xem", icon: Gamepad2, bgEmoji: "🎮", color: "text-info" },
-    { name: "Âm nhạc Trực tuyến", count: "8.9k đang xem", icon: Music, bgEmoji: "🎵", color: "text-success" },
-    { name: "Học tập & Sáng tạo", count: "5.1k đang xem", icon: MonitorPlay, bgEmoji: "📚", color: "text-warning" },
-  ];
+  const filteredStreams = MOCK_STREAMS.filter((stream) => {
+    const matchesCategory = selectedCategory === "all" || stream.category.toLowerCase() === selectedCategory;
+    const query = searchQuery.toLowerCase();
+    return matchesCategory && (!query || stream.title.toLowerCase().includes(query) || stream.streamer.name.toLowerCase().includes(query));
+  });
+  const featuredStream = MOCK_STREAMS[0];
 
   return (
-    <div className="w-full bg-background text-foreground font-sans space-y-10">
-
-      {/* Bố cục lưới tổng thể điều chỉnh theo yêu cầu đề bài */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 auto-rows-auto">
-
-        {/* Banner chiếm hết 1 hàng (4 cột trên md) và 2 ô dọc */}
-        <section className="md:col-span-4 md:row-span-2 relative rounded-3xl bg-foreground text-background p-6 md:p-10 overflow-hidden flex flex-col justify-between min-h-[360px] border border-accent shadow-xl">
-          <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/90 to-transparent z-10"></div>
-          <div className="absolute right-0 top-0 bottom-0 w-full md:w-1/2 opacity-30 md:opacity-100 flex items-center justify-center text-9xl select-none filter blur-sm">
-            ✨
+    <div className="min-h-[calc(100dvh-64px)] bg-background text-foreground">
+      <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-8 px-4 py-7 sm:px-6 lg:px-10 lg:py-10">
+        <header className="flex flex-col gap-7 border-b border-border/70 pb-8 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.22em] text-primary">Pinklive / discover</p>
+            <h1 className="max-w-xl text-4xl font-black tracking-[-0.055em] text-foreground sm:text-5xl">Find your next live room.</h1>
+            <p className="mt-3 max-w-lg text-sm leading-6 text-secondary">A hand-picked view of what is happening now, from quiet conversations to loud victories.</p>
           </div>
-
-          <div className="z-20 max-w-xl space-y-4">
-            <span className="inline-flex items-center gap-1.5 bg-danger text-background px-3 py-1 rounded-full text-xs font-bold tracking-wide">
-              <Flame className="w-3.5 h-3.5" /> Sự kiện công nghệ lớn nhất năm
-            </span>
-            <h2 className="text-3xl md:text-5xl font-black leading-tight text-background">
-              SterioX Developer Conference 2026
-            </h2>
-            <p className="text-sm md:text-base text-accent max-w-md leading-relaxed">
-              Cập nhật những xu hướng công nghệ đột phá nhất, kết nối các lập trình viên xuất sắc và trải nghiệm không gian triển lãm ảo.
-            </p>
-          </div>
-
-          <div className="z-20 flex flex-wrap items-center gap-4 pt-6">
-            <div className="flex items-center gap-2 text-xs md:text-sm text-accent">
-              <TrendingUp className="w-4 h-4 text-success" /> <strong>45.9k</strong> người đang theo dõi sự kiện trực tiếp
+          <div className="flex w-full items-center gap-2 sm:max-w-sm">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-secondary" />
+              <input value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Search rooms or creators" className="h-11 w-full rounded-xl border border-border bg-accent pl-10 pr-4 text-sm text-foreground outline-none transition placeholder:text-secondary focus:border-primary focus:ring-4 focus:ring-primary/10" />
             </div>
+            <Button variant="ghost" aria-label="Open filters" className="h-11 w-11 rounded-xl border border-border bg-accent p-0 text-secondary hover:text-primary"><SlidersHorizontal className="h-4 w-4" /></Button>
           </div>
+        </header>
+
+        {!searchQuery && selectedCategory === "all" && <Banner stream={featuredStream} />}
+
+        <section className="space-y-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-primary/20 bg-primary-light text-primary"><Flame className="h-4 w-4" /></span>
+              <div><h2 className="text-xl font-extrabold tracking-[-0.03em]">{selectedCategory === "all" ? "Live right now" : CATEGORIES.find((category) => category.id === selectedCategory)?.name}</h2><p className="text-xs text-secondary">{filteredStreams.length} rooms are broadcasting</p></div>
+            </div>
+            <div className="flex items-center gap-2 text-xs font-semibold text-secondary"><Eye className="h-3.5 w-3.5" /> Updated moments ago</div>
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+            {CATEGORIES.map((category) => <button key={category.id} onClick={() => setSelectedCategory(category.id)} className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition active:scale-95 ${selectedCategory === category.id ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "border border-border bg-accent text-secondary hover:border-primary/50 hover:text-primary"}`}>{category.name}</button>)}
+          </div>
+          {filteredStreams.length === 0 ? <div className="rounded-2xl border border-dashed border-border bg-accent py-20 text-center"><Compass className="mx-auto mb-4 h-8 w-8 text-secondary" /><p className="font-semibold">No rooms match that search.</p><button onClick={() => { setSelectedCategory("all"); setSearchQuery(""); }} className="mt-3 text-sm font-bold text-primary hover:underline">Clear filters</button></div> : <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">{filteredStreams.map((stream) => <StreamCard key={stream.id} stream={stream} />)}</div>}
         </section>
-
-        {/* Tiêu đề phần Livestream view cao */}
-        <div className="md:col-span-4 flex justify-between items-center pt-4">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-6 bg-danger rounded-full"></div>
-            <h3 className="text-xl font-extrabold tracking-tight">Livestream xu hướng xem nhiều</h3>
-          </div>
-          <Button variant="outline" className="text-xs font-bold flex items-center gap-1 border-accent">
-            Xem tất cả <ChevronRight className="w-4 h-4" />
-          </Button>
-        </div>
-
-        {/* 1 luồng Stream (video) view cao chiếm 2 ô ngang 1 ô dọc */}
-        {topLivestreams.map((stream, index) => (
-          <Link to={`/livestreams/${stream.id}`} key={index} className="md:col-span-2 md:row-span-1 group flex flex-col bg-background border border-accent rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-200">
-            <div className="relative aspect-video bg-foreground overflow-hidden">
-              <div className="absolute top-3 left-3 bg-danger text-background text-xs font-black px-2 py-0.5 rounded-md tracking-wider z-10">
-                Live
-              </div>
-              <div className="absolute top-3 right-3 bg-foreground/80 text-background text-xs font-bold px-2 py-0.5 rounded-md flex items-center gap-1 z-10 backdrop-blur-sm">
-                <Eye className="w-3.5 h-3.5 text-danger" /> {stream.totalViews}
-              </div>
-              <div className="w-full h-full flex items-center justify-center group-hover:scale-105 transition-transform duration-300 select-none overflow-hidden">
-                <img
-                  src={stream.thumbnail}
-                  alt="Stream thumbnail"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-
-            <div className="p-4 flex gap-3 flex-1 bg-background">
-              <div className="w-10 h-10 rounded-full bg-accent text-foreground flex items-center justify-center font-bold shrink-0 border border-primary">
-                <img
-                  src={stream.user?.avatarImageUrl}
-                  alt={stream.user?.username || "Avatar"}
-                  className="w-full h-full rounded-full object-cover"
-                />
-              </div>
-              <div className="flex-1 space-y-1 min-w-0">
-                <h4 className="text-sm font-bold text-foreground leading-snug truncate group-hover:text-primary transition-colors">
-                  {stream.title}
-                </h4>
-                <p className="text-xs font-medium text-secondary">
-                  {stream.user.username}
-                </p>
-                <div className="flex gap-1 pt-1">
-                  {stream.categories.map((category, tIdx) => (
-                    <span key={tIdx} className="text-[10px] font-bold bg-selection text-primary px-2 py-0.5 rounded-md">
-                      {category.name}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <Button variant="outline" className="p-1 border-none bg-transparent text-secondary hover:text-foreground h-8 w-8">
-                <MoreVertical className="w-4 h-4" />
-              </Button>
-            </div>
-          </Link>
-        ))}
-
-        {/* Tiêu đề phần Chuyên mục và Các livestream khác */}
-        <div className="md:col-span-4 flex justify-between items-center pt-6">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-6 bg-primary rounded-full"></div>
-            <h3 className="text-xl font-extrabold tracking-tight">Khám phá theo chuyên mục</h3>
-          </div>
-          <Button variant="outline" className="text-xs font-bold flex items-center gap-1 border-accent">
-            Xem tất cả <ChevronRight className="w-4 h-4" />
-          </Button>
-        </div>
-
-        {/* Danh sách các Category: Mỗi category chiếm 2 ô dọc 1 ô ngang */}
-        {categories.map((cat, index) => (
-          <div key={index} className="md:col-span-1 md:row-span-2 group relative rounded-2xl border border-accent bg-background p-4 flex flex-col justify-between overflow-hidden hover:border-primary transition-all duration-200 min-h-[220px]">
-            <div className="absolute -right-4 -bottom-4 text-7xl opacity-10 group-hover:opacity-20 transition-opacity select-none">
-              {cat.bgEmoji}
-            </div>
-
-            <div className="space-y-3 z-10">
-              <div className={`w-10 h-10 rounded-xl bg-accent flex items-center justify-center ${cat.color}`}>
-                <cat.icon className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="text-base font-bold text-foreground leading-tight group-hover:text-primary transition-colors">
-                  {cat.name}
-                </h4>
-                <p className="text-xs text-secondary mt-1">
-                  {cat.count}
-                </p>
-              </div>
-            </div>
-
-            <div className="z-10 pt-4">
-              <Button variant="outline" className="w-full text-xs font-bold py-2 border-accent hover:bg-selection hover:text-primary rounded-xl transition-colors">
-                Xem chi tiết
-              </Button>
-            </div>
-          </div>
-        ))}
-
-        {/* Tiêu đề cho các livestream khác */}
-        <div className="md:col-span-4 flex justify-between items-center pt-6">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-6 bg-info rounded-full"></div>
-            <h3 className="text-xl font-extrabold tracking-tight">Các buổi livestream đang diễn ra</h3>
-          </div>
-          <Button variant="outline" className="text-xs font-bold flex items-center gap-1 border-accent">
-            Xem tất cả <ChevronRight className="w-4 h-4" />
-          </Button>
-        </div>
-
-        {/* Các livestream khác xếp theo lưới tiêu chuẩn của hàng nội dung */}
-        {regularLivestream.map((stream, index) => (
-          <Link to={`/livestreams/${stream.id}`} key={index} className="md:col-span-1 group flex flex-col bg-background border border-accent rounded-2xl overflow-hidden hover:border-secondary transition-all duration-200">
-            <div className="relative aspect-video bg-foreground overflow-hidden">
-              <div className="absolute top-2 left-2 bg-secondary text-background text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
-                Đang phát
-              </div>
-              <div className="absolute top-2 right-2 bg-foreground/60 text-background text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1">
-                <Eye className="w-3 h-3 text-info" /> {stream.totalViews}
-              </div>
-              <div className="w-full h-full flex items-center justify-center text-4xl group-hover:scale-105 transition-transform duration-300 select-none">
-                {stream.thumbnail}
-              </div>
-            </div>
-
-            <div className="p-3 flex-1 flex flex-col justify-between space-y-2 bg-background">
-              <h4 className="text-xs font-bold text-foreground leading-snug line-clamp-2 group-hover:text-primary transition-colors">
-                {stream.title}
-              </h4>
-              <p className="text-[11px] font-medium text-secondary truncate">
-                {stream.user.username}
-              </p>
-            </div>
-          </Link>
-        ))}
-
-      </div>
+      </main>
     </div>
   );
 }

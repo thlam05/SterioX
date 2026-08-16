@@ -18,5 +18,4 @@ public class CreateStreamRequest {
     String title;
     String description;
     Set<String> categoryIds;
-    String thumbnail;
 }

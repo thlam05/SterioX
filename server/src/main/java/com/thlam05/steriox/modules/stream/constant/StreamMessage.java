@@ -21,4 +21,5 @@ public class StreamMessage {
     public static final String CATEGORY_UPDATE_REQUEST_REQUIRED = "Category update request is required";
     public static final String CATEGORY_NAME_NOT_BLANK = "Category name must not be blank";
     public static final String CATEGORY_SLUG_NOT_BLANK = "Category slug must not be blank";
+    public static final String THUMBNAIL_UPLOAD_FAILED = "Can not upload the file";
 }

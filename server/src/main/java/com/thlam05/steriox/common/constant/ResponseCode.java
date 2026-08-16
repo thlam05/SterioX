@@ -52,4 +52,3 @@ public enum ResponseCode {
     private final String message;
     private final HttpStatus httpStatus;
 }
-

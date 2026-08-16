@@ -2,6 +2,7 @@ package com.thlam05.steriox.modules.stream.controller;
 
 import java.util.List;
 
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,7 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.thlam05.steriox.common.constant.ResponseCode;
 import com.thlam05.steriox.common.dto.ApiResponse;
@@ -27,11 +30,18 @@ public class StreamController {
 
     private final StreamService streamService;
 
-    @PostMapping("/streams")
-    public ApiResponse<StreamResponse> create(@RequestBody CreateStreamRequest request, Authentication authentication) {
+    @PostMapping(value = "/streams", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<StreamResponse> create(@RequestBody CreateStreamRequest request,
+            @RequestPart(value = "image", required = false) MultipartFile thumbnailFile,
+            Authentication authentication) {
         String userId = authentication.getName();
-        StreamResponse response = streamService.create(request, userId);
+        StreamResponse response = streamService.create(request, userId, thumbnailFile);
         return new ApiResponse<>(response);
+    }
+
+    @PostMapping("/streams/{id}/views")
+    public String viewStream(@PathVariable String id) {
+        return "";
     }
 
     @GetMapping("/streams")
