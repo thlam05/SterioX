@@ -1,60 +1,14 @@
 import { useState } from "react";
+import { ArrowLeft, Check, Radio, Settings, Signal, Video, VideoOff } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Settings, Radio, ArrowLeft, Video, VideoOff } from "lucide-react";
 import StreamCredentials from "@/components/features/stream-setup/StreamCredentials";
 import StreamDetailForm from "@/components/features/stream-setup/StreamDetailForm";
 
+const steps = ["Room details", "Broadcast source", "Go live"];
+
 export default function StreamSetupPage() {
-  const [streamKey] = useState<string>("live_sk_94827103984719283741");
-  const [streamUrl] = useState<string>("rtmp://live.pinklive.com/app/");
+  const [streamKey] = useState("live_sk_94827103984719283741");
+  const [streamUrl] = useState("rtmp://live.pinklive.com/app/");
 
-  return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
-      <div className="sticky top-0 z-40 bg-background/90 backdrop-blur-md border-b border-border px-4 lg:px-8 py-3 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            className="rounded-full text-secondary hover:text-foreground"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Button variant="ghost">
-            <Settings className="w-4 h-4" />
-            <span>Advanced Settings</span>
-          </Button>
-          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-6 py-2 rounded-xl shadow-lg shadow-primary/25 transition-all flex items-center gap-2">
-            <Radio className="w-4 h-4" />
-            <span>Start Live Stream</span>
-          </Button>
-        </div>
-      </div>
-
-      <div className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Live Preview & Hardware Setup (7 cols) */}
-        <section className="lg:col-span-7 flex flex-col gap-6">
-          {/* Live Preview */}
-          <div className="bg-accent/30 border border-border rounded-2xl p-5 space-y-3">
-            <h3 className="font-bold text-base flex items-center gap-2 text-foreground">
-              <Video className="w-4 h-4 text-primary" />
-              Live Preview
-            </h3>
-            <div className="aspect-video w-full rounded-xl bg-accent border border-border flex flex-col items-center justify-center gap-2">
-              <VideoOff className="w-8 h-8 text-secondary" />
-              <p className="text-xs text-secondary font-medium">
-                No signal from broadcasting software yet
-              </p>
-            </div>
-          </div>
-
-          {/* Software / OBS Stream Credentials */}
-          <StreamCredentials streamUrl={streamUrl} streamKey={streamKey} />
-        </section>
-
-        <StreamDetailForm></StreamDetailForm>
-      </div>
-    </div>
-  );
+  return <div className="min-h-[calc(100dvh-68px)] bg-background text-foreground"><div className="border-b border-border/70 bg-background/90 px-4 py-4 backdrop-blur sm:px-6 lg:px-10"><div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4"><div className="flex items-center gap-3"><Button variant="ghost" aria-label="Go back" className="h-10 w-10 rounded-xl border border-border bg-accent p-0 text-secondary"><ArrowLeft className="h-4 w-4" /></Button><div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Creator studio</p><h1 className="text-lg font-black tracking-[-0.035em]">Set up your live room</h1></div></div><div className="flex items-center gap-2"><Button variant="ghost" className="hidden text-secondary sm:flex"><Settings className="h-4 w-4" /> Advanced settings</Button><Button className="rounded-xl bg-foreground px-4 text-primary-foreground shadow-lg shadow-foreground/15 hover:brightness-125"><Radio className="h-4 w-4 text-primary" /> Start live stream</Button></div></div></div><div className="mx-auto max-w-[1440px] px-4 py-7 sm:px-6 lg:px-10 lg:py-9"><div className="mb-7 grid grid-cols-3 gap-2 sm:max-w-xl">{steps.map((step, index) => <div key={step} className="flex items-center gap-2"><span className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${index < 2 ? "bg-primary-light text-primary" : "border border-border bg-accent text-secondary"}`}>{index < 2 ? <Check className="h-3.5 w-3.5" /> : index + 1}</span><span className="hidden text-xs font-bold text-secondary sm:block">{step}</span>{index < 2 && <span className="h-px flex-1 bg-border" />}</div>)}</div><div className="grid grid-cols-1 gap-6 lg:grid-cols-12"><section className="flex flex-col gap-6 lg:col-span-7"><div className="overflow-hidden rounded-2xl border border-border bg-accent/60 shadow-xl shadow-foreground/5"><div className="flex items-center justify-between border-b border-border/70 px-5 py-4"><div><h2 className="flex items-center gap-2 text-sm font-extrabold"><Video className="h-4 w-4 text-primary" /> Live preview</h2><p className="mt-1 text-xs text-secondary">Your broadcast will appear here once connected.</p></div><span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-secondary"><Signal className="h-3.5 w-3.5" /> Waiting for signal</span></div><div className="m-5 flex aspect-video flex-col items-center justify-center gap-3 rounded-xl bg-foreground text-center"><div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-foreground/10 text-primary-foreground/50"><VideoOff className="h-5 w-5" /></div><div><p className="text-sm font-bold text-primary-foreground/80">No signal yet</p><p className="mt-1 text-xs text-primary-foreground/40">Start your broadcasting software to preview video.</p></div></div></div><StreamCredentials streamUrl={streamUrl} streamKey={streamKey} /></section><StreamDetailForm /></div></div></div>;
 }

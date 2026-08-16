@@ -29,7 +29,7 @@ export function Banner({ stream }: BannerProps) {
   }).format(stream.viewerCount);
 
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-black text-white shadow-2xl">
+    <section className="relative overflow-hidden rounded-3xl border border-border bg-foreground text-primary-foreground shadow-2xl">
       <div className="relative aspect-[16/9] md:aspect-[21/9] w-full min-h-[360px]">
         <img
           src={stream.thumbnail}
@@ -37,30 +37,30 @@ export function Banner({ stream }: BannerProps) {
           className="h-full w-full object-cover"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-black/30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-foreground/90 via-foreground/60 to-foreground/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-transparent to-foreground/30" />
 
         <div className="absolute inset-0 p-6 md:p-10 flex flex-col justify-between">
           <div className="flex items-center gap-2.5">
             {stream.isLive && (
-              <span className="flex items-center gap-1.5 rounded-full bg-live px-3 py-1 text-xs font-bold uppercase text-white shadow-md">
-                <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
+              <span className="flex items-center gap-1.5 rounded-full bg-live px-3 py-1 text-xs font-bold uppercase text-primary-foreground shadow-md">
+                <span className="h-2 w-2 rounded-full bg-primary-foreground animate-pulse" />
                 LIVE
               </span>
             )}
 
-            <span className="rounded-full bg-white/15 px-3.5 py-1 text-xs font-medium text-white/90 backdrop-blur-md border border-white/10">
+              <span className="rounded-full bg-primary-foreground/15 px-3.5 py-1 text-xs font-medium text-primary-foreground/90 backdrop-blur-md border border-primary-foreground/10">
               {stream.category}
             </span>
           </div>
 
           <div className="max-w-2xl space-y-3">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white drop-shadow-md">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-primary-foreground drop-shadow-md">
               {stream.title}
             </h1>
 
             {stream.description && (
-              <p className="text-sm md:text-base text-white/80 line-clamp-2 leading-relaxed max-w-xl">
+              <p className="text-sm md:text-base text-primary-foreground/80 line-clamp-2 leading-relaxed max-w-xl">
                 {stream.description}
               </p>
             )}
@@ -74,17 +74,17 @@ export function Banner({ stream }: BannerProps) {
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2 overflow-hidden">
                   <img
-                    className="inline-block h-7 w-7 rounded-full ring-2 ring-black object-cover"
+                    className="inline-block h-7 w-7 rounded-full ring-2 ring-foreground object-cover"
                     src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80"
                     alt="Viewer 1"
                   />
                   <img
-                    className="inline-block h-7 w-7 rounded-full ring-2 ring-black object-cover"
+                    className="inline-block h-7 w-7 rounded-full ring-2 ring-foreground object-cover"
                     src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&auto=format&fit=crop&q=80"
                     alt="Viewer 2"
                   />
                 </div>
-                <span className="text-xs font-bold text-white/90 bg-white/10 px-2 py-0.5 rounded-full border border-white/10">
+                <span className="text-xs font-bold text-primary-foreground/90 bg-primary-foreground/10 px-2 py-0.5 rounded-full border border-primary-foreground/10">
                   +{formattedViewers}
                 </span>
               </div>

@@ -17,16 +17,16 @@ export function StreamCard({ stream }: StreamCardProps) {
         />
 
         <div className="absolute top-3 left-3 bg-live text-primary-foreground text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1.5 uppercase tracking-wider shadow-sm">
-          <span className="w-1.5 h-1.5 rounded-full bg-white" />
+          <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />
           Live
         </div>
 
-        <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-[11px] px-2.5 py-0.5 rounded-full flex items-center gap-1 font-medium">
+          <div className="absolute top-3 right-3 bg-foreground/60 backdrop-blur-md text-primary-foreground text-[11px] px-2.5 py-0.5 rounded-full flex items-center gap-1 font-medium">
           <Eye className="w-3 h-3 text-live" />
           {stream.viewerCount.toLocaleString()}
         </div>
 
-        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+        <div className="absolute inset-0 bg-foreground/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
           <div className="w-12 h-12 rounded-full bg-live/90 text-primary-foreground flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
             <Play className="w-6 h-6" />
           </div>

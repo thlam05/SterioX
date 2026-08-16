@@ -32,10 +32,8 @@ export default function StreamDetailForm() {
 
   return (
     <section className="lg:col-span-5 flex flex-col gap-6">
-      <div className="bg-accent/30 border border-border rounded-2xl p-5 space-y-5 flex-1">
-        <h3 className="font-bold text-base flex items-center gap-2 text-foreground border-b border-border/60 pb-3">
-          Live Room Information
-        </h3>
+      <div className="flex-1 space-y-6 rounded-2xl border border-border bg-accent/60 p-5 shadow-xl shadow-foreground/5">
+        <div className="border-b border-border/70 pb-4"><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Step 01</p><h3 className="mt-1 text-base font-extrabold text-foreground">Room details</h3><p className="mt-1 text-xs text-secondary">Give your audience a reason to join.</p></div>
 
         {/* Title */}
         <div className="space-y-2">
@@ -157,7 +155,7 @@ export default function StreamDetailForm() {
             <ImageIcon className="w-3.5 h-3.5 text-primary" />
             Stream Thumbnail
           </label>
-          <div className="border-2 border-dashed border-border hover:border-primary/50 rounded-xl p-4 text-center bg-accent/40 transition-colors flex flex-col items-center justify-center gap-2 cursor-pointer">
+          <div className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-accent/40 p-4 text-center transition-colors hover:border-primary/50">
             <ImageIcon className="w-8 h-8 text-secondary" />
             <div className="space-y-0.5">
               <p className="text-xs font-semibold text-foreground">

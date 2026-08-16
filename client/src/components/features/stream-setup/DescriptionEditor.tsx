@@ -88,7 +88,7 @@ export default function DescriptionEditor({
                 className={[
                   "rounded-md p-2 transition-colors",
                   isActive
-                    ? "bg-primary text-white"
+                    ? "bg-primary text-primary-foreground"
                     : "text-secondary hover:bg-background hover:text-foreground",
                 ].join(" ")}
               >

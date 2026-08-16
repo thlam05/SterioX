@@ -4,11 +4,11 @@ import { Outlet } from "react-router";
 
 export default function MainLayout() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-[100dvh] bg-background">
       <Header />
-      <div className="flex min-h-[calc(100vh-64px)]">
+      <div className="flex min-h-[calc(100dvh-68px)]">
         <Sidebar />
-        <main className="flex-1 overflow-auto px-2 py-2 lg:px-4 lg:py-4">
+        <main className="min-w-0 flex-1 overflow-auto">
           <Outlet />
         </main>
       </div>

@@ -20,12 +20,12 @@ export default function StreamCredentials({
   const { isCopied: isKeyCopied, copy: copyKey } = useCopyToClipboard();
 
   return (
-    <div className="bg-accent/30 border border-border rounded-2xl p-5 space-y-4">
+    <div className="space-y-5 rounded-2xl border border-border bg-accent/60 p-5 shadow-xl shadow-foreground/5">
       <div className="flex items-center justify-between">
-        <h3 className="font-bold text-base flex items-center gap-2 text-foreground">
+        <div><h3 className="flex items-center gap-2 text-base font-extrabold text-foreground">
           <Radio className="w-4 h-4 text-primary" />
-          Streaming Software Setup (OBS / Prism)
-        </h3>
+          Broadcast source
+        </h3><p className="mt-1 text-xs text-secondary">Connect OBS, Prism, or another RTMP source.</p></div>
         <span className="text-xs text-secondary flex items-center gap-1">
           <AlertCircle className="w-3.5 h-3.5 text-warning" /> Never share your
           live stream key

@@ -23,27 +23,27 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const baseClasses =
-  "inline-flex flex-row items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-accent-foreground font-semibold transition-all duration-200 outline-none active:scale-95 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-60";
+  "inline-flex flex-row items-center justify-center gap-2 whitespace-nowrap rounded-xl border font-semibold transition-all duration-200 outline-none active:scale-95 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-60";
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-primary text-primary-foreground hover:brightness-95 active:brightness-90",
+    "border-primary bg-primary text-primary-foreground hover:brightness-95 active:brightness-90",
 
   secondary:
-    "bg-secondary text-secondary-foreground hover:brightness-95 active:brightness-90",
+    "border-secondary bg-secondary text-secondary-foreground hover:brightness-95 active:brightness-90",
 
-  live: "bg-live text-white hover:brightness-95 active:brightness-90",
+  live: "border-live bg-live text-primary-foreground hover:brightness-95 active:brightness-90",
 
-  success: "bg-success text-white hover:brightness-95 active:brightness-90",
+  success: "border-success bg-success text-primary-foreground hover:brightness-95 active:brightness-90",
 
-  danger: "bg-danger text-white hover:brightness-95 active:brightness-90",
+  danger: "border-danger bg-danger text-primary-foreground hover:brightness-95 active:brightness-90",
 
-  warning: "bg-warning text-white hover:brightness-95 active:brightness-90",
+  warning: "border-warning bg-warning text-primary-foreground hover:brightness-95 active:brightness-90",
 
-  info: "bg-info text-white hover:brightness-95 active:brightness-90",
+  info: "border-info bg-info text-primary-foreground hover:brightness-95 active:brightness-90",
 
   ghost:
-    "bg-accent text-accent-foreground hover:bg-primary-light hover:text-foreground active:brightness-95",
+    "border-border bg-accent text-accent-foreground hover:border-primary/50 hover:bg-primary-light hover:text-foreground active:brightness-95",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
